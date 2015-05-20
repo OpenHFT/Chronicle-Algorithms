@@ -28,7 +28,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>chronicle-algorithms</artifactId>
-    <version>1.0.0-alpha</version>
+    <version>1.0.1-alpha-SNAPSHOT</version>
     <name>OpenHFT/Chronicle-Algorithms</name>
     <description>Chronicle-Algorithms</description>
 
@@ -157,7 +157,7 @@
         <connection>scm:git:git@github.com:OpenHFT/Chronicle-Algorithms.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/Chronicle-Algorithms.git
         </developerConnection>
-        <tag>chronicle-algorithms-1.0.0-alpha</tag>
+        <tag>master</tag>
     </scm>
 
 </project>
