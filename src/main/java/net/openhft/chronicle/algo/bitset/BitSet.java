@@ -30,7 +30,7 @@ public interface BitSet {
     /**
      * Returned if no entry is found
      */
-    public static final long NOT_FOUND = -1L;
+    long NOT_FOUND = -1L;
 
     /**
      * Sets the bit at the specified index to the complement of its
