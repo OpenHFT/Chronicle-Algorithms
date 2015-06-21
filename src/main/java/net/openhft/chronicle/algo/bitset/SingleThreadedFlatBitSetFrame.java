@@ -31,6 +31,11 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     public static final long ALL_ONES = ~0L;
 
     // masks
+    private final long longLength;
+
+    public SingleThreadedFlatBitSetFrame(long logicalSize) {
+        longLength = BITS.toLongs(logicalSize);
+    }
 
     static long singleBit(long bitIndex) {
         return 1L << bitIndex;
@@ -44,6 +49,8 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         return ALL_ONES >>> ~bitIndex;
     }
 
+    // conversions
+
     static long higherBitsExcludingThis(long bitIndex) {
         return ~(ALL_ONES >>> ~bitIndex);
     }
@@ -52,14 +59,8 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         return ~(ALL_ONES << bitIndex);
     }
 
-    // conversions
-
     static long longWithThisBit(long bitIndex) {
         return bitIndex >> 6;
-    }
-
-    long byteWithThisBit(long offset, long bitIndex) {
-        return offset + ((bitIndex >> 6) << 3);
     }
 
     static long firstByte(long offset, long longIndex) {
@@ -74,19 +75,12 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         return firstBit(longIndex) + 63;
     }
 
-    private final long longLength;
-
-    public SingleThreadedFlatBitSetFrame(long logicalSize) {
-        LONGS.checkAligned(logicalSize, BITS);
-        longLength = BITS.toLongs(logicalSize);
-    }
-
-    // checks
-
     static void checkNumberOfBits(int numberOfBits) {
         if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException("Illegal number of bits: " + numberOfBits);
     }
+
+    // checks
 
     static boolean checkNotFoundIndex(long fromIndex) {
         if (fromIndex < 0) {
@@ -95,6 +89,10 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
             throw new IndexOutOfBoundsException();
         }
         return false;
+    }
+
+    long byteWithThisBit(long offset, long bitIndex) {
+        return offset + ((bitIndex >> 6) << 3);
     }
 
     private void checkIndex(long bitIndex, long longIndex) {
@@ -415,42 +413,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         return NOT_FOUND;
     }
 
-    private class SetBits implements Bits {
-        private final long byteLength = longLength << 3;
-        private long byteIndex;
-        private long bitIndex;
-        private long currentWord;
-
-        @Override
-        public <T> Bits reset(Access<T> access, T handle, long offset) {
-            byteIndex = 0;
-            bitIndex = -1;
-            currentWord = access.readLong(handle, offset);
-            return this;
-        }
-
-        @Override
-        public <T> long next(Access<T> access, T handle, long offset) {
-            long l;
-            if ((l = currentWord) != 0) {
-                int trailingZeros = numberOfTrailingZeros(l);
-                currentWord = (l >>> trailingZeros) >>> 1;
-                return bitIndex += trailingZeros + 1;
-            }
-            for (long i = byteIndex, lim = byteLength; (i += 8) < lim; ) {
-                if ((l = access.readLong(handle, i)) != 0) {
-                    byteIndex = i;
-                    int trailingZeros = numberOfTrailingZeros(l);
-                    currentWord = (l >>> trailingZeros) >>> 1;
-                    return bitIndex = (i << 3) + trailingZeros;
-                }
-            }
-            currentWord = 0;
-            byteIndex = byteLength;
-            return -1;
-        }
-    }
-
     @Override
     public Bits setBits() {
         return new SetBits();
@@ -489,6 +451,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
         return NOT_FOUND;
     }
+
     @Override
     public <T> long nextClearBit(Access<T> access, T handle, long offset, long fromIndex) {
         if (fromIndex < 0)
@@ -560,7 +523,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
         return NOT_FOUND;
     }
-
 
     private <T> long previousSetBit(Access<T> access, T handle, long offset,
                                     long fromIndex, long inclusiveToIndex) {
@@ -1144,6 +1106,42 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                     continue longLoop;
                 }
             }
+        }
+    }
+
+    private class SetBits implements Bits {
+        private final long byteLength = longLength << 3;
+        private long byteIndex;
+        private long bitIndex;
+        private long currentWord;
+
+        @Override
+        public <T> Bits reset(Access<T> access, T handle, long offset) {
+            byteIndex = 0;
+            bitIndex = -1;
+            currentWord = access.readLong(handle, offset);
+            return this;
+        }
+
+        @Override
+        public <T> long next(Access<T> access, T handle, long offset) {
+            long l;
+            if ((l = currentWord) != 0) {
+                int trailingZeros = numberOfTrailingZeros(l);
+                currentWord = (l >>> trailingZeros) >>> 1;
+                return bitIndex += trailingZeros + 1;
+            }
+            for (long i = byteIndex, lim = byteLength; (i += 8) < lim; ) {
+                if ((l = access.readLong(handle, i)) != 0) {
+                    byteIndex = i;
+                    int trailingZeros = numberOfTrailingZeros(l);
+                    currentWord = (l >>> trailingZeros) >>> 1;
+                    return bitIndex = (i << 3) + trailingZeros;
+                }
+            }
+            currentWord = 0;
+            byteIndex = byteLength;
+            return -1;
         }
     }
 }

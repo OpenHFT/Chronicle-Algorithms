@@ -31,8 +31,15 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
     private final long longLength;
 
     public ConcurrentFlatBitSetFrame(long logicalSize) {
-        LONGS.checkAligned(logicalSize, BITS);
         longLength = BITS.toLongs(logicalSize);
+    }
+
+    private static long rightShiftOneFill(long l, long shift) {
+        return (l >> shift) | ~(ALL_ONES >>> shift);
+    }
+
+    private static long leftShiftOneFill(long l, long shift) {
+        return (l << shift) | ((1L << shift) - 1L);
     }
 
     private <T> long readLong(Access<T> access, T handle, long offset, long longIndex) {
@@ -350,52 +357,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         return NOT_FOUND;
     }
 
-    private class SetBits implements Bits {
-        private long byteIndex = 0;
-        private final long byteLength = longLength << 3;
-        private long bitIndex = 0;
-
-        @Override
-        public <T> Bits reset(Access<T> access, T handle, long offset) {
-            byteIndex = 0;
-            bitIndex = 0;
-            return this;
-        }
-
-        @Override
-        public <T> long next(Access<T> access, T handle, long offset) {
-            long bitIndex = this.bitIndex;
-            if (bitIndex >= 0) {
-                long i = byteIndex;
-                long l = access.readVolatileLong(handle, i) >>> bitIndex;
-                if (l != 0) {
-                    int trailingZeros = numberOfTrailingZeros(l);
-                    long index = bitIndex + trailingZeros;
-                    if (((this.bitIndex = index + 1) & 63) == 0) {
-                        if ((byteIndex = i + 8) == byteLength)
-                            this.bitIndex = -1;
-                    }
-                    return index;
-                }
-                for (long lim = byteLength; (i += 8) < lim; ) {
-                    if ((l = access.readLong(handle, i)) != 0) {
-                        int trailingZeros = numberOfTrailingZeros(l);
-                        long index = (i << 3) + trailingZeros;
-                        if (((this.bitIndex = index + 1) & 63) != 0) {
-                            byteIndex = i;
-                        } else {
-                            if ((byteIndex = i + 8) == lim)
-                                this.bitIndex = -1;
-                        }
-                        return index;
-                    }
-                }
-            }
-            this.bitIndex = -1;
-            return -1;
-        }
-    }
-
     @Override
     public Bits setBits() {
         return new SetBits();
@@ -646,10 +607,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         return count;
     }
 
-    private static long rightShiftOneFill(long l, long shift) {
-        return (l >> shift) | ~(ALL_ONES >>> shift);
-    }
-
     /**
      * WARNING! This implementation doesn't strictly follow the contract
      * from {@code DirectBitSet} interface. For the sake of atomicity this
@@ -843,10 +800,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         }
     }
 
-    private static long leftShiftOneFill(long l, long shift) {
-        return (l << shift) | ((1L << shift) - 1L);
-    }
-
     /**
      * WARNING! This implementation doesn't strictly follow the contract
      * from {@code DirectBitSet} interface. For the sake of atomicity this
@@ -857,7 +810,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
-    public <T> long setPreviousNContinuousClearBits(Access<T> access, T handle, long offset, 
+    public <T> long setPreviousNContinuousClearBits(Access<T> access, T handle, long offset,
             long fromIndex, int numberOfBits) {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
@@ -953,7 +906,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
-    public <T> long clearPreviousNContinuousSetBits(Access<T> access, T handle, long offset, 
+    public <T> long clearPreviousNContinuousSetBits(Access<T> access, T handle, long offset,
             long fromIndex, int numberOfBits) {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
@@ -1033,6 +986,52 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             byteIndex -= 8;
             bitIndex = lastBit(longIndex);
             l = w = access.readLong(handle, byteIndex);
+        }
+    }
+
+    private class SetBits implements Bits {
+        private final long byteLength = longLength << 3;
+        private long byteIndex = 0;
+        private long bitIndex = 0;
+
+        @Override
+        public <T> Bits reset(Access<T> access, T handle, long offset) {
+            byteIndex = 0;
+            bitIndex = 0;
+            return this;
+        }
+
+        @Override
+        public <T> long next(Access<T> access, T handle, long offset) {
+            long bitIndex = this.bitIndex;
+            if (bitIndex >= 0) {
+                long i = byteIndex;
+                long l = access.readVolatileLong(handle, i) >>> bitIndex;
+                if (l != 0) {
+                    int trailingZeros = numberOfTrailingZeros(l);
+                    long index = bitIndex + trailingZeros;
+                    if (((this.bitIndex = index + 1) & 63) == 0) {
+                        if ((byteIndex = i + 8) == byteLength)
+                            this.bitIndex = -1;
+                    }
+                    return index;
+                }
+                for (long lim = byteLength; (i += 8) < lim; ) {
+                    if ((l = access.readLong(handle, i)) != 0) {
+                        int trailingZeros = numberOfTrailingZeros(l);
+                        long index = (i << 3) + trailingZeros;
+                        if (((this.bitIndex = index + 1) & 63) != 0) {
+                            byteIndex = i;
+                        } else {
+                            if ((byteIndex = i + 8) == lim)
+                                this.bitIndex = -1;
+                        }
+                        return index;
+                    }
+                }
+            }
+            this.bitIndex = -1;
+            return -1;
         }
     }
 }

@@ -17,20 +17,17 @@
 package net.openhft.chronicle.algo.bitset;
 
 import static net.openhft.chronicle.core.MemoryUnit.BITS;
-import static net.openhft.chronicle.core.MemoryUnit.LONGS;
 
 enum FlatBitSetAlgorithm implements BitSetAlgorithm {
     INSTANCE;
 
     @Override
     public long sizeInBytes(long logicalSize) {
-        LONGS.checkAligned(logicalSize, BITS);
         return BITS.toBytes(logicalSize);
     }
 
     @Override
     public long maxLogicalSizeFittingSameSizeInBytes(long logicalSize) {
-        LONGS.checkAligned(logicalSize, BITS);
         return logicalSize;
     }
 }
