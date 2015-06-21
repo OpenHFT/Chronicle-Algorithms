@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.locks;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 /**
  * Logic of read-write-update lock state transitions.

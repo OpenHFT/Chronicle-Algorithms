@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.bitset;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 /**
  */
@@ -416,6 +416,29 @@ public interface BitSetFrame {
      * @return an iteration of <i>set</i> bits in <i>direct</i> order
      */
     Bits setBits();
+
+    /**
+     * An iteration of bits in a bit set.
+     * <p>
+     * <p>Usage idiom: <pre>{@code
+     * Bits bits = bitSet.setBits();
+     * for (long bit; (bit = bits.next()) >= 0;) {
+     *     // do something with the bit
+     * }}</pre>
+     */
+    interface Bits {
+
+        <T> Bits reset(Access<T> access, T handle, long offset);
+
+        /**
+         * Returns index of the next bit in the iteration,
+         * or {@code -1} if there are no more bits.
+         *
+         * @return index of the next bit in the iteration,
+         * or {@code -1} if there are no more bits
+         */
+        <T> long next(Access<T> access, T handle, long offset);
+    }
 
     BitSetAlgorithm algorithm();
 }

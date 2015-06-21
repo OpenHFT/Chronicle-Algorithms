@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.locks;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 public interface AcquisitionStrategy<S extends LockingStrategy, E extends Exception> {
 

@@ -16,8 +16,8 @@
 
 package net.openhft.chronicle.algo.hashing;
 
-import net.openhft.chronicle.bytes.Accessor;
-import net.openhft.chronicle.bytes.ReadAccess;
+import net.openhft.chronicle.algo.bytes.Accessor;
+import net.openhft.chronicle.algo.bytes.ReadAccess;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
@@ -26,8 +26,8 @@ import java.nio.ByteOrder;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.ByteOrder.nativeOrder;
-import static net.openhft.chronicle.bytes.Access.nativeAccess;
-import static net.openhft.chronicle.bytes.Accessor.*;
+import static net.openhft.chronicle.algo.bytes.Access.nativeAccess;
+import static net.openhft.chronicle.algo.bytes.Accessor.*;
 
 /**
  * Hash function producing {@code long}-valued result from byte sequences of any length and
@@ -68,9 +68,14 @@ import static net.openhft.chronicle.bytes.Accessor.*;
  * do defensive checks, and access only bytes within the requested range.
  */
 public abstract class LongHashFunction implements Serializable {
+    static final boolean NATIVE_LITTLE_ENDIAN = nativeOrder() == LITTLE_ENDIAN;
     private static final long serialVersionUID = 0L;
 
-    static final boolean NATIVE_LITTLE_ENDIAN = nativeOrder() == LITTLE_ENDIAN;
+    /**
+     * Constructor for use in subclasses.
+     */
+    protected LongHashFunction() {
+    }
 
     /**
      * Returns a hash function implementing
@@ -144,11 +149,6 @@ public abstract class LongHashFunction implements Serializable {
         if (len < 0 || off < 0 || off + len > arrayLength || off + len < 0)
             throw new IndexOutOfBoundsException();
     }
-
-    /**
-     * Constructor for use in subclasses.
-     */
-    protected LongHashFunction() {}
 
     /**
      * Returns the hash code for the given {@code long} value; this method is consistent with
@@ -225,7 +225,7 @@ public abstract class LongHashFunction implements Serializable {
 
     public <S, T, A extends ReadAccess<T>> long hash(
             Accessor<S, T, A> accessor, S source, long off, long len) {
-        return hash(accessor.handle(source), accessor.access(source),
+        return hash(accessor.handle(source), accessor.access(),
                 accessor.offset(source, off), accessor.size(len));
     }
 

@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.bitset;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 @SuppressWarnings("unchecked")
 public class ReusableBitSet implements BitSet {
@@ -177,6 +177,11 @@ public class ReusableBitSet implements BitSet {
                 fromIndex, numberOfBits);
     }
 
+    @Override
+    public Bits setBits() {
+        return new Bits(frame.setBits());
+    }
+
     protected class Bits implements BitSet.Bits {
         protected BitSetFrame.Bits frameBits;
 
@@ -194,10 +199,5 @@ public class ReusableBitSet implements BitSet {
         public long next() {
             return frameBits.next(access, handle, offset);
         }
-    }
-
-    @Override
-    public Bits setBits() {
-        return new Bits(frame.setBits());
     }
 }

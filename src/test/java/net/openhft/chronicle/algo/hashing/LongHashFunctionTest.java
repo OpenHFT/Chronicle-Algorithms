@@ -16,16 +16,13 @@
 
 package net.openhft.chronicle.algo.hashing;
 
-import net.openhft.chronicle.bytes.Access;
-import net.openhft.chronicle.bytes.Accessor;
 import sun.nio.ch.DirectBuffer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import static java.nio.ByteOrder.*;
-import static net.openhft.chronicle.bytes.Accessor.booleanArrayAccessor;
-import static net.openhft.chronicle.bytes.Accessor.checkedCharSequenceAccess;
+import static net.openhft.chronicle.algo.bytes.Accessor.checkedCharSequenceAccess;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 

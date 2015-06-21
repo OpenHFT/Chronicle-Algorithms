@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.hashing;
 
-import net.openhft.chronicle.bytes.ReadAccess;
+import net.openhft.chronicle.algo.bytes.ReadAccess;
 
 import static java.lang.Long.reverseBytes;
 import static java.lang.Long.rotateRight;
@@ -32,12 +32,13 @@ class CityHash_1_1 {
 
     private static final CityHash_1_1 NATIVE_CITY = NATIVE_LITTLE_ENDIAN ?
             CityHash_1_1.INSTANCE : BigEndian.INSTANCE;
-
-    private CityHash_1_1() {}
-
     private static final long K0 = 0xc3a5c85c97cb3127L;
     private static final long K1 = 0xb492b66fbe98f273L;
     private static final long K2 = 0x9ae16a3b2f90404fL;
+    private static final long K_MUL = 0x9ddfea08eb382d69L;
+
+    private CityHash_1_1() {
+    }
 
     private static long shiftMix(long val) {
         return val ^ (val >>> 47);
@@ -46,8 +47,6 @@ class CityHash_1_1 {
     private static long hashLen16(long u, long v) {
         return hashLen16(u, v, K_MUL);
     }
-
-    private static final long K_MUL = 0x9ddfea08eb382d69L;
 
     private static long hashLen16(long u, long v, long mul) {
         long a = shiftMix((u ^ v) * mul);
@@ -75,6 +74,18 @@ class CityHash_1_1 {
         long c = rotateRight(last8Bytes, 37) * mul + a;
         long d = (rotateRight(a, 25) + last8Bytes) * mul;
         return hashLen16(c, d, mul);
+    }
+
+    public static LongHashFunction asLongHashFunctionWithoutSeed() {
+        return AsLongHashFunction.INSTANCE;
+    }
+
+    public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
+        return new AsLongHashFunctionSeeded(K2, seed);
+    }
+
+    public static LongHashFunction asLongHashFunctionWithTwoSeeds(long seed0, long seed1) {
+        return new AsLongHashFunctionSeeded(seed0, seed1);
     }
 
     <T> long fetch64(ReadAccess<T> access, T in, long off) {
@@ -271,6 +282,11 @@ class CityHash_1_1 {
     private static class AsLongHashFunction extends LongHashFunction {
         public static final AsLongHashFunction INSTANCE = new AsLongHashFunction();
         private static final long serialVersionUID = 0L;
+        private static final int FIRST_SHORT_BYTE_SHIFT = NATIVE_LITTLE_ENDIAN ? 0 : 8;
+        // JIT could probably optimize & -1 to no-op
+        private static final int FIRST_SHORT_BYTE_MASK = NATIVE_LITTLE_ENDIAN ? 0xFF : -1;
+        private static final int SECOND_SHORT_BYTE_SHIFT = 8 - FIRST_SHORT_BYTE_SHIFT;
+        private static final int SECOND_SHORT_BYTE_MASK = NATIVE_LITTLE_ENDIAN ? -1 : 0xFF;
 
         private Object readResolve() {
             return INSTANCE;
@@ -295,12 +311,6 @@ class CityHash_1_1 {
         public long hashShort(short input) {
             return hashChar((char) input);
         }
-
-        private static final int FIRST_SHORT_BYTE_SHIFT = NATIVE_LITTLE_ENDIAN ? 0 : 8;
-        // JIT could probably optimize & -1 to no-op
-        private static final int FIRST_SHORT_BYTE_MASK = NATIVE_LITTLE_ENDIAN ? 0xFF : -1;
-        private static final int SECOND_SHORT_BYTE_SHIFT = 8 - FIRST_SHORT_BYTE_SHIFT;
-        private static final int SECOND_SHORT_BYTE_MASK = NATIVE_LITTLE_ENDIAN ? -1 : 0xFF;
 
         @Override
         public long hashChar(char input) {
@@ -339,10 +349,6 @@ class CityHash_1_1 {
         }
     }
 
-    public static LongHashFunction asLongHashFunctionWithoutSeed() {
-        return AsLongHashFunction.INSTANCE;
-    }
-
     private static class AsLongHashFunctionSeeded extends AsLongHashFunction {
         private static final long serialVersionUID = 0L;
 
@@ -364,13 +370,5 @@ class CityHash_1_1 {
         protected long finalize(long hash) {
             return hashLen16(hash - seed0, seed1);
         }
-    }
-
-    public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
-        return new AsLongHashFunctionSeeded(K2, seed);
-    }
-
-    public static LongHashFunction asLongHashFunctionWithTwoSeeds(long seed0, long seed1) {
-        return new AsLongHashFunctionSeeded(seed0, seed1);
     }
 }

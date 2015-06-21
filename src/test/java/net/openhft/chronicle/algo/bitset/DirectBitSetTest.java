@@ -16,9 +16,8 @@
 
 package net.openhft.chronicle.algo.bitset;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.bytes.Bytes;
-import net.openhft.chronicle.core.MemoryUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -27,11 +26,21 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static net.openhft.chronicle.bytes.Access.checkedByteBufferAccess;
+import static net.openhft.chronicle.algo.bytes.Access.checkedByteBufferAccess;
 import static org.junit.Assert.*;
 
 @RunWith(value = Parameterized.class)
 public class DirectBitSetTest {
+
+    private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
+    private ReusableBitSet bs;
+    private boolean singleThreaded;
+
+    public DirectBitSetTest(ReusableBitSet bs) {
+        this.bs = bs;
+        singleThreaded = bs.frame instanceof SingleThreadedFlatBitSetFrame;
+        assertTrue(bs.logicalSize() >= 256);
+    }
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
@@ -69,17 +78,6 @@ public class DirectBitSetTest {
                 },
 
         });
-    }
-
-    private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
-
-    private ReusableBitSet bs;
-    private boolean singleThreaded;
-
-    public DirectBitSetTest(ReusableBitSet bs) {
-        this.bs = bs;
-        singleThreaded = bs.frame instanceof SingleThreadedFlatBitSetFrame;
-        assertTrue(bs.logicalSize() >= 256);
     }
 
     private void setIndices() {

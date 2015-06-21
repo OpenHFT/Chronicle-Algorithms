@@ -16,28 +16,26 @@
 
 package net.openhft.chronicle.algo.locks;
 
-import net.openhft.chronicle.bytes.Access;
-import net.openhft.chronicle.bytes.ReadAccess;
+import net.openhft.chronicle.algo.bytes.Access;
+import net.openhft.chronicle.algo.bytes.ReadAccess;
 
 public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractReadWriteLockingStrategy
         implements ReadWriteWithWaitsLockingStrategy {
-
-    private static final ReadWriteWithWaitsLockingStrategy INSTANCE =
-            new VanillaReadWriteWithWaitsLockingStrategy();
-
-    public static ReadWriteWithWaitsLockingStrategy instance() {
-        return INSTANCE;
-    }
-
-    private VanillaReadWriteWithWaitsLockingStrategy() {}
-
 
     static final int RW_LOCK_LIMIT = 30;
     static final long RW_READ_LOCKED = 1L;
     static final long RW_WRITE_WAITING = 1L << RW_LOCK_LIMIT;
     static final long RW_WRITE_LOCKED = 1L << 2 * RW_LOCK_LIMIT;
     static final int RW_LOCK_MASK = (1 << RW_LOCK_LIMIT) - 1;
+    private static final ReadWriteWithWaitsLockingStrategy INSTANCE =
+            new VanillaReadWriteWithWaitsLockingStrategy();
 
+    private VanillaReadWriteWithWaitsLockingStrategy() {
+    }
+
+    public static ReadWriteWithWaitsLockingStrategy instance() {
+        return INSTANCE;
+    }
 
     static int rwReadLocked(long lock) {
         return (int) (lock & RW_LOCK_MASK);

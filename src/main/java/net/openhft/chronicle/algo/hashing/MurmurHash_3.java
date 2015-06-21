@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.hashing;
 
-import net.openhft.chronicle.bytes.ReadAccess;
+import net.openhft.chronicle.algo.bytes.ReadAccess;
 
 import static java.lang.Long.reverseBytes;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
@@ -36,6 +36,51 @@ class MurmurHash_3 {
     private static final long C2 = 0x4cf5ad432745937fL;
 
     private MurmurHash_3() {}
+
+    private static long finalize(long length, long h1, long h2) {
+        h1 ^= length;
+        h2 ^= length;
+
+        h1 += h2;
+        h2 += h1;
+
+        h1 = fmix64(h1);
+        h2 = fmix64(h2);
+
+        h1 += h2;
+        return h1;
+    }
+
+    private static long fmix64(long k) {
+        k ^= k >>> 33;
+        k *= 0xff51afd7ed558ccdL;
+        k ^= k >>> 33;
+        k *= 0xc4ceb9fe1a85ec53L;
+        k ^= k >>> 33;
+        return k;
+    }
+
+    private static long mixK1(long k1) {
+        k1 *= C1;
+        k1 = Long.rotateLeft(k1, 31);
+        k1 *= C2;
+        return k1;
+    }
+
+    private static long mixK2(long k2) {
+        k2 *= C2;
+        k2 = Long.rotateLeft(k2, 33);
+        k2 *= C1;
+        return k2;
+    }
+
+    public static LongHashFunction asLongHashFunctionWithoutSeed() {
+        return AsLongHashFunction.INSTANCE;
+    }
+
+    public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
+        return new AsLongHashFunctionSeeded(seed);
+    }
 
     <T> long fetch64(ReadAccess<T> access, T in, long off) {
         return access.readLong(in, off);
@@ -196,43 +241,6 @@ class MurmurHash_3 {
         return finalize(length, h1, h2);
     }
 
-    private static long finalize(long length, long h1, long h2) {
-        h1 ^= length;
-        h2 ^= length;
-
-        h1 += h2;
-        h2 += h1;
-
-        h1 = fmix64(h1);
-        h2 = fmix64(h2);
-
-        h1 += h2;
-        return h1;
-    }
-
-    private static long fmix64(long k) {
-        k ^= k >>> 33;
-        k *= 0xff51afd7ed558ccdL;
-        k ^= k >>> 33;
-        k *= 0xc4ceb9fe1a85ec53L;
-        k ^= k >>> 33;
-        return k;
-    }
-
-    private static long mixK1(long k1) {
-        k1 *= C1;
-        k1 = Long.rotateLeft(k1, 31);
-        k1 *= C2;
-        return k1;
-    }
-
-    private static long mixK2(long k2) {
-        k2 *= C2;
-        k2 = Long.rotateLeft(k2, 33);
-        k2 *= C1;
-        return k2;
-    }
-
     private static class BigEndian extends MurmurHash_3 {
         private static final BigEndian INSTANCE = new BigEndian();
         private BigEndian() {}
@@ -323,10 +331,6 @@ class MurmurHash_3 {
         }
     }
 
-    public static LongHashFunction asLongHashFunctionWithoutSeed() {
-        return AsLongHashFunction.INSTANCE;
-    }
-
     private static class AsLongHashFunctionSeeded extends AsLongHashFunction {
         private static final long serialVersionUID = 0L;
 
@@ -355,9 +359,5 @@ class MurmurHash_3 {
         public long hashVoid() {
             return voidHash;
         }
-    }
-
-    public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
-        return new AsLongHashFunctionSeeded(seed);
     }
 }

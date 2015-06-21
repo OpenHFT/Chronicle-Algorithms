@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.locks;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrategy {
 

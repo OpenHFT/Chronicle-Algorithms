@@ -16,13 +16,13 @@
 
 package net.openhft.chronicle.algo.bitset;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 import static java.lang.Long.numberOfLeadingZeros;
 import static java.lang.Long.numberOfTrailingZeros;
+import static net.openhft.chronicle.algo.bitset.MemoryUnit.BITS;
+import static net.openhft.chronicle.algo.bitset.MemoryUnit.LONGS;
 import static net.openhft.chronicle.algo.bitset.SingleThreadedFlatBitSetFrame.*;
-import static net.openhft.chronicle.core.MemoryUnit.BITS;
-import static net.openhft.chronicle.core.MemoryUnit.LONGS;
 
 /**
  * DirectBitSet with input validations and ThreadSafe memory access.

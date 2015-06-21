@@ -17,7 +17,9 @@
 package net.openhft.chronicle.algo.locks;
 
 
-import net.openhft.chronicle.bytes.*;
+import net.openhft.chronicle.algo.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Accessor;
+import net.openhft.chronicle.bytes.BytesStore;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,28 +31,15 @@ import java.util.Collection;
 import java.util.concurrent.*;
 
 import static java.util.Arrays.asList;
+import static net.openhft.chronicle.algo.bytes.Accessor.uncheckedByteBufferAccessor;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.ADDRESS;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.BYTES_WITH_OFFSET;
-import static net.openhft.chronicle.bytes.Accessor.checkedByteBufferAccessor;
-import static net.openhft.chronicle.bytes.Accessor.uncheckedByteBufferAccessor;
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(value = Parameterized.class)
 public class LockingStrategyTest {
     
-    enum AccessMethod {ADDRESS, BYTES_WITH_OFFSET}
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        return asList(new Object[][] {
-                {VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), ADDRESS},
-                {VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), BYTES_WITH_OFFSET},
-                {VanillaReadWriteWithWaitsLockingStrategy.instance(), ADDRESS},
-                {VanillaReadWriteWithWaitsLockingStrategy.instance(), BYTES_WITH_OFFSET},
-        });
-    }
-
     ExecutorService e1, e2;
     ByteBuffer buffer;
     BytesStore bytesStore;
@@ -59,10 +48,58 @@ public class LockingStrategyTest {
     AccessMethod accessMethod;
     Access access;
     Object handle;
+    TestReadWriteLockState rwLockState = new TestReadWriteLockState();
+    Callable<Boolean> tryReadLockTask = new Callable<Boolean>() {
+        @Override
+        public Boolean call() throws Exception {
+            return rwls().tryReadLock();
+        }
+    };
+    TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
+    Runnable readUnlockTask = new Runnable() {
+        @Override
+        public void run() {
+            rwls().readUnlock();
+        }
+    };
+    Callable<Boolean> tryUpdateLockTask = new Callable<Boolean>() {
+        @Override
+        public Boolean call() throws Exception {
+            return rwuls().tryUpdateLock();
+        }
+    };
+    Runnable updateUnlockTask = new Runnable() {
+        @Override
+        public void run() {
+            rwuls().updateUnlock();
+        }
+    };
+    Callable<Boolean> tryWriteLockTask = new Callable<Boolean>() {
+        @Override
+        public Boolean call() throws Exception {
+            return rwls().tryWriteLock();
+        }
+    };
+    Runnable writeUnlockTask = new Runnable() {
+        @Override
+        public void run() {
+            rwls().writeUnlock();
+        }
+    };
 
     public LockingStrategyTest(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
         this.lockingStrategy = lockingStrategy;
         this.accessMethod = accessMethod;
+    }
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        return asList(new Object[][]{
+                {VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), ADDRESS},
+                {VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), BYTES_WITH_OFFSET},
+                {VanillaReadWriteWithWaitsLockingStrategy.instance(), ADDRESS},
+                {VanillaReadWriteWithWaitsLockingStrategy.instance(), BYTES_WITH_OFFSET},
+        });
     }
 
     @Before
@@ -75,13 +112,13 @@ public class LockingStrategyTest {
         buffer = ByteBuffer.allocateDirect(8);
         if (accessMethod == ADDRESS) {
             Accessor.Full<ByteBuffer, ?> accessor = uncheckedByteBufferAccessor(buffer);
-            access = accessor.access(buffer);
+            access = accessor.access();
             handle = accessor.handle(buffer);
             offset = accessor.offset(buffer, 0);
         } else {
             bytesStore = BytesStore.wrap(buffer);
             Accessor.Full<BytesStore, ?> accessor = Accessor.checkedBytesStoreAccessor();
-            access = accessor.access(bytesStore);
+            access = accessor.access();
             handle = accessor.handle(bytesStore);
             offset = accessor.offset(bytesStore, 0);
         }
@@ -95,154 +132,13 @@ public class LockingStrategyTest {
         e2.shutdown();
     }
 
-    Callable<Boolean> tryReadLockTask = new Callable<Boolean>() {
-        @Override
-        public Boolean call() throws Exception {
-            return rwls().tryReadLock();
-        }
-    };
-
-    class TestReadWriteLockState extends AbstractReadWriteLockState {
-
-        private ReadWriteLockingStrategy rwls() {
-            return (ReadWriteLockingStrategy) lockingStrategy;
-        }
-
-        @Override
-        public boolean tryReadLock() {
-            return rwls().tryReadLock(access, handle, offset);
-        }
-
-        @Override
-        public boolean tryWriteLock() {
-            return rwls().tryWriteLock(access, handle, offset);
-        }
-
-        @Override
-        public boolean tryUpgradeReadToWriteLock() {
-            return rwls().tryUpgradeReadToWriteLock(access, handle, offset);
-        }
-
-        @Override
-        public void readUnlock() {
-            rwls().readUnlock(access, handle, offset);
-        }
-
-        @Override
-        public void writeUnlock() {
-            rwls().writeUnlock(access, handle, offset);
-        }
-
-        @Override
-        public void downgradeWriteToReadLock() {
-            rwls().downgradeWriteToReadLock(access, handle, offset);
-        }
-
-        @Override
-        public void reset() {
-            rwls().reset(access, handle, offset);
-        }
-
-        @Override
-        public long getState() {
-            return rwls().getState(access, handle, offset);
-        }
-
-        @Override
-        public ReadWriteLockingStrategy lockingStrategy() {
-            return rwls();
-        }
-    }
-    TestReadWriteLockState rwLockState = new TestReadWriteLockState();
-
     ReadWriteLockState rwls() {
         return rwLockState;
     }
 
-    class TestReadWriteUpdateLockState extends TestReadWriteLockState
-            implements ReadWriteUpdateLockState {
-
-        ReadWriteUpdateLockingStrategy rwuls() {
-            return (ReadWriteUpdateLockingStrategy) lockingStrategy;
-        }
-
-        @Override
-        public boolean tryUpdateLock() {
-            return rwuls().tryUpdateLock(access, handle, offset);
-        }
-
-        @Override
-        public boolean tryUpgradeReadToUpdateLock() {
-            return rwuls().tryUpgradeReadToUpdateLock(access, handle, offset);
-        }
-
-        @Override
-        public boolean tryUpgradeUpdateToWriteLock() {
-            return rwuls().tryUpgradeUpdateToWriteLock(access, handle, offset);
-        }
-
-        @Override
-        public void updateUnlock() {
-            rwuls().updateUnlock(access, handle, offset);
-        }
-
-        @Override
-        public void downgradeUpdateToReadLock() {
-            rwuls().downgradeUpdateToReadLock(access, handle, offset);
-        }
-
-        @Override
-        public void downgradeWriteToUpdateLock() {
-            rwuls().downgradeWriteToUpdateLock(access, handle, offset);
-        }
-
-        @Override
-        public ReadWriteUpdateLockingStrategy lockingStrategy() {
-            return rwuls();
-        }
-    }
-    TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
-
-    Runnable readUnlockTask = new Runnable() {
-        @Override
-        public void run() {
-            rwls().readUnlock();
-        }
-    };
-
-    Callable<Boolean> tryUpdateLockTask = new Callable<Boolean>() {
-        @Override
-        public Boolean call() throws Exception {
-            return rwuls().tryUpdateLock();
-        }
-    };
-
     ReadWriteUpdateLockState rwuls() {
         return rwuLockState;
     }
-
-    Runnable updateUnlockTask = new Runnable() {
-        @Override
-        public void run() {
-            rwuls().updateUnlock();
-        }
-    };
-
-    Callable<Boolean> tryWriteLockTask = new Callable<Boolean>() {
-        @Override
-        public Boolean call() throws Exception {
-            return rwls().tryWriteLock();
-        }
-    };
-
-    Runnable writeUnlockTask = new Runnable() {
-        @Override
-        public void run() {
-            rwls().writeUnlock();
-        }
-    };
-
-
 
     @Test
     public void testUpdateLockIsExclusive() throws Exception {
@@ -544,5 +440,102 @@ public class LockingStrategyTest {
 
     void assumeReadWriteLock() {
         assumeTrue(lockingStrategy instanceof ReadWriteLockingStrategy);
+    }
+
+    enum AccessMethod {ADDRESS, BYTES_WITH_OFFSET}
+
+    class TestReadWriteLockState extends AbstractReadWriteLockState {
+
+        private ReadWriteLockingStrategy rwls() {
+            return (ReadWriteLockingStrategy) lockingStrategy;
+        }
+
+        @Override
+        public boolean tryReadLock() {
+            return rwls().tryReadLock(access, handle, offset);
+        }
+
+        @Override
+        public boolean tryWriteLock() {
+            return rwls().tryWriteLock(access, handle, offset);
+        }
+
+        @Override
+        public boolean tryUpgradeReadToWriteLock() {
+            return rwls().tryUpgradeReadToWriteLock(access, handle, offset);
+        }
+
+        @Override
+        public void readUnlock() {
+            rwls().readUnlock(access, handle, offset);
+        }
+
+        @Override
+        public void writeUnlock() {
+            rwls().writeUnlock(access, handle, offset);
+        }
+
+        @Override
+        public void downgradeWriteToReadLock() {
+            rwls().downgradeWriteToReadLock(access, handle, offset);
+        }
+
+        @Override
+        public void reset() {
+            rwls().reset(access, handle, offset);
+        }
+
+        @Override
+        public long getState() {
+            return rwls().getState(access, handle, offset);
+        }
+
+        @Override
+        public ReadWriteLockingStrategy lockingStrategy() {
+            return rwls();
+        }
+    }
+
+    class TestReadWriteUpdateLockState extends TestReadWriteLockState
+            implements ReadWriteUpdateLockState {
+
+        ReadWriteUpdateLockingStrategy rwuls() {
+            return (ReadWriteUpdateLockingStrategy) lockingStrategy;
+        }
+
+        @Override
+        public boolean tryUpdateLock() {
+            return rwuls().tryUpdateLock(access, handle, offset);
+        }
+
+        @Override
+        public boolean tryUpgradeReadToUpdateLock() {
+            return rwuls().tryUpgradeReadToUpdateLock(access, handle, offset);
+        }
+
+        @Override
+        public boolean tryUpgradeUpdateToWriteLock() {
+            return rwuls().tryUpgradeUpdateToWriteLock(access, handle, offset);
+        }
+
+        @Override
+        public void updateUnlock() {
+            rwuls().updateUnlock(access, handle, offset);
+        }
+
+        @Override
+        public void downgradeUpdateToReadLock() {
+            rwuls().downgradeUpdateToReadLock(access, handle, offset);
+        }
+
+        @Override
+        public void downgradeWriteToUpdateLock() {
+            rwuls().downgradeWriteToUpdateLock(access, handle, offset);
+        }
+
+        @Override
+        public ReadWriteUpdateLockingStrategy lockingStrategy() {
+            return rwuls();
+        }
     }
 }

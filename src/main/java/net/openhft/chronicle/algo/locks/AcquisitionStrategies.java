@@ -16,11 +16,29 @@
 
 package net.openhft.chronicle.algo.locks;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 import java.util.concurrent.TimeUnit;
 
 public final class AcquisitionStrategies {
+
+    private AcquisitionStrategies() {
+    }
+
+    public static AcquisitionStrategy<LockingStrategy, RuntimeException> spinLoop(
+            long duration, TimeUnit unit) {
+        return new SpinLoopAcquisitionStrategy<LockingStrategy>(duration, unit);
+    }
+
+    public static AcquisitionStrategy<LockingStrategy, RuntimeException> spinLoopOrFail(
+            long duration, TimeUnit unit) {
+        return new SpinLoopOrFailAcquisitionStrategy<LockingStrategy>(duration, unit);
+    }
+
+    public static AcquisitionStrategy<ReadWriteWithWaitsLockingStrategy, RuntimeException>
+    spinLoopRegisteringWaitOrFail(long duration, TimeUnit unit) {
+        return new SpinLoopWriteWithWaitsAcquisitionStrategy(duration, unit);
+    }
 
     private static class SpinLoopAcquisitionStrategy<S extends LockingStrategy>
             implements AcquisitionStrategy<S, RuntimeException> {
@@ -56,11 +74,6 @@ public final class AcquisitionStrategies {
         }
     }
 
-    public static AcquisitionStrategy<LockingStrategy, RuntimeException> spinLoop(
-            long duration, TimeUnit unit) {
-        return new SpinLoopAcquisitionStrategy<LockingStrategy>(duration, unit);
-    }
-
     private static class SpinLoopOrFailAcquisitionStrategy<S extends LockingStrategy>
             extends SpinLoopAcquisitionStrategy<S> {
 
@@ -72,11 +85,6 @@ public final class AcquisitionStrategies {
         boolean end() {
             throw new RuntimeException("Failed to acquire the lock");
         }
-    }
-
-    public static AcquisitionStrategy<LockingStrategy, RuntimeException> spinLoopOrFail(
-            long duration, TimeUnit unit) {
-        return new SpinLoopOrFailAcquisitionStrategy<LockingStrategy>(duration, unit);
     }
 
     private static class SpinLoopWriteWithWaitsAcquisitionStrategy
@@ -98,11 +106,4 @@ public final class AcquisitionStrategies {
             strategy.deregisterWait(access, t, offset);
         }
     }
-
-    public static AcquisitionStrategy<ReadWriteWithWaitsLockingStrategy, RuntimeException>
-    spinLoopRegisteringWaitOrFail(long duration, TimeUnit unit) {
-        return new SpinLoopWriteWithWaitsAcquisitionStrategy(duration, unit);
-    }
-
-    private AcquisitionStrategies() {}
 }

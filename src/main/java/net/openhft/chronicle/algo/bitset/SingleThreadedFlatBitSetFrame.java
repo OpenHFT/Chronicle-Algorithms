@@ -16,12 +16,12 @@
 
 package net.openhft.chronicle.algo.bitset;
 
-import net.openhft.chronicle.bytes.Access;
+import net.openhft.chronicle.algo.bytes.Access;
 
 import static java.lang.Long.numberOfLeadingZeros;
 import static java.lang.Long.numberOfTrailingZeros;
-import static net.openhft.chronicle.core.MemoryUnit.BITS;
-import static net.openhft.chronicle.core.MemoryUnit.LONGS;
+import static net.openhft.chronicle.algo.bitset.MemoryUnit.BITS;
+import static net.openhft.chronicle.algo.bitset.MemoryUnit.LONGS;
 
 /**
  * DirectBitSet with input validations, This class is not thread safe

@@ -16,8 +16,8 @@
 
 package net.openhft.chronicle.algo.locks;
 
-import net.openhft.chronicle.bytes.Access;
-import net.openhft.chronicle.bytes.ReadAccess;
+import net.openhft.chronicle.algo.bytes.Access;
+import net.openhft.chronicle.algo.bytes.ReadAccess;
 
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.ByteOrder.nativeOrder;
@@ -26,33 +26,28 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         extends AbstractReadWriteLockingStrategy
         implements ReadWriteUpdateWithWaitsLockingStrategy {
 
-    private static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
-
-    private static final ReadWriteUpdateWithWaitsLockingStrategy INSTANCE =
-            new VanillaReadWriteUpdateWithWaitsLockingStrategy();
-
-    public static ReadWriteUpdateWithWaitsLockingStrategy instance() {
-        return INSTANCE;
-    }
-
-    private VanillaReadWriteUpdateWithWaitsLockingStrategy() {}
-
     static final long COUNT_WORD_OFFSET = 0L;
     static final long WAIT_WORD_OFFSET = COUNT_WORD_OFFSET + 4L;
-
     static final int COUNT_WORD_SHIFT = nativeOrder() == LITTLE_ENDIAN ? 0 : 32;
     static final int WAIT_WORD_SHIFT = nativeOrder() == LITTLE_ENDIAN ? 32 : 0;
-
     static final int READ_BITS = 30;
     static final int MAX_READ = (1 << READ_BITS) - 1;
     static final int READ_MASK = MAX_READ;
     static final int READ_PARTY = 1;
-
     static final int UPDATE_PARTY = 1 << READ_BITS;
     static final int WRITE_LOCKED_COUNT_WORD = UPDATE_PARTY << 1;
-
     static final int MAX_WAIT = Integer.MAX_VALUE;
     static final int WAIT_PARTY = 1;
+    private static final long UNSIGNED_INT_MASK = 0xFFFFFFFFL;
+    private static final ReadWriteUpdateWithWaitsLockingStrategy INSTANCE =
+            new VanillaReadWriteUpdateWithWaitsLockingStrategy();
+
+    private VanillaReadWriteUpdateWithWaitsLockingStrategy() {
+    }
+
+    public static ReadWriteUpdateWithWaitsLockingStrategy instance() {
+        return INSTANCE;
+    }
 
     private static <T> long getLockWord(ReadAccess<T> access, T t, long offset) {
         return access.readVolatileLong(t, offset);
@@ -148,6 +143,25 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         }
     }
 
+    private static <T> boolean tryWriteLockAndDeregisterWait0(
+            Access<T> access, T t, long offset, long lockWord) {
+        int waitWord = waitWord(lockWord);
+        checkWaitWordForDecrement(waitWord);
+        return casLockWord(access, t, offset, lockWord,
+                lockWord(WRITE_LOCKED_COUNT_WORD, waitWord - WAIT_PARTY));
+    }
+
+    private static boolean checkExclusiveUpdateLocked(int countWord) {
+        checkUpdateLocked(countWord);
+        return countWord == UPDATE_PARTY;
+    }
+
+    private static <T> void checkWriteLockedAndPut(
+            Access<T> access, T t, long offset, int countWord) {
+        checkWriteLocked(getCountWord(access, t, offset));
+        putCountWord(access, t, offset, countWord);
+    }
+
     @Override
     public long resetState() {
         return 0L;
@@ -199,14 +213,6 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         checkReadLocked(countWord);
         return countWord == READ_PARTY &&
                 tryWriteLockAndDeregisterWait0(access, t, offset, lockWord);
-    }
-
-    private static <T> boolean tryWriteLockAndDeregisterWait0(
-            Access<T> access, T t, long offset, long lockWord) {
-        int waitWord = waitWord(lockWord);
-        checkWaitWordForDecrement(waitWord);
-        return casLockWord(access, t, offset, lockWord,
-                lockWord(WRITE_LOCKED_COUNT_WORD, waitWord - WAIT_PARTY));
     }
 
     @Override
@@ -261,11 +267,6 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
                 casCountWord(access, t, offset, countWord, WRITE_LOCKED_COUNT_WORD);
     }
 
-    private static boolean checkExclusiveUpdateLocked(int countWord) {
-        checkUpdateLocked(countWord);
-        return countWord == UPDATE_PARTY;
-    }
-
     @Override
     public <T> boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(
             Access<T> access, T t, long offset) {
@@ -311,12 +312,6 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     @Override
     public <T> void writeUnlock(Access<T> access, T t, long offset) {
         checkWriteLockedAndPut(access, t, offset, 0);
-    }
-
-    private static <T> void checkWriteLockedAndPut(
-            Access<T> access, T t, long offset, int countWord) {
-        checkWriteLocked(getCountWord(access, t, offset));
-        putCountWord(access, t, offset, countWord);
     }
 
     @Override
