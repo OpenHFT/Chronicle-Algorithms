@@ -387,29 +387,6 @@ public interface BitSetFrame {
                                              long fromIndex, int numberOfBits);
 
     /**
-     * An iteration of bits in a bit set.
-     *
-     * <p>Usage idiom: <pre>{@code
-     * Bits bits = bitSet.setBits();
-     * for (long bit; (bit = bits.next()) >= 0;) {
-     *     // do something with the bit
-     * }}</pre>
-     */
-    interface Bits {
-
-        <T> Bits reset(Access<T> access, T handle, long offset);
-
-        /**
-         * Returns index of the next bit in the iteration,
-         * or {@code -1} if there are no more bits.
-         *
-         * @return index of the next bit in the iteration,
-         * or {@code -1} if there are no more bits
-         */
-        <T> long next(Access<T> access, T handle, long offset);
-    }
-
-    /**
      * Returns an iteration of <i>set</i> bits in <i>direct</i> order
      * (from 0 to the end of the bit set).
      *
@@ -417,9 +394,11 @@ public interface BitSetFrame {
      */
     Bits setBits();
 
+    BitSetAlgorithm algorithm();
+
     /**
      * An iteration of bits in a bit set.
-     * <p>
+     *
      * <p>Usage idiom: <pre>{@code
      * Bits bits = bitSet.setBits();
      * for (long bit; (bit = bits.next()) >= 0;) {
@@ -439,6 +418,4 @@ public interface BitSetFrame {
          */
         <T> long next(Access<T> access, T handle, long offset);
     }
-
-    BitSetAlgorithm algorithm();
 }
