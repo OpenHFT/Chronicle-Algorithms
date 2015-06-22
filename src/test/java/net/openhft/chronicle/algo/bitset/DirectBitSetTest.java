@@ -17,7 +17,7 @@
 package net.openhft.chronicle.algo.bitset;
 
 import net.openhft.chronicle.algo.bytes.Access;
-import net.openhft.chronicle.bytes.Bytes;
+import net.openhft.chronicle.bytes.BytesStore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -45,8 +45,8 @@ public class DirectBitSetTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         int capacityInBytes = (int) MemoryUnit.BITS.toBytes(256);
-        Bytes<ByteBuffer> bytes1 = Bytes.wrap(ByteBuffer.allocateDirect(capacityInBytes));
-        Bytes<ByteBuffer> bytes2 = Bytes.wrap(ByteBuffer.allocateDirect(capacityInBytes));
+        BytesStore bytes1 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
+        BytesStore bytes2 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
         return Arrays.asList(new Object[][]{
                 {
                         new ReusableBitSet(
