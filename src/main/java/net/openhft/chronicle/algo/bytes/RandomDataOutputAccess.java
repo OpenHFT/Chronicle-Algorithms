@@ -20,7 +20,7 @@ import net.openhft.chronicle.bytes.RandomDataOutput;
 
 import java.nio.ByteOrder;
 
-public interface RandomDataOutputAccess<R extends RandomDataOutput<R>>
+interface RandomDataOutputAccess<R extends RandomDataOutput<R>>
         extends WriteAccess<R> {
     @Override
     default void writeByte(R handle, long offset, int i) {

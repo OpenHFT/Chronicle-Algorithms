@@ -17,12 +17,17 @@
 package net.openhft.chronicle.algo.bytes;
 
 import net.openhft.chronicle.bytes.BytesStore;
+import net.openhft.chronicle.bytes.RandomDataInput;
 
 import java.nio.ByteOrder;
 
 final class BytesAccesses {
 
     private BytesAccesses() {
+    }
+
+     enum RandomDataInputReadAccessEnum implements RandomDataInputAccess<RandomDataInput> {
+        INSTANCE
     }
 
     static class Full<B extends BytesStore<B, U>, U> implements RandomDataInputAccess<B>,

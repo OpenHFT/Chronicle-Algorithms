@@ -16,6 +16,7 @@
 
 package net.openhft.chronicle.algo.bitset;
 
+import net.openhft.chronicle.algo.MemoryUnit;
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.bytes.BytesStore;
 import org.junit.Test;

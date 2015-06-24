@@ -17,6 +17,7 @@
 package net.openhft.chronicle.algo.bytes;
 
 import net.openhft.chronicle.bytes.BytesStore;
+import net.openhft.chronicle.bytes.RandomDataInput;
 
 import java.nio.ByteBuffer;
 
@@ -32,6 +33,10 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
 
     static <B extends BytesStore<B, U>, U> Access<B> checkedBytesStoreAccess() {
         return BytesAccesses.Full.INSTANCE;
+    }
+
+    static ReadAccess<RandomDataInput> checkedRandomDataInputAccess() {
+        return BytesAccesses.RandomDataInputReadAccessEnum.INSTANCE;
     }
 
     static <S, T> void copy(ReadAccess<S> sourceAccess, S source, long sourceOffset,

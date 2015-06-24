@@ -20,8 +20,8 @@ import net.openhft.chronicle.algo.bytes.Access;
 
 import static java.lang.Long.numberOfLeadingZeros;
 import static java.lang.Long.numberOfTrailingZeros;
-import static net.openhft.chronicle.algo.bitset.MemoryUnit.BITS;
-import static net.openhft.chronicle.algo.bitset.MemoryUnit.LONGS;
+import static net.openhft.chronicle.algo.MemoryUnit.BITS;
+import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
 
 /**
  * DirectBitSet with input validations, This class is not thread safe

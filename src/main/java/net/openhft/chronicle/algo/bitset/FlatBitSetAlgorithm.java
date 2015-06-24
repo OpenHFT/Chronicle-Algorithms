@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.bitset;
 
-import static net.openhft.chronicle.algo.bitset.MemoryUnit.BITS;
+import static net.openhft.chronicle.algo.MemoryUnit.BITS;
 
 enum FlatBitSetAlgorithm implements BitSetAlgorithm {
     INSTANCE;
