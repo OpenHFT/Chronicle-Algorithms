@@ -51,7 +51,7 @@ public class LockingStrategyTest {
     TestReadWriteLockState rwLockState = new TestReadWriteLockState();
     Callable<Boolean> tryReadLockTask = new Callable<Boolean>() {
         @Override
-        public Boolean call() throws Exception {
+        public Boolean call() {
             return rwls().tryReadLock();
         }
     };
@@ -64,7 +64,7 @@ public class LockingStrategyTest {
     };
     Callable<Boolean> tryUpdateLockTask = new Callable<Boolean>() {
         @Override
-        public Boolean call() throws Exception {
+        public Boolean call() {
             return rwuls().tryUpdateLock();
         }
     };
@@ -76,7 +76,7 @@ public class LockingStrategyTest {
     };
     Callable<Boolean> tryWriteLockTask = new Callable<Boolean>() {
         @Override
-        public Boolean call() throws Exception {
+        public Boolean call() {
             return rwls().tryWriteLock();
         }
     };
@@ -103,7 +103,7 @@ public class LockingStrategyTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         e1 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>());
         e2 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
@@ -127,7 +127,7 @@ public class LockingStrategyTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         e1.shutdown();
         e2.shutdown();
     }
@@ -141,7 +141,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testUpdateLockIsExclusive() throws Exception {
+    public void testUpdateLockIsExclusive() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -161,7 +161,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testUpdateLockAllowsOtherReaders() throws Exception {
+    public void testUpdateLockAllowsOtherReaders() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -178,7 +178,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testUpdateLockBlocksOtherWriters() throws Exception {
+    public void testUpdateLockBlocksOtherWriters() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -198,7 +198,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testWriteLockBlocksOtherReaders() throws Exception {
+    public void testWriteLockBlocksOtherReaders() throws ExecutionException, InterruptedException {
         assumeReadWriteLock();
 
         // Acquire the write lock in thread 1...
@@ -218,7 +218,7 @@ public class LockingStrategyTest {
     }
 
     @Test
-    public void testUpdateLockUpgradeToWriteLock() throws Exception {
+    public void testUpdateLockUpgradeToWriteLock() throws ExecutionException, InterruptedException {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -227,7 +227,7 @@ public class LockingStrategyTest {
         // Try to acquire write lock in thread 1, should succeed...
         assertTrue(e1.submit(new Callable<Boolean>() {
             @Override
-            public Boolean call() throws Exception {
+            public Boolean call() {
                 return rwuls().tryUpgradeUpdateToWriteLock();
             }
         }).get());

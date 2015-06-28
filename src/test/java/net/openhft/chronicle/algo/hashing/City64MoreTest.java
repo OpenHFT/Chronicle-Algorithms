@@ -29,7 +29,7 @@ import java.security.SecureRandom;
 public class City64MoreTest {
     @Test
     @Ignore("Long running, avg score = 6834")
-    public void testSmallRandomness() throws Exception {
+    public void testSmallRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
         for (int t = 1; t < 500; t++) {
@@ -65,7 +65,7 @@ public class City64MoreTest {
 
     @Ignore("Long running, avg score = 6852")
     @Test
-    public void testRandomness() throws Exception {
+    public void testRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
         for (int t = 0; t < 500; t++) {
