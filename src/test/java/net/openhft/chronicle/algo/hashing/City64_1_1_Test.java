@@ -60,6 +60,7 @@ public class City64_1_1_Test {
         LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
     }
 
+
 // The following numbers is the result of compiling & running this program
 // with city-1.1.1, reference impl:
 //
