@@ -19,6 +19,7 @@ package net.openhft.chronicle.algorithms.benchmarks;
 import net.openhft.affinity.Affinity;
 import net.openhft.chronicle.algo.hashing.LongHashFunction;
 import net.openhft.chronicle.bytes.Bytes;
+import net.openhft.chronicle.bytes.algo.OptimisedBytesHash;
 import net.openhft.chronicle.core.Jvm;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Mode;
@@ -44,25 +45,8 @@ public class Main256bytes {
     final Bytes bytes = Bytes.allocateDirect(256).unchecked(true);
     final ByteBuffer buffer = ByteBuffer.allocateDirect(256).order(ByteOrder.nativeOrder());
     long num = 0;
-    LongHashFunction murmur_3 = LongHashFunction.murmur_3();
-
-/*    @Benchmark
-    public long vanillaHash() {
-        for (int i = 0; i < bytes.capacity(); i += 8)
-            bytes.writeLong(i, num += 0x1111111111111111L);
-        return OptimisedBytesHash.INSTANCE.applyAsLong(bytes);
-    }*/
-
-/*
     LongHashFunction city_1_1 = LongHashFunction.city_1_1();
-
-    @Benchmark
-    public long city11Hash() {
-        for (int i = 0; i < buffer.capacity(); i += 8)
-            buffer.putLong(i, num += 0x1111111111111111L);
-        return city_1_1.hashBytes(buffer);
-    }
-*/
+    LongHashFunction murmur_3 = LongHashFunction.murmur_3();
 
     public static void main(String... args) throws RunnerException, InvocationTargetException, IllegalAccessException {
         Affinity.setAffinity(2);
@@ -86,6 +70,20 @@ public class Main256bytes {
 
             new Runner(opt).run();
         }
+    }
+
+    @Benchmark
+    public long vanillaHash() {
+        for (int i = 0; i < bytes.capacity(); i += 8)
+            bytes.writeLong(i, num += 0x1111111111111111L);
+        return OptimisedBytesHash.INSTANCE.applyAsLong(bytes);
+    }
+
+    @Benchmark
+    public long city11Hash() {
+        for (int i = 0; i < buffer.capacity(); i += 8)
+            buffer.putLong(i, num += 0x1111111111111111L);
+        return city_1_1.hashBytes(buffer);
     }
 
     @Benchmark
