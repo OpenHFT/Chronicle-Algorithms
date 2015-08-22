@@ -26,9 +26,9 @@ import java.util.Arrays;
  */
 public class OrtogonalBitsScore {
     public static long score(AddressWrapper wrapper) {
-        long time = 0, timeCount = 0;
-        int runs = 500;
+        int runs = 1000;
         long[] scores = new long[runs];
+        long[] times = new long[runs];
         for (int t = 0; t < runs; t++) {
             long[] hashs = new long[8192];
             byte[] init = new byte[hashs.length / 8];
@@ -52,9 +52,8 @@ public class OrtogonalBitsScore {
                 b.readLimit(hashs.length / 8);
                 long start = System.nanoTime();
                 hashs[i] = wrapper.hash();
-                time += System.nanoTime() - start;
+                times[t] = System.nanoTime() - start;
                 b.writeLong(index, prev);
-                timeCount++;
             }
             long score = 0;
             for (int i = 0; i < hashs.length - 1; i++)
@@ -69,9 +68,11 @@ public class OrtogonalBitsScore {
             scores[t] = score;
         }
         Arrays.sort(scores);
+        Arrays.sort(times);
         long score = scores[runs * 99 / 100];
-        System.out.println("Orthogonal bit, 99%tile score: " + score);
-        System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
+        long time = times[runs * 99 / 100];
+        System.out.println("Orthogonal bits: 99%tile score: " + score);
+        System.out.printf("Speed: The 99%%tile for latency was %.3f us%n", time / 1e3);
         return score;
     }
 }

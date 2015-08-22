@@ -66,7 +66,7 @@ public class MaskHashScore {
         }
         Arrays.sort(collisions);
         int score = collisions[runs * 99 / 100];
-        System.out.println("MaskHashScore 99%tile collisions: " + score);
+        System.out.println("Mask of Hash: 99%tile collisions: " + score);
         return score;
     }
 }
