@@ -14,7 +14,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.openhft.chronicle.algorithms.benchmarks;
+package net.openhft.chronicle.algorithms.measures;
 
 import net.openhft.chronicle.algo.bytes.NativeAccess;
 import net.openhft.chronicle.algo.hashing.LongHashFunction;
@@ -23,39 +23,38 @@ import net.openhft.chronicle.bytes.BytesStore;
 import net.openhft.chronicle.bytes.PointerBytesStore;
 import net.openhft.chronicle.bytes.algo.OptimisedBytesHash;
 
-import java.security.SecureRandom;
-import java.util.Random;
-
 /**
  * Created by peter on 21/08/15.
  */
 public enum AddressWrappers implements AddressWrapper {
-    RANDOM {
-        Random rand = new Random();
+    /*
+            RANDOM {
+                Random rand = new Random();
 
-        @Override
-        public void setAddress(long address, long length) {
+                @Override
+                public void setAddress(long address, long length) {
 
-        }
+                }
 
-        @Override
-        public long hash() {
-            return rand.nextLong();
-        }
-    },
-    SECURE_RANDOM {
-        SecureRandom rand = new SecureRandom();
+                @Override
+                public long hash() {
+                    return rand.nextLong();
+                }
+            },
+            SECURE_RANDOM {
+                SecureRandom rand = new SecureRandom();
 
-        @Override
-        public void setAddress(long address, long length) {
+                @Override
+                public void setAddress(long address, long length) {
 
-        }
+                }
 
-        @Override
-        public long hash() {
-            return rand.nextLong();
-        }
-    },
+                @Override
+                public long hash() {
+                    return rand.nextLong();
+                }
+            },
+    */
     VANILLA {
         int length;
         Bytes bytes;
@@ -116,7 +115,17 @@ public enum AddressWrappers implements AddressWrapper {
             int hc = 0;
             for (int i = 0; i < bytes.length(); i++)
                 hc = hc * 31 + bytes.charAt(i);
-            return hc;
+
+            return hash(hc);
+        }
+
+        // from the hash() function in HashMap
+        int hash(int h) {
+            // This function ensures that hashCodes that differ only by
+            // constant multiples at each bit position have a bounded
+            // number of collisions (approximately 8 at default load factor).
+            h ^= (h >>> 20) ^ (h >>> 12);
+            return h ^ (h >>> 7) ^ (h >>> 4);
         }
     },
     STRING64 {
@@ -134,7 +143,13 @@ public enum AddressWrappers implements AddressWrapper {
             long hc = 0;
             for (int i = 0; i < bytes.length(); i++)
                 hc = hc * 31 + bytes.charAt(i);
-            return hc;
+            return hash(hc);
+        }
+
+        // based on the hash() function in HashMap
+        long hash(long h) {
+            h ^= (h >>> 41) ^ (h >>> 23);
+            return h ^ (h >>> 14) ^ (h >>> 7);
         }
     }
 }

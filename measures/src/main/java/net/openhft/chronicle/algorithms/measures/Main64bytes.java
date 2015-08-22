@@ -14,7 +14,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.openhft.chronicle.algorithms.benchmarks;
+package net.openhft.chronicle.algorithms.measures;
 
 import net.openhft.affinity.Affinity;
 import net.openhft.chronicle.algo.hashing.LongHashFunction;
@@ -41,9 +41,9 @@ import java.util.concurrent.TimeUnit;
  * Created by peter on 11/08/15.
  */
 @State(Scope.Thread)
-public class Main256bytes {
-    final Bytes bytes = Bytes.allocateDirect(256).unchecked(true);
-    final ByteBuffer buffer = ByteBuffer.allocateDirect(256).order(ByteOrder.nativeOrder());
+public class Main64bytes {
+    final Bytes bytes = Bytes.allocateDirect(64).unchecked(true);
+    final ByteBuffer buffer = ByteBuffer.allocateDirect(64).order(ByteOrder.nativeOrder());
     long num = 0;
     LongHashFunction city_1_1 = LongHashFunction.city_1_1();
     LongHashFunction murmur_3 = LongHashFunction.murmur_3();
@@ -51,8 +51,8 @@ public class Main256bytes {
     public static void main(String... args) throws RunnerException, InvocationTargetException, IllegalAccessException {
         Affinity.setAffinity(2);
         if (Jvm.isDebug()) {
-            Main256bytes main = new Main256bytes();
-            for (Method m : Main256bytes.class.getMethods()) {
+            Main64bytes main = new Main64bytes();
+            for (Method m : Main64bytes.class.getMethods()) {
                 if (m.getAnnotation(Benchmark.class) != null) {
                     m.invoke(main);
                 }
@@ -61,7 +61,7 @@ public class Main256bytes {
             int time = Boolean.getBoolean("longTest") ? 30 : 2;
             System.out.println("measurementTime: " + time + " secs");
             Options opt = new OptionsBuilder()
-                    .include(Main256bytes.class.getSimpleName())
+                    .include(Main64bytes.class.getSimpleName())
                     .mode(Mode.SampleTime)
                     .measurementTime(TimeValue.seconds(time))
                     .timeUnit(TimeUnit.NANOSECONDS)

@@ -14,13 +14,19 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.openhft.chronicle.algorithms.benchmarks;
+package net.openhft.chronicle.algorithms.measures;
 
 /**
  * Created by peter on 21/08/15.
  */
-public interface AddressWrapper {
-    void setAddress(long address, long length);
-
-    long hash();
+public class CheckMain {
+    public static void main(String[] args) {
+        for (AddressWrappers aw : AddressWrappers.values()) {
+            System.out.println(aw);
+            OrtogonalBitsScore.score(aw);
+            AvalancheScore.score(aw);
+            MaskHashScore.score(aw);
+            System.out.println();
+        }
+    }
 }

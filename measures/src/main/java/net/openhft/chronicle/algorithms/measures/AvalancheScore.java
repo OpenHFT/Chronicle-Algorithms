@@ -14,22 +14,32 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.openhft.chronicle.algorithms.benchmarks;
+package net.openhft.chronicle.algorithms.measures;
 
 import net.openhft.chronicle.bytes.NativeBytes;
 
 import java.security.SecureRandom;
 
 /**
- * Created by peter on 21/08/15.
+ * Created by peter on 22/08/15.
  */
-public class OrtogonalBitsScore {
-    public static long score(AddressWrapper wrapper) {
-        long time = 0, timeCount = 0;
-        long scoreSum = 0;
-        int runs = 500;
+public class AvalancheScore {
+    /**
+     * Based on the SMHasher Avalanche test
+     * <p>
+     * search for biases bits.
+     * when flipping a single bit of the input, the output should have a 49% - 51% chance of flipping. Some randomness is expected.
+     *
+     * @return the worst flip bias.
+     */
+    public static double score(AddressWrapper wrapper) {
+        int runs = 10;
+
+        int[] bitFlipCount = new int[64];
+        int bits = 8192;
+
         for (int t = 0; t < runs; t++) {
-            long[] hashs = new long[8192];
+            long[] hashs = new long[bits];
             byte[] init = new byte[hashs.length / 8];
             NativeBytes b = NativeBytes.nativeBytes(init.length);
             new SecureRandom().nextBytes(init);
@@ -51,26 +61,30 @@ public class OrtogonalBitsScore {
                 b.readLimit(hashs.length / 8);
                 long start = System.nanoTime();
                 hashs[i] = wrapper.hash();
-                time += System.nanoTime() - start;
                 b.writeLong(index, prev);
-                timeCount++;
             }
-            long score = 0;
             for (int i = 0; i < hashs.length - 1; i++)
                 for (int j = i + 1; j < hashs.length; j++) {
                     long diff = hashs[j] ^ hashs[i];
-                    int diffBC = Long.bitCount(diff);
-                    if (diffBC < 18) {
-                        long d = 1L << (17 - diffBC);
-                        score += d;
+                    for (int k = 0; k < 64; k++) {
+                        bitFlipCount[k] += (int) ((diff >>> k) & 1);
                     }
                 }
-            scoreSum += score * score;
-            if (t % 50 == 0)
-                System.out.println(t + " - Score: " + score);
         }
-        System.out.println("Average score: " + (long) Math.sqrt(scoreSum / runs));
-        System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
-        return scoreSum / runs;
+        long tests = bits * (bits - 1) / 2;
+        double score = 50;
+        double total = 0;
+        for (int i = 0; i < bitFlipCount.length; i++) {
+            int count = bitFlipCount[i];
+            double bitScore = 10000L * count / tests / runs / 100.0;
+            double err = Math.abs(bitScore - 50);
+            if (err > Math.abs(score - 50))
+                score = bitScore;
+            total += err;
+            if (err >= 1)
+                System.out.println(i + ": " + bitScore);
+        }
+        System.out.printf("Total drift from 50%% was %.2f %%%n", total);
+        return score;
     }
 }
