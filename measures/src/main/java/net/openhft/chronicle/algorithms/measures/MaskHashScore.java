@@ -42,11 +42,12 @@ public class MaskHashScore {
             Set<Integer> maskedhashs = new HashSet<>();
             byte[] init = new byte[bits / 8];
             NativeBytes b = NativeBytes.nativeBytes(init.length);
-            new SecureRandom().nextBytes(init);
+            SecureRandom rand = new SecureRandom();
+            rand.nextBytes(init);
             // low bit count test
             if (t % 2 == 0) {
                 byte[] init2 = new byte[bits / 8];
-                new SecureRandom().nextBytes(init2);
+                rand.nextBytes(init2);
                 for (int i = 0; i < init.length; i++)
                     init[i] &= init2[i];
             }

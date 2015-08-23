@@ -33,11 +33,12 @@ public class OrtogonalBitsScore {
             long[] hashs = new long[8192];
             byte[] init = new byte[hashs.length / 8];
             NativeBytes b = NativeBytes.nativeBytes(init.length);
-            new SecureRandom().nextBytes(init);
+            SecureRandom rand = new SecureRandom();
+            rand.nextBytes(init);
             // low bit count test
             if (t % 2 == 0) {
                 byte[] init2 = new byte[hashs.length / 8];
-                new SecureRandom().nextBytes(init2);
+                rand.nextBytes(init2);
                 for (int i = 0; i < init.length; i++)
                     init[i] &= init2[i];
             }
