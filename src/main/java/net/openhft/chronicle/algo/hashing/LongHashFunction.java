@@ -121,6 +121,38 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
+     * <a href="https://github.com/Cyan4973/xxHash/releases/tag/r39">xxHash
+     * algorithm, release 39</a> without seed value (0 is used as default seed value).
+     * This implementation produce equal results for equal
+     * input on platforms with different {@link ByteOrder}, but is slower on big-endian platforms
+     * than on little-endian.
+     *
+     * <p>Note: implementation is fully compatible with r40
+     *
+     * @see #xx_r39(long)
+     */
+    public static LongHashFunction xx_r39() {
+        return XxHash_r39.asLongHashFunctionWithoutSeed();
+    }
+
+    /**
+     * Returns a hash function implementing
+     * <a href="https://github.com/Cyan4973/xxHash/releases/tag/r39">xxHash
+     * algorithm, release 39</a> with the given seed value.
+     * This implementation produce equal results for equal
+     * input on platforms with different {@link ByteOrder}, but is slower on big-endian platforms
+     * than on little-endian.
+     *
+     * <p>Note: implementation is fully compatible with r40
+     *
+     * @see #xx_r39()
+     */
+    public static LongHashFunction xx_r39(long seed) {
+        return XxHash_r39.asLongHashFunctionWithSeed(seed);
+    }
+
+    /**
+     * Returns a hash function implementing
      * <a href="https://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp">MurmurHash3
      * algorithm</a> without seed values. This implementation produce equal results for equal input
      * on platforms with different {@link ByteOrder}, but is slower on big-endian platforms than on
