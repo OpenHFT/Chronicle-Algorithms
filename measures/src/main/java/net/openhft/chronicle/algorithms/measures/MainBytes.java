@@ -21,10 +21,7 @@ import net.openhft.chronicle.algo.hashing.LongHashFunction;
 import net.openhft.chronicle.bytes.Bytes;
 import net.openhft.chronicle.bytes.algo.OptimisedBytesHash;
 import net.openhft.chronicle.core.Jvm;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -33,26 +30,24 @@ import org.openjdk.jmh.runner.options.TimeValue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by peter on 11/08/15.
- */
 @State(Scope.Thread)
-public class Main16bytes {
-    final Bytes bytes = Bytes.allocateDirect(16).unchecked(true);
-    final ByteBuffer buffer = ByteBuffer.allocateDirect(16).order(ByteOrder.nativeOrder());
+public class MainBytes {
+    Bytes bytes;
     long num = 0;
-    LongHashFunction city_1_1 = LongHashFunction.city_1_1();
-    LongHashFunction murmur_3 = LongHashFunction.murmur_3();
+    static final LongHashFunction city_1_1 = LongHashFunction.city_1_1();
+    static final LongHashFunction murmur_3 = LongHashFunction.murmur_3();
+    static final LongHashFunction xx_r39 = LongHashFunction.xx_r39();
 
-    public static void main(String... args) throws RunnerException, InvocationTargetException, IllegalAccessException {
+    public static void main(String... args)
+            throws RunnerException, InvocationTargetException, IllegalAccessException {
         Affinity.setAffinity(2);
         if (Jvm.isDebug()) {
-            Main16bytes main = new Main16bytes();
-            for (Method m : Main16bytes.class.getMethods()) {
+            MainBytes main = new MainBytes();
+            main.size = 16;
+            main.fillBytes();
+            for (Method m : MainBytes.class.getMethods()) {
                 if (m.getAnnotation(Benchmark.class) != null) {
                     m.invoke(main);
                 }
@@ -61,7 +56,7 @@ public class Main16bytes {
             int time = Boolean.getBoolean("longTest") ? 30 : 2;
             System.out.println("measurementTime: " + time + " secs");
             Options opt = new OptionsBuilder()
-                    .include(Main16bytes.class.getSimpleName())
+                    .include(MainBytes.class.getSimpleName())
                     .mode(Mode.SampleTime)
                     .measurementTime(TimeValue.seconds(time))
                     .timeUnit(TimeUnit.NANOSECONDS)
@@ -72,25 +67,36 @@ public class Main16bytes {
         }
     }
 
+    @Param({"16", "64", "256"})
+    int size;
+
+    @Setup(Level.Trial)
+    public void fillBytes() {
+        bytes = Bytes.allocateDirect(size).unchecked(true);
+        for (int i = 0; i < bytes.capacity(); i += 8) {
+            bytes.writeLong(i, num += 0x1111111111111111L);
+        }
+        bytes.writePosition(bytes.capacity());
+    }
+
     @Benchmark
     public long vanillaHash() {
-        for (int i = 0; i < bytes.capacity(); i += 8)
-            bytes.writeLong(i, num += 0x1111111111111111L);
         return OptimisedBytesHash.INSTANCE.applyAsLong(bytes);
     }
 
     @Benchmark
     public long city11Hash() {
-        for (int i = 0; i < buffer.capacity(); i += 8)
-            buffer.putLong(i, num += 0x1111111111111111L);
-        return city_1_1.hashBytes(buffer);
+        return city_1_1.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
     }
 
     @Benchmark
     public long murmur3Hash() {
-        for (int i = 0; i < buffer.capacity(); i += 8)
-            buffer.putLong(i, num += 0x1111111111111111L);
-        return murmur_3.hashBytes(buffer);
+        return murmur_3.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
+    }
+
+    @Benchmark
+    public long xx39Hash() {
+        return xx_r39.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
     }
 }
 
