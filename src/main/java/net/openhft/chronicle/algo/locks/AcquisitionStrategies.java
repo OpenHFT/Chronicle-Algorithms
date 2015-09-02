@@ -83,7 +83,7 @@ public final class AcquisitionStrategies {
 
         @Override
         boolean end() {
-            throw new RuntimeException("Failed to acquire the lock");
+            throw new IllegalStateException("Failed to acquire the lock");
         }
     }
 

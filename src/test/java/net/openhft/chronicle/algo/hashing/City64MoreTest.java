@@ -38,7 +38,7 @@ public class City64MoreTest {
             for (int i = 0; i < hashs.length; i++) {
                 b.clear();
                 b.append(t);
-                b.append('-');
+                b.appendUtf8('-');
                 b.append(i);
                 long start = System.nanoTime();
                 hashs[i] = LongHashFunction.city_1_1().hash((Object) null, NativeAccess.instance(), b.address(b.readPosition()), b.readRemaining());

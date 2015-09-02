@@ -38,7 +38,7 @@ public class MurmurHash3MoreTest {
             for (int i = 0; i < hashs.length; i++) {
                 b.clear();
                 b.append(t);
-                b.append('-');
+                b.appendUtf8('-');
                 b.append(i);
                 long start = System.nanoTime();
                 hashs[i] = LongHashFunction.murmur_3().hash((Object) null, NativeAccess.instance(), b.address(b.readPosition()), b.readRemaining());
