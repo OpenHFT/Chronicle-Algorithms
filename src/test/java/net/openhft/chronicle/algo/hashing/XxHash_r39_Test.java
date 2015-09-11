@@ -26,64 +26,32 @@ import java.util.Collection;
 @RunWith(Parameterized.class)
 public class XxHash_r39_Test {
 
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        ArrayList<Object[]> data = new ArrayList<Object[]>();
-        for (int len = 0; len < 1025; len++) {
-            data.add(new Object[]{len});
-        }
-        return data;
-    }
-
-    @Parameterized.Parameter
-    public int len;
-
-    @Test
-    public void testCityWithoutSeeds() {
-        test(LongHashFunction.xx_r39(), HASHES_OF_LOOPING_BYTES_WITHOUT_SEED);
-    }
-
-    @Test
-    public void testCityWithOneSeed() {
-        test(LongHashFunction.xx_r39(42L), HASHES_OF_LOOPING_BYTES_WITH_SEED_42);
-    }
-
-
-    public void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
-        byte[] data = new byte[len];
-        for (int j = 0; j < data.length; j++) {
-            data[j] = (byte) j;
-        }
-        LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
-    }
-
     /**
      * Test data is output of the following program with xxHash implementation
      * from https://code.google.com/p/xxhash/
-     *
+     * <p>
      * #include "xxhash.c"
      * #include <stdlib.h>
      * #include <stdio.h>
      * int main()
      * {
-     *     char* src = (char*) malloc(1024);
-     *     const int N = 1024;
-     *     for (int i = 0; i < N; i++) {
-     *         src[i] = (char) i;
-     *     }
-     *
-     *     printf("without seed\n");
-     *     for (int i = 0; i <= N; i++) {
-     *        printf("%lldL,\n", (long long) XXH64(src, i, 0));
-     *     }
-     *
-     *     printf("with seed 42\n");
-     *     for (int i = 0; i <= N; i++) {
-     *        printf("%lldL,\n", (long long) XXH64(src, i, 42));
-     *     }
+     * char* src = (char*) malloc(1024);
+     * const int N = 1024;
+     * for (int i = 0; i < N; i++) {
+     * src[i] = (char) i;
+     * }
+     * <p>
+     * printf("without seed\n");
+     * for (int i = 0; i <= N; i++) {
+     * printf("%lldL,\n", (long long) XXH64(src, i, 0));
+     * }
+     * <p>
+     * printf("with seed 42\n");
+     * for (int i = 0; i <= N; i++) {
+     * printf("%lldL,\n", (long long) XXH64(src, i, 42));
+     * }
      * }
      */
-
     public static final long[] HASHES_OF_LOOPING_BYTES_WITHOUT_SEED = {
             -1205034819632174695L,
             -1642502924627794072L,
@@ -1111,7 +1079,6 @@ public class XxHash_r39_Test {
             1887955086977822594L,
             8014460039616323415L
     };
-
     public static final long[] HASHES_OF_LOOPING_BYTES_WITH_SEED_42 = {
             -7444071767201028348L,
             -8959994473701255385L,
@@ -2139,4 +2106,33 @@ public class XxHash_r39_Test {
             4879532090226251157L,
             5528644708740739488L
     };
+    @Parameterized.Parameter
+    public int len;
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        ArrayList<Object[]> data = new ArrayList<Object[]>();
+        for (int len = 0; len < 1025; len++) {
+            data.add(new Object[]{len});
+        }
+        return data;
+    }
+
+    @Test
+    public void testCityWithoutSeeds() {
+        test(LongHashFunction.xx_r39(), HASHES_OF_LOOPING_BYTES_WITHOUT_SEED);
+    }
+
+    @Test
+    public void testCityWithOneSeed() {
+        test(LongHashFunction.xx_r39(42L), HASHES_OF_LOOPING_BYTES_WITH_SEED_42);
+    }
+
+    public void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
+        byte[] data = new byte[len];
+        for (int j = 0; j < data.length; j++) {
+            data[j] = (byte) j;
+        }
+        LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
+    }
 }

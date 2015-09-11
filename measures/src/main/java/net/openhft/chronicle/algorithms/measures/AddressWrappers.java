@@ -35,7 +35,6 @@ public enum AddressWrappers implements AddressWrapper {
 
         @Override
         public void setAddress(long address, long length) {
-
         }
 
         @Override
@@ -48,7 +47,6 @@ public enum AddressWrappers implements AddressWrapper {
 
         @Override
         public void setAddress(long address, long length) {
-
         }
 
         @Override
