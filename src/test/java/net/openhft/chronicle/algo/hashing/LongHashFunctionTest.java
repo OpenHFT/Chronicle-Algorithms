@@ -63,7 +63,6 @@ public class LongHashFunctionTest {
         if (len == 1)
             assertEquals("byte hash", eh, f.hashByte(bb.get(0)));
 
-
         if (len == 2) {
             assertEquals("short hash", eh, f.hashShort(bb.getShort(0)));
             assertEquals("char hash", eh, f.hashChar(bb.getChar(0)));
@@ -94,7 +93,6 @@ public class LongHashFunctionTest {
             short[] shorts2 = new short[shortLen + 2];
             System.arraycopy(shorts, 0, shorts2, 1, shortLen);
             assertEquals("short array off len", eh, f.hashShorts(shorts2, 1, shortLen));
-
 
             char[] chars = new char[shortLen];
             bb.asCharBuffer().get(chars);

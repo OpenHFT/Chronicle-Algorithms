@@ -16,7 +16,6 @@
 
 package net.openhft.chronicle.algo.locks;
 
-
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.algo.bytes.Accessor;
 import net.openhft.chronicle.bytes.BytesStore;

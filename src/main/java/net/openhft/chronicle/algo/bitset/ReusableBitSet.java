@@ -39,7 +39,6 @@ public class ReusableBitSet implements BitSet {
         return this;
     }
 
-
     @Override
     public void flip(long bitIndex) {
         frame.flip(access, handle, offset, bitIndex);

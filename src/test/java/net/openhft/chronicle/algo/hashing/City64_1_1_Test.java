@@ -29,60 +29,6 @@ import static org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class City64_1_1_Test {
 
-    @Parameters
-    public static Collection<Object[]> data() {
-        ArrayList<Object[]> data = new ArrayList<Object[]>();
-        for (int len = 0; len < 1025; len++) {
-        	data.add(new Object[] {len});
-        }
-        return data;
-    }
-
-    @Parameter
-    public int len;
-
-    @Test
-    public void testCityWithoutSeeds() {
-        test(LongHashFunction.city_1_1(), HASHES_OF_LOOPING_BYTES_WITHOUT_SEEDS);
-    }
-
-    @Test
-    public void testCityWithOneSeed() {
-        test(LongHashFunction.city_1_1(0L, 0L), HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0);
-    }
-
-
-    public void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
-        byte[] data = new byte[len];
-        for (int j = 0; j < data.length; j++) {
-            data[j] = (byte) j;
-        }
-        LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
-    }
-
-
-// The following numbers is the result of compiling & running this program
-// with city-1.1.1, reference impl:
-//
-//    #include <stdlib.h>
-//    #include <stdio.h>
-//    #include <city.h>
-//
-//     main() {
-//        char* src = (char*) malloc(1024);
-//        for (int i = 0; i < 1024; i++) {
-//            src[i] = (char) i;
-//        }
-//        printf("without seeds\n");
-//        for (int i = 0; i <= 1024; i++) {
-//            printf("%lldL,\n", (long long)CityHash64(src, i));
-//        }
-//        printf("with seeds 0, 0\n");
-//        for (int i = 0; i <= 1024; i++) {
-//            printf("%lldL,\n", (long long)CityHash64WithSeeds(src, i, 0, 0));
-//        }
-//    }
-
     public static final long[] HASHES_OF_LOOPING_BYTES_WITHOUT_SEEDS = {
             -7286425919675154353L,
             -4728684028706075820L,
@@ -1110,7 +1056,6 @@ public class City64_1_1_Test {
             -8655210458445057123L,
             -7169091905545403953L,
     };
-
     public static final long[] HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0 = new long[]{
             6665653827947065942L,
             -5789604048565922719L,
@@ -2138,4 +2083,55 @@ public class City64_1_1_Test {
             -6312701748516438716L,
             -8712455751362790038L,
     };
+    @Parameter
+    public int len;
+
+    @Parameters
+    public static Collection<Object[]> data() {
+        ArrayList<Object[]> data = new ArrayList<Object[]>();
+        for (int len = 0; len < 1025; len++) {
+            data.add(new Object[]{len});
+        }
+        return data;
+    }
+
+    @Test
+    public void testCityWithoutSeeds() {
+        test(LongHashFunction.city_1_1(), HASHES_OF_LOOPING_BYTES_WITHOUT_SEEDS);
+    }
+
+// The following numbers is the result of compiling & running this program
+// with city-1.1.1, reference impl:
+//
+//    #include <stdlib.h>
+//    #include <stdio.h>
+//    #include <city.h>
+//
+//     main() {
+//        char* src = (char*) malloc(1024);
+//        for (int i = 0; i < 1024; i++) {
+//            src[i] = (char) i;
+//        }
+//        printf("without seeds\n");
+//        for (int i = 0; i <= 1024; i++) {
+//            printf("%lldL,\n", (long long)CityHash64(src, i));
+//        }
+//        printf("with seeds 0, 0\n");
+//        for (int i = 0; i <= 1024; i++) {
+//            printf("%lldL,\n", (long long)CityHash64WithSeeds(src, i, 0, 0));
+//        }
+//    }
+
+    @Test
+    public void testCityWithOneSeed() {
+        test(LongHashFunction.city_1_1(0L, 0L), HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0);
+    }
+
+    public void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
+        byte[] data = new byte[len];
+        for (int j = 0; j < data.length; j++) {
+            data[j] = (byte) j;
+        }
+        LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
+    }
 }
