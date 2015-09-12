@@ -30,11 +30,27 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     public static final long ALL_ONES = ~0L;
 
-    // masks
     private final long longLength;
 
+    /**
+     * Creates a new {@code SingleThreadedFlatBitSetFrame} of the given logical size
+     *
+     * @param logicalSize the logical bit set size, should be {@code long}-aligned
+     *                    (i. e. a multiple of 8)
+     * @throws IllegalArgumentException is the given logicalSize is not a multiple of 8
+     * or non-positive
+     */
     public SingleThreadedFlatBitSetFrame(long logicalSize) {
+        if (logicalSize <= 0) {
+            throw new IllegalArgumentException("Logical size should be positive, " +
+                    logicalSize + " given");
+        }
         longLength = BITS.toLongs(logicalSize);
+        if (LONGS.toBits(longLength) != logicalSize) {
+            throw new IllegalArgumentException(
+                    "logical size should be long-aligned (i. e. a multiple of 8), " +
+                            logicalSize + " given");
+        }
     }
 
     static long singleBit(long bitIndex) {
