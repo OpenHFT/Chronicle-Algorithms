@@ -48,39 +48,85 @@ public class HashTesterMain {
         FTSE.stream().map(String::hashCode).forEach(hashes);
     }
 
-    @HashTest("String.hashCode() & 511")
+    @HashTest("String.hashCode() mask 9 bits")
     public static void generateStringHashCodeAnd511(Consumer<Integer> hashes) {
-        FTSE.stream().map(s -> s.hashCode() & 511).forEach(hashes);
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 9) - 1)).forEach(hashes);
     }
 
-    @HashTest("String.hashCode() & 1023")
+    @HashTest("String.hashCode() mask 10 bits")
     public static void generateStringHashCodeAnd1023(Consumer<Integer> hashes) {
-        FTSE.stream().map(s -> s.hashCode() & 1023).forEach(hashes);
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 10) - 1)).forEach(hashes);
     }
 
-    @HashTest("String.hashCode() & 2047")
+    @HashTest("String.hashCode() mask 11 bits")
     public static void generateStringHashCodeAnd2047(Consumer<Integer> hashes) {
-        FTSE.stream().map(s -> s.hashCode() & 2047).forEach(hashes);
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 11) - 1)).forEach(hashes);
     }
 
-    @HashTest("String.hashCode() & 4095")
+    @HashTest("String.hashCode() mask 12 bits")
     public static void generateStringHashCodeAnd4095(Consumer<Integer> hashes) {
-        FTSE.stream().map(s -> s.hashCode() & 4095).forEach(hashes);
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 12) - 1)).forEach(hashes);
     }
 
-    @HashTest("HashMap.hash(String.hashCode()) & 511")
+    @HashTest("String.hashCode() mask 13 bits")
+    public static void generateStringHashCodeAnd8191(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 13) - 1)).forEach(hashes);
+    }
+
+    @HashTest("String.hashCode() mask 14 bits")
+    public static void generateStringHashCodeAnd14(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 14) - 1)).forEach(hashes);
+    }
+
+    @HashTest("String.hashCode() mask 15 bits")
+    public static void generateStringHashCodeAnd15(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 15) - 1)).forEach(hashes);
+    }
+
+    @HashTest("String.hashCode() mask 16 bits")
+    public static void generateStringHashCodeAnd16(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> s.hashCode() & ((1 << 16) - 1)).forEach(hashes);
+    }
+
+
+    @HashTest("HashMap.hash(String.hashCode()) mask 9")
     public static void generateStringHashCodeXorShift(Consumer<Integer> hashes) {
-        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & 511).forEach(hashes);
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 9) - 1)).forEach(hashes);
     }
 
-    @HashTest("HashMap.hash(String.hashCode()) & 1023")
+    @HashTest("HashMap.hash(String.hashCode()) mask 10")
     public static void generateStringHashCodeXorShiftAnd1023(Consumer<Integer> hashes) {
-        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & 1023).forEach(hashes);
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 10) - 1)).forEach(hashes);
     }
 
-    @HashTest("HashMap.hash(String.hashCode()) & 2047")
+    @HashTest("HashMap.hash(String.hashCode()) mask 11")
     public static void generateStringHashCodeXorShiftAnd2047(Consumer<Integer> hashes) {
-        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & 2047).forEach(hashes);
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 11) - 1)).forEach(hashes);
+    }
+
+    @HashTest("HashMap.hash(String.hashCode()) mask 12")
+    public static void generateStringHashCodeXorShiftAnd12(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 12) - 1)).forEach(hashes);
+    }
+
+    @HashTest("HashMap.hash(String.hashCode()) mask 13")
+    public static void generateStringHashCodeXorShiftAnd13(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 13) - 1)).forEach(hashes);
+    }
+
+    @HashTest("HashMap.hash(String.hashCode()) mask 14")
+    public static void generateStringHashCodeXorShiftAnd14(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 14) - 1)).forEach(hashes);
+    }
+
+    @HashTest("HashMap.hash(String.hashCode()) mask 15")
+    public static void generateStringHashCodeXorShiftAnd15(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 15) - 1)).forEach(hashes);
+    }
+
+    @HashTest("HashMap.hash(String.hashCode()) mask 16")
+    public static void generateStringHashCodeXorShiftAnd16(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 16) - 1)).forEach(hashes);
     }
 
     @HashTest("hashCode(String, 1) & 511")
@@ -116,6 +162,26 @@ public class HashTesterMain {
     @HashTest("hashCode(String, 7) & 511")
     public static void generateMultiplierHash7And511(Consumer<Integer> hashes) {
         FTSE.stream().map(s -> hash(s, 7) & 511).forEach(hashes);
+    }
+
+    @HashTest("hashCode(String, 8) & 511")
+    public static void generateMultiplierHash8And511(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hash(s, 8) & 511).forEach(hashes);
+    }
+
+    @HashTest("hashCode(String, 9) & 511")
+    public static void generateMultiplierHash9And511(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hash(s, 9) & 511).forEach(hashes);
+    }
+
+    @HashTest("hashCode(String, 10) & 511")
+    public static void generateMultiplierHash10And511(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hash(s, 10) & 511).forEach(hashes);
+    }
+
+    @HashTest("hashCode(String, 11) & 511")
+    public static void generateMultiplierHash11And511(Consumer<Integer> hashes) {
+        FTSE.stream().map(s -> hash(s, 11) & 511).forEach(hashes);
     }
 
     public static int hashMap_hash(Object key) {

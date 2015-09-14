@@ -27,9 +27,10 @@ import static net.openhft.chronicle.algo.hashing.HashTesterMain.FTSE;
 public class HashSearcherMain {
     public static void main(String[] args) {
         Random rand = new Random();
-        int samples = 10_000_000;
-        RandomOptimiser<Integer> optimiser = new RandomOptimiser<>(() -> rand.nextInt() | 1, Comparator.comparing(Integer::toUnsignedLong), samples);
-        int mask = 1023;
+        int samples = 1_000_000;
+        RandomOptimiser<Integer> optimiser = new RandomOptimiser<>(() -> rand.nextInt() | 1,
+                Comparator.comparing(Integer::toUnsignedLong), samples);
+        int mask = (1 << 9) - 1;
         optimiser.randomSearch(i ->
                 HashTesterRunner.performTest(c ->
                         FTSE.stream().map(s ->
