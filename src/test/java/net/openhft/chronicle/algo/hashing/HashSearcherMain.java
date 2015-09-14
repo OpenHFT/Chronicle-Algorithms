@@ -30,7 +30,7 @@ public class HashSearcherMain {
         int samples = 1_000_000;
         RandomOptimiser<Integer> optimiser = new RandomOptimiser<>(() -> rand.nextInt() | 1,
                 Comparator.comparing(Integer::toUnsignedLong), samples);
-        int mask = (1 << 9) - 1;
+        int mask = (1 << 10) - 1;
         optimiser.randomSearch(i ->
                 HashTesterRunner.performTest(c ->
                         FTSE.stream().map(s ->
@@ -59,6 +59,14 @@ public class HashSearcherMain {
         System.out.println("xorShift16n9(hash): " + optimiser);
     }
 
+    public static int hash(String s, int multiplier) {
+        int h = 0;
+        for (int i = 0; i < s.length(); i++) {
+            h = multiplier * h + s.charAt(i);
+        }
+        return h;
+    }
+
     private static int xorShift16(int hash) {
         return hash ^ (hash >> 16);
     }
@@ -71,14 +79,6 @@ public class HashSearcherMain {
         hash ^= (hash >>> 16);
         hash ^= (hash >>> 9);
         return hash;
-    }
-
-    public static int hash(String s, int multiplier) {
-        int h = 0;
-        for (int i = 0; i < s.length(); i++) {
-            h = multiplier * h + s.charAt(i);
-        }
-        return h;
     }
 
 }
