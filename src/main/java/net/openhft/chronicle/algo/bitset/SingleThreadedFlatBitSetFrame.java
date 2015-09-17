@@ -102,24 +102,35 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         if (fromIndex < 0) {
             if (fromIndex == NOT_FOUND)
                 return true;
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("from index: " + fromIndex);
         }
         return false;
+    }
+
+    static void checkFromIndex(long fromIndex) {
+        if (fromIndex < 0)
+            throw new IndexOutOfBoundsException("from index: " + fromIndex);
     }
 
     long byteWithThisBit(long offset, long bitIndex) {
         return offset + ((bitIndex >> 6) << 3);
     }
 
-    private void checkIndex(long bitIndex, long longIndex) {
-        if (bitIndex < 0 || longIndex >= longLength)
-            throw new IndexOutOfBoundsException();
+    private boolean checkIndex(long bitIndex) {
+        if (bitIndex < 0 || (bitIndex >> 6) >= longLength) {
+            throw new IndexOutOfBoundsException(
+                    "index: " + bitIndex + ", logical size: " + LONGS.toBits(longLength));
+        }
+        return true;
     }
 
-    private void checkFromTo(long fromIndex, long exclusiveToIndex, long toLongIndex) {
-        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
-                toLongIndex >= longLength)
-            throw new IndexOutOfBoundsException();
+    private boolean checkFromTo(long fromIndex, long exclusiveToIndex, long toLongIndex) {
+        if (fromIndex < 0 || fromIndex > exclusiveToIndex || toLongIndex >= longLength) {
+            throw new IndexOutOfBoundsException(
+                    "index range: [" + fromIndex + ", " + exclusiveToIndex + "), " +
+                    "logical size: " + LONGS.toBits(longLength));
+        }
+        return true;
     }
 
     private <T> long readLong(Access<T> access, T handle, long offset, long longIndex) {
@@ -133,6 +144,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void flip(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long byteIndex = byteWithThisBit(offset, bitIndex);
         long mask = singleBit(bitIndex);
         long l = access.readLong(handle, byteIndex);
@@ -146,7 +158,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -185,6 +197,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void set(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long byteIndex = byteWithThisBit(offset, bitIndex);
         long mask = singleBit(bitIndex);
         long l = access.readLong(handle, byteIndex);
@@ -196,6 +209,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean setIfClear(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long byteIndex = byteWithThisBit(offset, bitIndex);
         long mask = singleBit(bitIndex);
         long l = access.readLong(handle, byteIndex);
@@ -212,7 +226,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -258,6 +272,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void clear(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long byteIndex = byteWithThisBit(offset, bitIndex);
         long mask = singleBit(bitIndex);
         long l = access.readLong(handle, byteIndex);
@@ -269,6 +284,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean clearIfSet(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long byteIndex = byteWithThisBit(offset, bitIndex);
         long mask = singleBit(bitIndex);
         long l = access.readLong(handle, byteIndex);
@@ -285,7 +301,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -328,7 +344,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -366,7 +382,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -405,6 +421,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean get(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long byteIndex = byteWithThisBit(offset, bitIndex);
         long l = access.readLong(handle, byteIndex);
         return (l & (singleBit(bitIndex))) != 0;
@@ -412,8 +429,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long nextSetBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -441,8 +457,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long clearNextSetBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -470,8 +485,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long nextClearBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -489,8 +503,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long setNextClearBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -544,7 +557,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                                     long fromIndex, long inclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toLongIndex = longWithThisBit(inclusiveToIndex);
-        checkFromTo(inclusiveToIndex, fromIndex + 1, toLongIndex);
+        assert checkFromTo(inclusiveToIndex, fromIndex + 1, toLongIndex);
         if (fromLongIndex >= longLength) {
             // the same policy for this "index out of bounds" situation
             // as in j.u.BitSet
@@ -685,8 +698,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
             return setNextClearBit(access, handle, offset, fromIndex);
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
 
         long nTrailingOnes = ALL_ONES >>> (64 - numberOfBits);
 
@@ -812,8 +824,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
             return clearNextSetBit(access, handle, offset, fromIndex);
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
 
         long nTrailingOnes = ALL_ONES >>> (64 - numberOfBits);
 
