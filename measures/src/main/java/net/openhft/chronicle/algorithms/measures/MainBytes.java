@@ -19,7 +19,7 @@ package net.openhft.chronicle.algorithms.measures;
 import net.openhft.affinity.Affinity;
 import net.openhft.chronicle.algo.hashing.LongHashFunction;
 import net.openhft.chronicle.bytes.Bytes;
-import net.openhft.chronicle.bytes.algo.OptimisedBytesHash;
+import net.openhft.chronicle.bytes.algo.OptimisedBytesStoreHash;
 import net.openhft.chronicle.core.Jvm;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -34,11 +34,13 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Thread)
 public class MainBytes {
-    Bytes bytes;
-    long num = 0;
     static final LongHashFunction city_1_1 = LongHashFunction.city_1_1();
     static final LongHashFunction murmur_3 = LongHashFunction.murmur_3();
     static final LongHashFunction xx_r39 = LongHashFunction.xx_r39();
+    Bytes bytes;
+    long num = 0;
+    @Param({"16", "64", "256"})
+    int size;
 
     public static void main(String... args)
             throws RunnerException, InvocationTargetException, IllegalAccessException {
@@ -67,9 +69,6 @@ public class MainBytes {
         }
     }
 
-    @Param({"16", "64", "256"})
-    int size;
-
     @Setup(Level.Trial)
     public void fillBytes() {
         bytes = Bytes.allocateDirect(size).unchecked(true);
@@ -81,7 +80,7 @@ public class MainBytes {
 
     @Benchmark
     public long vanillaHash() {
-        return OptimisedBytesHash.INSTANCE.applyAsLong(bytes);
+        return OptimisedBytesStoreHash.INSTANCE.applyAsLong(bytes);
     }
 
     @Benchmark

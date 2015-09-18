@@ -21,7 +21,7 @@ import net.openhft.chronicle.algo.hashing.LongHashFunction;
 import net.openhft.chronicle.bytes.Bytes;
 import net.openhft.chronicle.bytes.BytesStore;
 import net.openhft.chronicle.bytes.PointerBytesStore;
-import net.openhft.chronicle.bytes.algo.OptimisedBytesHash;
+import net.openhft.chronicle.bytes.algo.OptimisedBytesStoreHash;
 
 import java.security.SecureRandom;
 import java.util.Random;
@@ -69,7 +69,7 @@ public enum AddressWrappers implements AddressWrapper {
 
         @Override
         public long hash() {
-            return OptimisedBytesHash.applyAsLong32bytesMultiple(bytes, length);
+            return OptimisedBytesStoreHash.applyAsLong32bytesMultiple(bytes, length);
         }
     },
     CITY_1_1 {
