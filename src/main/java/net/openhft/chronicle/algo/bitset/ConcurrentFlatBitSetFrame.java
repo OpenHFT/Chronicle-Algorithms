@@ -50,11 +50,27 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         return access.readVolatileLong(handle, firstByte(offset, longIndex));
     }
 
+    private boolean checkIndex(long bitIndex) {
+        if (bitIndex < 0 || (bitIndex >> 6) >= longLength) {
+            throw new IndexOutOfBoundsException(
+                    "index: " + bitIndex + ", logical size: " + LONGS.toBits(longLength));
+        }
+        return true;
+    }
+
+    private boolean checkFromTo(long fromIndex, long exclusiveToIndex, long toLongIndex) {
+        if (fromIndex < 0 || fromIndex > exclusiveToIndex || toLongIndex >= longLength) {
+            throw new IndexOutOfBoundsException(
+                    "index range: [" + fromIndex + ", " + exclusiveToIndex + "), " +
+                            "logical size: " + LONGS.toBits(longLength));
+        }
+        return true;
+    }
+
     @Override
     public <T> void flip(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
-        if (bitIndex < 0 || longIndex >= longLength)
-            throw new IndexOutOfBoundsException();
         long byteIndex = firstByte(offset, longIndex);
         // only 6 lowest-order bits used, JLS 15.19
         long mask = singleBit(bitIndex);
@@ -72,9 +88,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
-                toLongIndex >= longLength)
-            throw new IndexOutOfBoundsException();
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -132,9 +146,8 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void set(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
-        if (bitIndex < 0 || longIndex >= longLength)
-            throw new IndexOutOfBoundsException();
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
         while (true) {
@@ -149,9 +162,8 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean setIfClear(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
-        if (bitIndex < 0 || longIndex >= longLength)
-            throw new IndexOutOfBoundsException();
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
         while (true) {
@@ -170,9 +182,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
-                toLongIndex >= longLength)
-            throw new IndexOutOfBoundsException();
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -227,9 +237,8 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void clear(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
-        if (bitIndex < 0 || longIndex >= longLength)
-            throw new IndexOutOfBoundsException();
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
         while (true) {
@@ -244,9 +253,8 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean clearIfSet(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
-        if (bitIndex < 0 || longIndex >= longLength)
-            throw new IndexOutOfBoundsException();
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
         while (true) {
@@ -264,9 +272,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        if (fromIndex < 0 || fromIndex > exclusiveToIndex ||
-                toLongIndex >= longLength)
-            throw new IndexOutOfBoundsException();
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -319,9 +325,8 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean get(Access<T> access, T handle, long offset, long bitIndex) {
+        assert checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
-        if (bitIndex < 0 || longIndex >= longLength)
-            throw new IndexOutOfBoundsException();
         long l = readVolatileLong(access, handle, offset, longIndex);
         return (l & (singleBit(bitIndex))) != 0;
     }
@@ -340,8 +345,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long nextSetBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -369,8 +373,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long clearNextSetBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -407,8 +410,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long nextClearBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -426,8 +428,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long setNextClearBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength)
             return NOT_FOUND;
@@ -622,8 +623,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
             return setNextClearBit(access, handle, offset, fromIndex);
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
 
         int n64Complement = 64 - numberOfBits;
         long nTrailingOnes = ALL_ONES >>> n64Complement;
@@ -710,7 +710,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     /**
      * WARNING! This implementation doesn't strictly follow the contract
-     * from {@code DirectBitSet} interface. For the sake of atomicity this
+     * from {@code BitSetFrame} interface. For the sake of atomicity this
      * implementation couldn't find and flip the range crossing native word
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
@@ -723,8 +723,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
             return clearNextSetBit(access, handle, offset, fromIndex);
-        if (fromIndex < 0)
-            throw new IndexOutOfBoundsException();
+        checkFromIndex(fromIndex);
 
         int n64Complement = 64 - numberOfBits;
         long nTrailingOnes = ALL_ONES >>> n64Complement;
