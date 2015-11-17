@@ -25,19 +25,20 @@ public final class AcquisitionStrategies {
     private AcquisitionStrategies() {
     }
 
-    public static AcquisitionStrategy<LockingStrategy, RuntimeException> spinLoop(
-            long duration, TimeUnit unit) {
-        return new SpinLoopAcquisitionStrategy<LockingStrategy>(duration, unit);
+    public static <S extends LockingStrategy>
+    AcquisitionStrategy<S, RuntimeException> spinLoop(long duration, TimeUnit unit) {
+        return new SpinLoopAcquisitionStrategy<>(duration, unit);
     }
 
-    public static AcquisitionStrategy<LockingStrategy, RuntimeException> spinLoopOrFail(
-            long duration, TimeUnit unit) {
-        return new SpinLoopOrFailAcquisitionStrategy<LockingStrategy>(duration, unit);
+    public static <S extends LockingStrategy>
+    AcquisitionStrategy<S, RuntimeException> spinLoopOrFail(long duration, TimeUnit unit) {
+        return new SpinLoopOrFailAcquisitionStrategy<>(duration, unit);
     }
 
-    public static AcquisitionStrategy<ReadWriteWithWaitsLockingStrategy, RuntimeException>
-    spinLoopRegisteringWaitOrFail(long duration, TimeUnit unit) {
-        return new SpinLoopWriteWithWaitsAcquisitionStrategy(duration, unit);
+    public static <S extends ReadWriteWithWaitsLockingStrategy>
+    AcquisitionStrategy<S, RuntimeException> spinLoopRegisteringWaitOrFail(
+            long duration, TimeUnit unit) {
+        return new SpinLoopWriteWithWaitsAcquisitionStrategy<>(duration, unit);
     }
 
     private static class SpinLoopAcquisitionStrategy<S extends LockingStrategy>
@@ -50,7 +51,7 @@ public final class AcquisitionStrategies {
 
         @Override
         public <T> boolean acquire(TryAcquireOperation<? super S> operation, S strategy,
-                Access<T> access, T t, long offset) {
+                                   Access<T> access, T t, long offset) {
             if (operation.tryAcquire(strategy, access, t, offset))
                 return true;
             long deadLine = System.currentTimeMillis() + durationNanos;
@@ -87,22 +88,21 @@ public final class AcquisitionStrategies {
         }
     }
 
-    private static class SpinLoopWriteWithWaitsAcquisitionStrategy
-            extends SpinLoopOrFailAcquisitionStrategy<ReadWriteWithWaitsLockingStrategy> {
+    private static class SpinLoopWriteWithWaitsAcquisitionStrategy<
+            S extends ReadWriteWithWaitsLockingStrategy>
+            extends SpinLoopOrFailAcquisitionStrategy<S> {
 
         private SpinLoopWriteWithWaitsAcquisitionStrategy(long duration, TimeUnit unit) {
             super(duration, unit);
         }
 
         @Override
-        <T> void beforeLoop(ReadWriteWithWaitsLockingStrategy strategy,
-                            Access<T> access, T t, long offset) {
+        <T> void beforeLoop(S strategy, Access<T> access, T t, long offset) {
             strategy.registerWait(access, t, offset);
         }
 
         @Override
-        <T> void afterLoop(ReadWriteWithWaitsLockingStrategy strategy,
-                           Access<T> access, T t, long offset) {
+        <T> void afterLoop(S strategy, Access<T> access, T t, long offset) {
             strategy.deregisterWait(access, t, offset);
         }
     }
