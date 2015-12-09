@@ -54,12 +54,12 @@ public final class AcquisitionStrategies {
                                    Access<T> access, T t, long offset) {
             if (operation.tryAcquire(strategy, access, t, offset))
                 return true;
-            long deadLine = System.currentTimeMillis() + durationNanos;
+            long deadLineNanos = System.nanoTime() + durationNanos;
             beforeLoop(strategy, access, t, offset);
             do {
                 if (operation.tryAcquire(strategy, access, t, offset))
                     return true;
-            } while (deadLine - System.currentTimeMillis() >= 0L); // overflow-cautious
+            } while (deadLineNanos - System.nanoTime() >= 0L); // overflow-cautious
             afterLoop(strategy, access, t, offset);
             return end();
         }
