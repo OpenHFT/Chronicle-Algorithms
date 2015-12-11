@@ -227,8 +227,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     @Override
     public <T> boolean tryWriteLock(Access<T> access, T t, long offset) {
-        return getCountWord(access, t, offset) == 0 &&
-                casCountWord(access, t, offset, 0, WRITE_LOCKED_COUNT_WORD);
+        return casCountWord(access, t, offset, 0, WRITE_LOCKED_COUNT_WORD);
     }
 
     @Override
