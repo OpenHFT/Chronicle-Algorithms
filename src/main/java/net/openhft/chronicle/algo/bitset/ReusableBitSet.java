@@ -30,7 +30,7 @@ public class ReusableBitSet implements BitSet {
         reuse(frame, access, handle, offset);
     }
 
-    public <T> ReusableBitSet reuse(
+    public final <T> ReusableBitSet reuse(
             BitSetFrame frame, Access<T> access, T handle, long offset) {
         this.frame = frame;
         this.access = access;
