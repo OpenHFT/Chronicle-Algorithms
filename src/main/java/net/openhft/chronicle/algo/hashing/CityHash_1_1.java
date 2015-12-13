@@ -296,7 +296,7 @@ class CityHash_1_1 {
         public long hashLong(long input) {
             input = NATIVE_CITY.toLittleEndian(input);
             long hash = hash8To16Bytes(8L, input, input);
-            return finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
@@ -304,7 +304,7 @@ class CityHash_1_1 {
             input = NATIVE_CITY.toLittleEndian(input);
             long unsignedInt = Primitives.unsignedInt(input);
             long hash = hash4To7Bytes(4L, unsignedInt, unsignedInt);
-            return finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
@@ -318,14 +318,14 @@ class CityHash_1_1 {
             int firstByte = (unsignedInput >> FIRST_SHORT_BYTE_SHIFT) & FIRST_SHORT_BYTE_MASK;
             int secondByte = (unsignedInput >> SECOND_SHORT_BYTE_SHIFT) & SECOND_SHORT_BYTE_MASK;
             long hash = hash1To3Bytes(2, firstByte, secondByte, secondByte);
-            return finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
         public long hashByte(byte input) {
             int unsignedByte = Primitives.unsignedByte(input);
             long hash = hash1To3Bytes(1, unsignedByte, unsignedByte, unsignedByte);
-            return finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
@@ -341,10 +341,10 @@ class CityHash_1_1 {
             } else {
                 hash = BigEndian.INSTANCE.cityHash64(access, input, off, len);
             }
-            return finalize(hash);
+            return finalizeHash(hash);
         }
 
-        long finalize(long hash) {
+        long finalizeHash(long hash) {
             return hash;
         }
     }
@@ -358,7 +358,7 @@ class CityHash_1_1 {
         private AsLongHashFunctionSeeded(long seed0, long seed1) {
             this.seed0 = seed0;
             this.seed1 = seed1;
-            voidHash = finalize(K2);
+            voidHash = finalizeHash(K2);
         }
 
         @Override
@@ -367,7 +367,7 @@ class CityHash_1_1 {
         }
 
         @Override
-        protected final long finalize(long hash) {
+        protected final long finalizeHash(long hash) {
             return hashLen16(hash - seed0, seed1);
         }
     }
