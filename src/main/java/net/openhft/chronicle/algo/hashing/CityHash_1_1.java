@@ -367,7 +367,7 @@ class CityHash_1_1 {
         }
 
         @Override
-        protected long finalize(long hash) {
+        protected final long finalize(long hash) {
             return hashLen16(hash - seed0, seed1);
         }
     }
