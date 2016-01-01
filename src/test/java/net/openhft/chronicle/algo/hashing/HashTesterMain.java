@@ -88,7 +88,6 @@ public class HashTesterMain {
         FTSE.stream().map(s -> s.hashCode() & ((1 << 16) - 1)).forEach(hashes);
     }
 
-
     @HashTest("HashMap.hash(String.hashCode()) mask 9")
     public static void generateStringHashCodeXorShift(Consumer<Integer> hashes) {
         FTSE.stream().map(s -> hashMap_hash(s.hashCode()) & ((1 << 9) - 1)).forEach(hashes);
