@@ -198,10 +198,13 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     @Override
     public <T> boolean tryUpgradeReadToWriteLock(Access<T> access, T t, long offset) {
-        int countWord = getCountWord(access, t, offset);
-        checkReadLocked(countWord);
-        return countWord == READ_PARTY &&
-                casCountWord(access, t, offset, READ_PARTY, WRITE_LOCKED_COUNT_WORD);
+        if (casCountWord(access, t, offset, READ_PARTY, WRITE_LOCKED_COUNT_WORD)) {
+            return true;
+        } else {
+            int countWord = getCountWord(access, t, offset);
+            checkReadLocked(countWord);
+            return false;
+        }
     }
 
     @Override
@@ -260,9 +263,13 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     @Override
     public <T> boolean tryUpgradeUpdateToWriteLock(Access<T> access, T t, long offset) {
-        int countWord = getCountWord(access, t, offset);
-        return checkExclusiveUpdateLocked(countWord) &&
-                casCountWord(access, t, offset, countWord, WRITE_LOCKED_COUNT_WORD);
+        if (casCountWord(access, t, offset, UPDATE_PARTY, WRITE_LOCKED_COUNT_WORD)) {
+            return true;
+        } else {
+            int countWord = getCountWord(access, t, offset);
+            checkUpdateLocked(countWord);
+            return false;
+        }
     }
 
     @Override
