@@ -38,11 +38,9 @@ abstract class CharSequenceAccessor
     static {
         initAccessor:
         {
-            if (System.getProperty("java.vm.name").contains("HotSpot")) {
-                if (System.getProperty("java.version").compareTo("1.7.0_06") >= 0) {
-                    stringAccessor = HotSpotStringAccessor.INSTANCE;
-                    break initAccessor;
-                }
+            if (System.getProperty("java.vm.name").contains("HotSpot") && System.getProperty("java.version").compareTo("1.7.0_06") >= 0) {
+                stringAccessor = HotSpotStringAccessor.INSTANCE;
+                break initAccessor;
             }
             stringAccessor = nativeCharSequenceAccessor();
         }

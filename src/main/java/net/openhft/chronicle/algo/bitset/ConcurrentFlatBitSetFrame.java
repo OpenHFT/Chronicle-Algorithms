@@ -1009,9 +1009,8 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 if (l != 0) {
                     int trailingZeros = numberOfTrailingZeros(l);
                     long index = bitIndex + trailingZeros;
-                    if (((this.bitIndex = index + 1) & 63) == 0) {
-                        if ((byteIndex = i + 8) == byteLength)
-                            this.bitIndex = -1;
+                    if (((this.bitIndex = index + 1) & 63) == 0 && (byteIndex = i + 8) == byteLength) {
+                        this.bitIndex = -1;
                     }
                     return index;
                 }

@@ -221,9 +221,9 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     public <T> boolean tryUpdateLock(Access<T> access, T t, long offset) {
         long lockWord = getLockWord(access, t, offset);
         int countWord = countWord(lockWord);
-        if (!updateLocked(countWord) && !writeLocked(countWord) && waitWord(lockWord) == 0) {
-            if (casCountWord(access, t, offset, countWord, countWord + UPDATE_PARTY))
-                return true;
+        if (!updateLocked(countWord) && !writeLocked(countWord) && waitWord(lockWord) == 0 &&
+            casCountWord(access, t, offset, countWord, countWord + UPDATE_PARTY)) {
+            return true;
         }
         return false;
     }

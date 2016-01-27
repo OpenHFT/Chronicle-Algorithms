@@ -81,9 +81,8 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
         int readersLocked = rwReadLocked(lock);
         int writersLocked = rwWriteLocked(lock);
         // writers don't wait for waiting readers.
-        if (readersLocked <= 0 && writersLocked <= 0) {
-            if (cas(access, t, offset, lock, lock + RW_WRITE_LOCKED))
-                return true;
+        if (readersLocked <= 0 && writersLocked <= 0 && cas(access, t, offset, lock, lock + RW_WRITE_LOCKED)) {
+            return true;
         }
         return false;
     }
