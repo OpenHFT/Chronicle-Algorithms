@@ -89,11 +89,6 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         return countWord == WRITE_LOCKED_COUNT_WORD;
     }
 
-    private static void checkWriteLocked(int countWord) {
-        if (countWord != WRITE_LOCKED_COUNT_WORD)
-            throw new IllegalMonitorStateException("Expected write lock");
-    }
-
     private static boolean updateLocked(int countWord) {
         return (countWord & UPDATE_PARTY) != 0;
     }
@@ -157,8 +152,8 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     private static <T> void checkWriteLockedAndPut(
             Access<T> access, T t, long offset, int countWord) {
-        checkWriteLocked(getCountWord(access, t, offset));
-        putCountWord(access, t, offset, countWord);
+        if (!casCountWord(access, t, offset, WRITE_LOCKED_COUNT_WORD, countWord))
+            throw new IllegalMonitorStateException("Expected write lock");
     }
 
     @Override
