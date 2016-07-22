@@ -68,7 +68,6 @@
             <artifactId>chronicle-bytes</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -78,8 +77,6 @@
             <groupId>com.intellij</groupId>
             <artifactId>annotations</artifactId>
         </dependency>
-
-
 
         <!-- test dependencies -->
 
@@ -107,9 +104,7 @@
             <scope>test</scope>
         </dependency>
 
-
     </dependencies>
-
 
     <build>
         <plugins>
