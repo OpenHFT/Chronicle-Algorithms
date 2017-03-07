@@ -89,11 +89,6 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         return countWord == WRITE_LOCKED_COUNT_WORD;
     }
 
-    private static void checkWriteLocked(int countWord) {
-        if (countWord != WRITE_LOCKED_COUNT_WORD)
-            throw new IllegalMonitorStateException("Expected write lock");
-    }
-
     private static boolean updateLocked(int countWord) {
         return (countWord & UPDATE_PARTY) != 0;
     }
@@ -157,8 +152,8 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     private static <T> void checkWriteLockedAndPut(
             Access<T> access, T t, long offset, int countWord) {
-        checkWriteLocked(getCountWord(access, t, offset));
-        putCountWord(access, t, offset, countWord);
+        if (!casCountWord(access, t, offset, WRITE_LOCKED_COUNT_WORD, countWord))
+            throw new IllegalMonitorStateException("Expected write lock");
     }
 
     @Override
@@ -198,10 +193,13 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     @Override
     public <T> boolean tryUpgradeReadToWriteLock(Access<T> access, T t, long offset) {
-        int countWord = getCountWord(access, t, offset);
-        checkReadLocked(countWord);
-        return countWord == READ_PARTY &&
-                casCountWord(access, t, offset, READ_PARTY, WRITE_LOCKED_COUNT_WORD);
+        if (casCountWord(access, t, offset, READ_PARTY, WRITE_LOCKED_COUNT_WORD)) {
+            return true;
+        } else {
+            int countWord = getCountWord(access, t, offset);
+            checkReadLocked(countWord);
+            return false;
+        }
     }
 
     @Override
@@ -260,9 +258,13 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     @Override
     public <T> boolean tryUpgradeUpdateToWriteLock(Access<T> access, T t, long offset) {
-        int countWord = getCountWord(access, t, offset);
-        return checkExclusiveUpdateLocked(countWord) &&
-                casCountWord(access, t, offset, countWord, WRITE_LOCKED_COUNT_WORD);
+        if (casCountWord(access, t, offset, UPDATE_PARTY, WRITE_LOCKED_COUNT_WORD)) {
+            return true;
+        } else {
+            int countWord = getCountWord(access, t, offset);
+            checkUpdateLocked(countWord);
+            return false;
+        }
     }
 
     @Override
