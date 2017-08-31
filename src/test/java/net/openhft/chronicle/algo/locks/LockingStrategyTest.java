@@ -27,64 +27,43 @@ import org.junit.runners.Parameterized;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Arrays.asList;
 import static net.openhft.chronicle.algo.bytes.Accessor.uncheckedByteBufferAccessor;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.ADDRESS;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.BYTES_WITH_OFFSET;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(value = Parameterized.class)
 public class LockingStrategyTest {
     
-    ExecutorService e1, e2;
-    ByteBuffer buffer;
-    BytesStore bytesStore;
-    long offset;
-    LockingStrategy lockingStrategy;
-    AccessMethod accessMethod;
-    Access access;
-    Object handle;
-    TestReadWriteLockState rwLockState = new TestReadWriteLockState();
-    Callable<Boolean> tryReadLockTask = new Callable<Boolean>() {
-        @Override
-        public Boolean call() {
-            return rwls().tryReadLock();
-        }
-    };
-    TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
-    Runnable readUnlockTask = new Runnable() {
-        @Override
-        public void run() {
-            rwls().readUnlock();
-        }
-    };
-    Callable<Boolean> tryUpdateLockTask = new Callable<Boolean>() {
-        @Override
-        public Boolean call() {
-            return rwuls().tryUpdateLock();
-        }
-    };
-    Runnable updateUnlockTask = new Runnable() {
-        @Override
-        public void run() {
-            rwuls().updateUnlock();
-        }
-    };
-    Callable<Boolean> tryWriteLockTask = new Callable<Boolean>() {
-        @Override
-        public Boolean call() {
-            return rwls().tryWriteLock();
-        }
-    };
-    Runnable writeUnlockTask = new Runnable() {
-        @Override
-        public void run() {
-            rwls().writeUnlock();
-        }
-    };
+    private ExecutorService e1, e2;
+    @SuppressWarnings("FieldCanBeLocal")
+    private ByteBuffer buffer;
+    @SuppressWarnings("FieldCanBeLocal")
+    private BytesStore bytesStore;
+    private long offset;
+    private LockingStrategy lockingStrategy;
+    private AccessMethod accessMethod;
+    private Access access;
+    private Object handle;
+    private TestReadWriteLockState rwLockState = new TestReadWriteLockState();
+    private Callable<Boolean> tryReadLockTask = () -> rwls().tryReadLock();
+    private TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
+    private Runnable readUnlockTask = () -> rwls().readUnlock();
+    private Callable<Boolean> tryUpdateLockTask = () -> rwuls().tryUpdateLock();
+    private Runnable updateUnlockTask = () -> rwuls().updateUnlock();
+    private Callable<Boolean> tryWriteLockTask = () -> rwls().tryWriteLock();
+    private Runnable writeUnlockTask = () -> rwls().writeUnlock();
 
     public LockingStrategyTest(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
         this.lockingStrategy = lockingStrategy;
@@ -101,12 +80,13 @@ public class LockingStrategyTest {
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Before
     public void setUp() {
         e1 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>());
+                new LinkedBlockingQueue<>());
         e2 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>());
+                new LinkedBlockingQueue<>());
 
         buffer = ByteBuffer.allocateDirect(8);
         if (accessMethod == ADDRESS) {
@@ -129,14 +109,6 @@ public class LockingStrategyTest {
     public void tearDown() {
         e1.shutdown();
         e2.shutdown();
-    }
-
-    ReadWriteLockState rwls() {
-        return rwLockState;
-    }
-
-    ReadWriteUpdateLockState rwuls() {
-        return rwuLockState;
     }
 
     @Test
@@ -224,20 +196,10 @@ public class LockingStrategyTest {
         assertTrue(e1.submit(tryUpdateLockTask).get());
 
         // Try to acquire write lock in thread 1, should succeed...
-        assertTrue(e1.submit(new Callable<Boolean>() {
-            @Override
-            public Boolean call() {
-                return rwuls().tryUpgradeUpdateToWriteLock();
-            }
-        }).get());
+        assertTrue(e1.submit(() -> rwuls().tryUpgradeUpdateToWriteLock()).get());
 
         // Release the write lock in thread 1...
-        e1.submit(new Runnable() {
-            @Override
-            public void run() {
-                rwuls().downgradeWriteToUpdateLock();
-            }
-        });
+        e1.submit(() -> rwuls().downgradeWriteToUpdateLock());
 
         // Release the update lock in thread 1...
         e1.submit(updateUnlockTask).get();
@@ -281,53 +243,11 @@ public class LockingStrategyTest {
         // allow downgrade to read lock
         try {
             rwls().downgradeWriteToReadLock();
-        } catch (UnsupportedOperationException tolerated) {}
+        } catch (UnsupportedOperationException tolerated) {
+            // ignore
+        }
 
         rwls().reset();
-    }
-
-    void downgradeWriteToReadLockForbidden() {
-        try {
-            rwls().downgradeWriteToReadLock();
-            fail("downgradeWriteToReadLock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
-            // expected
-        }
-    }
-
-    void upgradeReadToWriteLockForbidden() {
-        try {
-            rwls().tryUpgradeReadToWriteLock();
-            fail("tryUpgradeReadToWriteLock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
-            // expected
-        }
-    }
-
-    void writeUnlockForbidden() {
-        try {
-            rwls().writeUnlock();
-            fail("writeUnlock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
-            // expected
-        }
-    }
-
-    void readUnlockForbidden() {
-        try {
-            rwls().readUnlock();
-            fail("readUnlock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
-            // expected
-        }
     }
 
     @Test
@@ -378,72 +298,107 @@ public class LockingStrategyTest {
         rwuls().updateUnlock();
     }
 
-    void downgradeWriteToUpdateLockForbidden() {
+    private void downgradeWriteToReadLockForbidden() {
+        try {
+            rwls().downgradeWriteToReadLock();
+            fail("downgradeWriteToReadLock() should fail");
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
+            // expected
+        }
+    }
+
+    private void upgradeReadToWriteLockForbidden() {
+        try {
+            rwls().tryUpgradeReadToWriteLock();
+            fail("tryUpgradeReadToWriteLock() should fail");
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
+            // expected
+        }
+    }
+
+    private void writeUnlockForbidden() {
+        try {
+            rwls().writeUnlock();
+            fail("writeUnlock() should fail");
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
+            // expected
+        }
+    }
+
+    private void readUnlockForbidden() {
+        try {
+            rwls().readUnlock();
+            fail("readUnlock() should fail");
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
+            // expected
+        }
+    }
+
+    private void downgradeWriteToUpdateLockForbidden() {
         try {
             rwuls().downgradeWriteToUpdateLock();
             fail("downgradeWriteToUpdateLock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
             // expected
         }
     }
 
-    void downgradeUpdateToReadLockForbidden() {
+    private void downgradeUpdateToReadLockForbidden() {
         try {
             rwuls().downgradeUpdateToReadLock();
             fail("downgradeUpdateToReadLock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
             // expected
         }
     }
 
-    void upgradeUpdateToWriteLockForbidden() {
+    private void upgradeUpdateToWriteLockForbidden() {
         try {
             rwuls().tryUpgradeUpdateToWriteLock();
             fail("tryUpgradeUpdateToWriteLock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
             // expected
         }
     }
 
-    void upgradeReadToUpdateLockForbidden() {
+    private void upgradeReadToUpdateLockForbidden() {
         try {
             rwuls().tryUpgradeReadToUpdateLock();
             fail("tryUpgradeReadToUpdateLock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
             // expected
         }
     }
 
-    void updateUnlockForbidden() {
+    private void updateUnlockForbidden() {
         try {
             rwuls().updateUnlock();
             fail("updateUnlock() should fail");
-        } catch (IllegalMonitorStateException e) {
-            // expected
-        } catch (UnsupportedOperationException e2) {
+        } catch (IllegalMonitorStateException | UnsupportedOperationException e) {
             // expected
         }
     }
 
-    void assumeReadWriteUpdateLock() {
+    private void assumeReadWriteUpdateLock() {
         assumeTrue(lockingStrategy instanceof ReadWriteUpdateLockingStrategy);
     }
 
-    void assumeReadWriteLock() {
+    private void assumeReadWriteLock() {
         assumeTrue(lockingStrategy instanceof ReadWriteLockingStrategy);
+    }
+
+    private ReadWriteLockState rwls() {
+        return rwLockState;
+    }
+
+    private ReadWriteUpdateLockState rwuls() {
+        return rwuLockState;
     }
 
     enum AccessMethod {ADDRESS, BYTES_WITH_OFFSET}
 
-    class TestReadWriteLockState extends AbstractReadWriteLockState {
+    @SuppressWarnings("unchecked")
+    private class TestReadWriteLockState extends AbstractReadWriteLockState {
 
         private ReadWriteLockingStrategy rwls() {
             return (ReadWriteLockingStrategy) lockingStrategy;
@@ -495,7 +450,8 @@ public class LockingStrategyTest {
         }
     }
 
-    class TestReadWriteUpdateLockState extends TestReadWriteLockState
+    @SuppressWarnings("unchecked")
+    private class TestReadWriteUpdateLockState extends TestReadWriteLockState
             implements ReadWriteUpdateLockState {
 
         ReadWriteUpdateLockingStrategy rwuls() {
