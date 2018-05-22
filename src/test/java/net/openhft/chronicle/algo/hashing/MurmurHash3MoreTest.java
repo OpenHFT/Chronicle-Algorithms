@@ -41,7 +41,7 @@ public class MurmurHash3MoreTest {
                 b.appendUtf8('-');
                 b.append(i);
                 long start = System.nanoTime();
-                hashs[i] = LongHashFunction.murmur_3().hash((Object) null, NativeAccess.instance(), b.address(b.readPosition()), b.readRemaining());
+                hashs[i] = LongHashFunction.murmur_3().hash((Object) null, NativeAccess.instance(), b.addressForRead(b.readPosition()), b.readRemaining());
                 time += System.nanoTime() - start;
                 timeCount++;
             }
@@ -80,7 +80,7 @@ public class MurmurHash3MoreTest {
                 b.writeLong(i >> 6 << 3, 1L << i);
                 b.readLimit(hashs.length / 8);
                 long start = System.nanoTime();
-                hashs[i] = LongHashFunction.murmur_3().hash((Object) null, NativeAccess.instance(), b.address(b.readPosition()), b.readRemaining());
+                hashs[i] = LongHashFunction.murmur_3().hash((Object) null, NativeAccess.instance(), b.addressForRead(b.readPosition()), b.readRemaining());
                 time += System.nanoTime() - start;
                 timeCount++;
             }
