@@ -39,14 +39,14 @@
                 <groupId>net.openhft</groupId>
                 <artifactId>third-party-bom</artifactId>
                 <type>pom</type>
-                <version>3.5.8</version>
+                <version>3.6.2</version>
                 <scope>import</scope>
             </dependency>
 
             <dependency>
                 <groupId>net.openhft</groupId>
                 <artifactId>chronicle-bom</artifactId>
-                <version>1.15.325-SNAPSHOT</version>
+                <version>1.15.344-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
