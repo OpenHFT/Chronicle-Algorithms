@@ -31,7 +31,6 @@ public class MurmurHash3Test {
         testMurmur(LongHashFunction.murmur_3(), Hashing.murmur3_128());
     }
 
-    @Ignore("JIRA https://higherfrequencytrading.atlassian.net/browse/HCOLL-404")
     @Test
     public void testMurmurWithSeed() {
         testMurmur(LongHashFunction.murmur_3(42L), Hashing.murmur3_128(42));

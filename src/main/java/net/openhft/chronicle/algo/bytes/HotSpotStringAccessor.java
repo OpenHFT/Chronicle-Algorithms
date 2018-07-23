@@ -18,8 +18,9 @@ package net.openhft.chronicle.algo.bytes;
 
 import java.lang.reflect.Field;
 
-final class HotSpotStringAccessor implements Accessor.Read<String, char[]> {
-    public static final HotSpotStringAccessor INSTANCE = new HotSpotStringAccessor();
+final class HotSpotStringAccessor<T> implements Accessor.Read<String, T> {
+    public static final HotSpotStringAccessor<char[]> JAVA8 = new HotSpotStringAccessor<>();
+    public static final HotSpotStringAccessor<byte[]> JAVA9PLUS = new HotSpotStringAccessor<>();
 
     private static final long valueOffset;
 
@@ -36,13 +37,13 @@ final class HotSpotStringAccessor implements Accessor.Read<String, char[]> {
     }
 
     @Override
-    public ReadAccess<char[]> access() {
+    public ReadAccess<T> access() {
         return NativeAccess.instance();
     }
 
     @Override
-    public char[] handle(String source) {
-        return (char[]) NativeAccess.U.getObject(source, valueOffset);
+    public T handle(String source) {
+        return (T) NativeAccess.U.getObject(source, valueOffset);
     }
 
     @Override
