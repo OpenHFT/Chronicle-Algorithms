@@ -17,6 +17,7 @@
 package net.openhft.chronicle.algo.bitset;
 
 import net.openhft.chronicle.algo.bytes.Access;
+import net.openhft.chronicle.core.Jvm;
 
 import static java.lang.Long.numberOfLeadingZeros;
 import static java.lang.Long.numberOfTrailingZeros;
@@ -79,6 +80,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             long l2 = l ^ mask;
             if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                 return;
+            Jvm.nanoPause();
         }
     }
 
@@ -100,6 +102,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long l2 = l ^ mask;
                     if (access.compareAndSwapLong(handle, fromByteIndex, l, l2))
                         break;
+                    Jvm.nanoPause();
                 }
                 firstFullLongIndex++;
             }
@@ -111,6 +114,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                         long l2 = ~l;
                         if (access.compareAndSwapLong(handle, firstByte(offset, i), l, l2))
                             break;
+                        Jvm.nanoPause();
                     }
                 }
             } else {
@@ -120,6 +124,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                         long l2 = ~l;
                         if (access.compareAndSwapLong(handle, firstByte(offset, i), l, l2))
                             break;
+                        Jvm.nanoPause();
                     }
                 }
 
@@ -130,6 +135,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long l2 = l ^ mask;
                     if (access.compareAndSwapLong(handle, toByteIndex, l, l2))
                         return;
+                    Jvm.nanoPause();
                 }
             }
         } else {
@@ -140,6 +146,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long l2 = l ^ mask;
                 if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                     return;
+                Jvm.nanoPause();
             }
         }
     }
@@ -157,6 +164,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             long l2 = l | mask;
             if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                 return;
+            Jvm.nanoPause();
         }
     }
 
@@ -173,6 +181,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 return false;
             if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                 return true;
+            Jvm.nanoPause();
         }
     }
 
@@ -194,6 +203,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long l2 = l | mask;
                     if (access.compareAndSwapLong(handle, fromByteIndex, l, l2))
                         break;
+                    Jvm.nanoPause();
                 }
                 firstFullLongIndex++;
             }
@@ -214,6 +224,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long l2 = l | mask;
                     if (access.compareAndSwapLong(handle, toByteIndex, l, l2))
                         return;
+                    Jvm.nanoPause();
                 }
             }
         } else {
@@ -224,6 +235,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long l2 = l | mask;
                 if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                     return;
+                Jvm.nanoPause();
             }
         }
     }
@@ -248,6 +260,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             long l2 = l & ~mask;
             if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                 return;
+            Jvm.nanoPause();
         }
     }
 
@@ -263,6 +276,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             long l2 = l & ~mask;
             if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                 return true;
+            Jvm.nanoPause();
         }
     }
 
@@ -284,6 +298,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long l2 = l & mask;
                     if (access.compareAndSwapLong(handle, fromByteIndex, l, l2))
                         break;
+                    Jvm.nanoPause();
                 }
                 firstFullLongIndex++;
             }
@@ -304,6 +319,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long l2 = l & mask;
                     if (access.compareAndSwapLong(handle, toByteIndex, l, l2))
                         return;
+                    Jvm.nanoPause();
                 }
             }
         } else {
@@ -314,6 +330,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long l2 = l & mask;
                 if (access.compareAndSwapLong(handle, byteIndex, l, l2))
                     return;
+                Jvm.nanoPause();
             }
         }
     }
@@ -386,6 +403,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long mask = singleBit(indexOfSetBit);
                 if (access.compareAndSwapLong(handle, fromByteIndex, w, w ^ mask))
                     return indexOfSetBit;
+                Jvm.nanoPause();
             } else {
                 break;
             }
@@ -400,6 +418,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long mask = singleBit(indexOfSetBit);
                     if (access.compareAndSwapLong(handle, byteIndex, l, l ^ mask))
                         return indexOfSetBit;
+                    Jvm.nanoPause();
                 } else {
                     continue longLoop;
                 }
@@ -442,6 +461,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long mask = singleBit(indexOfClearBit);
                 if (access.compareAndSwapLong(handle, fromByteIndex, w, w ^ mask))
                     return indexOfClearBit;
+                Jvm.nanoPause();
             } else {
                 break;
             }
@@ -457,6 +477,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long mask = singleBit(indexOfClearBit);
                     if (access.compareAndSwapLong(handle, byteIndex, w, w ^ mask))
                         return indexOfClearBit;
+                    Jvm.nanoPause();
                 } else {
                     continue longLoop;
                 }
@@ -506,6 +527,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long mask = singleBit(indexOfSetBit);
                 if (access.compareAndSwapLong(handle, fromByteIndex, w, w ^ mask))
                     return indexOfSetBit;
+                Jvm.nanoPause();
             } else {
                 break;
             }
@@ -520,6 +542,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long mask = singleBit(indexOfSetBit);
                     if (access.compareAndSwapLong(handle, byteIndex, l, l ^ mask))
                         return indexOfSetBit;
+                    Jvm.nanoPause();
                 } else {
                     continue longLoop;
                 }
