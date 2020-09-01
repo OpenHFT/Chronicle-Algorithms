@@ -86,7 +86,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void flipRange(Access<T> access, T handle, long offset,
-                         long fromIndex, long exclusiveToIndex) {
+                              long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
@@ -106,7 +106,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 }
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     while (true) {
@@ -127,7 +126,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                         Jvm.nanoPause();
                     }
                 }
-
                 long toByteIndex = firstByte(offset, toLongIndex);
                 long mask = lowerBitsIncludingThis(toIndex);
                 while (true) {
@@ -207,7 +205,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 }
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     access.writeOrderedLong(handle, firstByte(offset, i), ALL_ONES);
@@ -216,7 +213,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     access.writeOrderedLong(handle, firstByte(offset, i), ALL_ONES);
                 }
-
                 long toByteIndex = firstByte(offset, toLongIndex);
                 long mask = lowerBitsIncludingThis(toIndex);
                 while (true) {
@@ -302,7 +298,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 }
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     access.writeOrderedLong(handle, firstByte(offset, i), 0L);
@@ -311,7 +306,6 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     access.writeOrderedLong(handle, firstByte(offset, i), 0L);
                 }
-
                 long toByteIndex = firstByte(offset, toLongIndex);
                 long mask = higherBitsExcludingThis(toIndex);
                 while (true) {
@@ -638,7 +632,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public <T> long setNextNContinuousClearBits(Access<T> access, T handle, long offset,
@@ -738,7 +732,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public <T> long clearNextNContinuousSetBits(Access<T> access, T handle, long offset,
@@ -829,11 +823,11 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public <T> long setPreviousNContinuousClearBits(Access<T> access, T handle, long offset,
-            long fromIndex, int numberOfBits) {
+                                                    long fromIndex, int numberOfBits) {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
             return setPreviousClearBit(access, handle, offset, fromIndex);
@@ -925,11 +919,11 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      * boundary, e. g. bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
-     *         is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
+     *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
      */
     @Override
     public <T> long clearPreviousNContinuousSetBits(Access<T> access, T handle, long offset,
-            long fromIndex, int numberOfBits) {
+                                                    long fromIndex, int numberOfBits) {
         checkNumberOfBits(numberOfBits);
         if (numberOfBits == 1)
             return clearPreviousSetBit(access, handle, offset, fromIndex);

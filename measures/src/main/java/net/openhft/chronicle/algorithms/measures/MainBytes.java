@@ -68,8 +68,7 @@ public class MainBytes {
             new Runner(opt).run();
         }
     }
-
-    @Setup(Level.Trial)
+@Setup(Level.Trial)
     public void fillBytes() {
         bytes = Bytes.allocateDirect(size).unchecked(true);
         for (int i = 0; i < bytes.capacity(); i += 8) {
@@ -77,25 +76,20 @@ public class MainBytes {
         }
         bytes.writePosition(bytes.capacity());
     }
-
-    @Benchmark
+@Benchmark
     public long vanillaHash() {
         return OptimisedBytesStoreHash.INSTANCE.applyAsLong(bytes);
     }
-
-    @Benchmark
+@Benchmark
     public long city11Hash() {
         return city_1_1.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
     }
-
-    @Benchmark
+@Benchmark
     public long murmur3Hash() {
         return murmur_3.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
     }
-
-    @Benchmark
+@Benchmark
     public long xx39Hash() {
         return xx_r39.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
     }
 }
-

@@ -19,6 +19,7 @@ package net.openhft.chronicle.algo.bitset;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
+ *
  */
 public interface BitSetFrame {
     /**
@@ -104,7 +105,7 @@ public interface BitSetFrame {
      * @param value     value to set the selected bits to
      */
     default <T> void setRange(Access<T> access, T handle, long offset,
-                 long fromIndex, long toIndex, boolean value) {
+                              long fromIndex, long toIndex, boolean value) {
         if (value) {
             setRange(access, handle, offset, fromIndex, toIndex);
         } else {
@@ -159,7 +160,7 @@ public interface BitSetFrame {
      * exclusiveToIndex} is set to {@code true}.
      *
      * @param fromIndex index of the first bit to check
-     * @param toIndex index after the last bit to check
+     * @param toIndex   index after the last bit to check
      * @return {@code true} if all bits in the specified range are set to {@code true},
      * {@code false} otherwise
      */
@@ -170,7 +171,7 @@ public interface BitSetFrame {
      *
      * @param bitIndex the bit index
      * @return {@code true} is the bit at the specified index is clear in this
-     *         bit set; if the bit is set to {@code true} then returns {@code false}
+     * bit set; if the bit is set to {@code true} then returns {@code false}
      */
     default <T> boolean isClear(Access<T> access, T handle, long offset, long bitIndex) {
         return !get(access, handle, offset, bitIndex);
@@ -181,7 +182,7 @@ public interface BitSetFrame {
      * exclusiveToIndex} is set to {@code false}.
      *
      * @param fromIndex index of the first bit to check
-     * @param toIndex index after the last bit to check
+     * @param toIndex   index after the last bit to check
      * @return {@code true} if all bits in the specified range are set to {@code false},
      * {@code false} otherwise
      */
@@ -309,12 +310,12 @@ public interface BitSetFrame {
      * {@code setNextNContinuousClearBits(i, 1)} is exact equivalent of
      * {@code setNextClearBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous clear bits to search and set
      * @return the index of the first bit in the found range of clear bits,
      * or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     <T> long setNextNContinuousClearBits(Access<T> access, T handle, long offset,
                                          long fromIndex, int numberOfBits);
@@ -330,12 +331,12 @@ public interface BitSetFrame {
      * {@code clearNextNContinuousSetBits(i, 1)} is exact equivalent of
      * {@code clearNextSetBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous set bits to search and clear
      * @return the index of the first bit in the found range
      * of {@code true} bits, or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     <T> long clearNextNContinuousSetBits(Access<T> access, T handle, long offset,
                                          long fromIndex, int numberOfBits);
@@ -352,13 +353,13 @@ public interface BitSetFrame {
      * {@code setPreviousNContinuousClearBits(i, 1)} is exact equivalent of
      * {@code setPreviousClearBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous clear bits to search and set
      * @return the index of the first bit in the found range of clear bits,
      * or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is less
      *                                   than {@code -1}
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     <T> long setPreviousNContinuousClearBits(Access<T> access, T handle, long offset,
                                              long fromIndex, int numberOfBits);
@@ -375,13 +376,13 @@ public interface BitSetFrame {
      * {@code clearPreviousNContinuousSetBits(i, 1)} is exact equivalent of
      * {@code clearPreviousSetBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous set bits to search and clear
      * @return the index of the first bit in the found range
      * of {@code true} bits, or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is less
      *                                   than {@code -1}
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     <T> long clearPreviousNContinuousSetBits(Access<T> access, T handle, long offset,
                                              long fromIndex, int numberOfBits);

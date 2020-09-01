@@ -1,9 +1,8 @@
 package net.openhft.chronicle.algo.locks;
 
+import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.map.ChronicleMap;
 import org.junit.Assert;
-
-import java.util.Scanner;
 
 import static net.openhft.chronicle.values.Values.newNativeReference;
 
@@ -11,17 +10,13 @@ class WriterToo implements Runnable {
 
     @Override
     public void run() {
-
-        Scanner sc = new Scanner(System.in);
-
         try {
-            String isoLevel = "WRITER";
-            long sleepT = Long.parseLong("0");
-            long holdTime = Long.parseLong("20");
+            long sleepT = 0;
+            long holdTime = 20;
 
             ChronicleMap<String, BondVOInterface> chm =
                     DirtyReadTolerance.offHeap(
-                            "C:\\Users\\buddy\\dev\\shm\\" +
+                            OS.TARGET + "/shm-" +
                                     "OPERAND_CHRONICLE_MAP"
                     );
             System.out.println(
@@ -30,7 +25,7 @@ class WriterToo implements Runnable {
                             " DirtyReadOffender established chm "
             );
             ChronicleStampedLock offHeapLock = new ChronicleStampedLock(
-                    "C:\\Users\\buddy\\dev\\shm\\"
+                    OS.TARGET + "/shm-"
                             + "OPERAND_ChronicleStampedLock"
             );
             Assert.assertNotEquals(offHeapLock, null);
@@ -49,8 +44,8 @@ class WriterToo implements Runnable {
                             " @t=" + System.currentTimeMillis() +
                             " DirtyReadOffender awakening "
             );
-            /**
-             *  ben.cotton@rutgers.edu  ... anticipate Chronicle (www.OpenHFT.net)
+            /*
+             *anticipate Chronicle (www.OpenHFT.net)
              *  providing a j.u.c.l.StampedLock API for off-heap enthusiasts
              *
              *  START
@@ -63,7 +58,6 @@ class WriterToo implements Runnable {
                             " DirtyReadOffender ACQUIRING offHeapLock.writeLock();"
             );
             while ((stamp = offHeapLock.writeLock()) == 0) {
-                ;
             }
             System.out.println(
                     "WRITER TOO" +
@@ -122,7 +116,4 @@ class WriterToo implements Runnable {
             );
         }
     }
-
-
 }
-

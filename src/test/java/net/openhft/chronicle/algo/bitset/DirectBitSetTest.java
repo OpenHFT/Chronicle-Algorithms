@@ -42,8 +42,7 @@ public class DirectBitSetTest {
         singleThreaded = bs.frame instanceof SingleThreadedFlatBitSetFrame;
         assertTrue(bs.logicalSize() >= 256);
     }
-
-    @Parameterized.Parameters
+@Parameterized.Parameters
     public static Collection<Object[]> data() {
         int capacityInBytes = (int) MemoryUnit.BITS.toBytes(256);
         BytesStore bytes1 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
@@ -79,7 +78,7 @@ public class DirectBitSetTest {
                 },
 
         });
-    }
+}
 
     private void setIndices() {
         bs.clearAll();
@@ -111,12 +110,6 @@ public class DirectBitSetTest {
         }
     }
 
-    private void assertRangeIsSet(String message, long from, long to) {
-        for (long i = from; i < to; i++) {
-            assertTrue(message + ", bit: " + i, bs.get(i));
-        }
-    }
-
     @Test
     public void testGetSetClearAndCardinality() {
         bs.clearAll();
@@ -133,7 +126,6 @@ public class DirectBitSetTest {
             assertFalse("At index " + i, bs.isClear(i));
             assertEquals(c, bs.cardinality());
         }
-
         for (int i : INDICES) {
             assertTrue("At index " + i, bs.get(i));
             assertTrue("At index " + i, bs.isSet(i));
@@ -143,12 +135,10 @@ public class DirectBitSetTest {
             assertFalse("At index " + i, bs.isSet(i));
             assertTrue("At index " + i, bs.isClear(i));
         }
-
         for (int i : INDICES) {
             assertEquals("At index " + i, true, bs.setIfClear(i));
             assertEquals("At index " + i, false, bs.setIfClear(i));
         }
-
         for (int i : INDICES) {
             assertEquals("At index " + i, true, bs.clearIfSet(i));
             assertEquals("At index " + i, false, bs.clearIfSet(i));
@@ -407,7 +397,6 @@ public class DirectBitSetTest {
             assertTrue(bs.isRangeSet(0, 0));
             assertTrue(bs.isRangeSet(63, 63));
         }
-
         bs.flipRange(0, 0);
         assertEquals(false, bs.get(0));
         assertEquals(0, bs.cardinality());
@@ -419,7 +408,6 @@ public class DirectBitSetTest {
             assertFalse(bs.isRangeSet(0, 2));
             assertFalse(bs.isRangeClear(0, 1));
         }
-
         bs.clearRange(0, 0);
         assertEquals(true, bs.get(0));
         assertEquals(1, bs.cardinality());
@@ -455,7 +443,6 @@ public class DirectBitSetTest {
             assertFalse(bs.isRangeSet(63, 65));
             assertFalse(bs.isRangeClear(63, 65));
         }
-
         bs.clear(64);
         bs.setRange(63, 64);
         assertEquals(true, bs.get(63));
@@ -477,7 +464,6 @@ public class DirectBitSetTest {
             assertTrue(bs.isRangeSet(63, 65));
             assertFalse(bs.isRangeClear(63, 65));
         }
-
         bs.clearRange(63, 65);
         assertEquals(false, bs.get(63));
         assertEquals(false, bs.get(64));
@@ -495,14 +481,12 @@ public class DirectBitSetTest {
             assertTrue(bs.isRangeClear(0, bs.logicalSize()));
             assertFalse(bs.isRangeSet(0, bs.logicalSize()));
         }
-
         bs.setRange(0, bs.logicalSize());
         assertEquals(bs.logicalSize(), bs.cardinality());
         if (singleThreaded) {
             assertFalse(bs.isRangeClear(0, bs.logicalSize()));
             assertTrue(bs.isRangeSet(0, bs.logicalSize()));
         }
-
         bs.clearRange(0, bs.logicalSize());
         assertEquals(0, bs.cardinality());
 

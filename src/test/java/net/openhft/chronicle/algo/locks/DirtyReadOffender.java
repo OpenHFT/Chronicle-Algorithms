@@ -1,18 +1,18 @@
 package net.openhft.chronicle.algo.locks;
 
 import net.openhft.chronicle.map.ChronicleMap;
-//import net.openhft.chronicle.map.fromdocs.BondVOInterface;
 
 import java.util.Scanner;
 import java.util.concurrent.locks.StampedLock;
 
 import static net.openhft.chronicle.values.Values.newNativeReference;
 
-;
+//import net.openhft.chronicle.map.fromdocs.BondVOInterface;
+
 
 public class DirtyReadOffender {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
         try {
@@ -59,7 +59,6 @@ public class DirtyReadOffender {
                             " DirtyReadOffender ACQUIRING offHeapLock.writeLock();"
             );
             while ((stamp = offHeapLock.writeLock()) == 0) {
-                ;
             }
             System.out.println(
                     " @t=" + System.currentTimeMillis() +

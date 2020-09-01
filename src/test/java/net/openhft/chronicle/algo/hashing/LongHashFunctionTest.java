@@ -48,11 +48,11 @@ public class LongHashFunctionTest {
         if (len == 0)
             assertEquals("void", eh, f.hashVoid());
     }
-    
+
     public static void testBoolean(LongHashFunction f, int len) {
         if (len != 1)
             return;
-        for (boolean b : new boolean[] {true, false}) {
+        for (boolean b : new boolean[]{true, false}) {
             boolean[] a = {b};
             long single = f.hashBoolean(b);
             assertEquals(single, f.hashBooleans(a));
@@ -67,7 +67,6 @@ public class LongHashFunctionTest {
             assertEquals("short hash", eh, f.hashShort(bb.getShort(0)));
             assertEquals("char hash", eh, f.hashChar(bb.getChar(0)));
         }
-
         if (len == 4)
             assertEquals("int hash", eh, f.hashInt(bb.getInt(0)));
 
@@ -102,7 +101,6 @@ public class LongHashFunctionTest {
             System.arraycopy(chars, 0, chars2, 1, shortLen);
             assertEquals("char array off len", eh, f.hashChars(chars2, 1, shortLen));
         }
-
         if ((len & 3) == 0) {
             int intLen = len / 4;
             int[] ints = new int[intLen];
@@ -113,7 +111,6 @@ public class LongHashFunctionTest {
             System.arraycopy(ints, 0, ints2, 1, intLen);
             assertEquals("int array off len", eh, f.hashInts(ints2, 1, intLen));
         }
-
         if ((len & 7) == 0) {
             int longLen = len / 8;
             long[] longs = new long[longLen];

@@ -163,7 +163,6 @@ class CityHash_1_1 {
         } else if (len <= 64L) {
             return hashLen33To64(access, in, off, len);
         }
-
         long x = fetch64(access, in, off + len - 40L);
         long y = fetch64(access, in, off + len - 16L) + fetch64(access, in, off + len - 56L);
         long z = hashLen16(fetch64(access, in, off + len - 48L) + len,
@@ -256,7 +255,9 @@ class CityHash_1_1 {
 
     private static class BigEndian extends CityHash_1_1 {
         private static final BigEndian INSTANCE = new BigEndian();
-        private BigEndian() {}
+
+        private BigEndian() {
+        }
 
         @Override
         <T> long fetch64(ReadAccess<T> access, T in, long off) {
@@ -314,7 +315,7 @@ class CityHash_1_1 {
 
         @Override
         public long hashChar(char input) {
-            int unsignedInput = (int) input;
+            int unsignedInput = input;
             int firstByte = (unsignedInput >> FIRST_SHORT_BYTE_SHIFT) & FIRST_SHORT_BYTE_MASK;
             int secondByte = (unsignedInput >> SECOND_SHORT_BYTE_SHIFT) & SECOND_SHORT_BYTE_MASK;
             long hash = hash1To3Bytes(2, firstByte, secondByte, secondByte);
@@ -353,7 +354,7 @@ class CityHash_1_1 {
         private static final long serialVersionUID = 0L;
 
         private final long seed0, seed1;
-        private transient long voidHash;
+        private final transient long voidHash;
 
         private AsLongHashFunctionSeeded(long seed0, long seed1) {
             this.seed0 = seed0;

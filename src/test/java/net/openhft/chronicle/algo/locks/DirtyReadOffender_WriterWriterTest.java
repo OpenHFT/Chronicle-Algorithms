@@ -1,16 +1,13 @@
 package net.openhft.chronicle.algo.locks;
 
+import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.map.ChronicleMap;
-//import net.openhft.chronicle.map.fromdocs.BondVOInterface;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Scanner;
-
 import static net.openhft.chronicle.values.Values.newNativeReference;
-
 
 public class DirtyReadOffender_WriterWriterTest {
 
@@ -24,11 +21,7 @@ public class DirtyReadOffender_WriterWriterTest {
 
     @Test
     public void main() {
-
-        Scanner sc = new Scanner(System.in);
-
         try {
-            String isoLevel = "WRITER";
             long sleepT = Long.parseLong("8");
             long holdTime = Long.parseLong("20");
 
@@ -37,7 +30,7 @@ public class DirtyReadOffender_WriterWriterTest {
 
             ChronicleMap<String, BondVOInterface> chm =
                     DirtyReadTolerance.offHeap(
-                            "C:\\Users\\buddy\\dev\\shm\\" +
+                            OS.TARGET + "/shm-" +
                                     "OPERAND_CHRONICLE_MAP"
                     );
             System.out.println(
@@ -46,7 +39,7 @@ public class DirtyReadOffender_WriterWriterTest {
                             " DirtyReadOffender established chm "
             );
             ChronicleStampedLock offHeapLock = new ChronicleStampedLock(
-                    "C:\\Users\\buddy\\dev\\shm\\"
+                    OS.TARGET + "/shm-"
                             + "OPERAND_ChronicleStampedLock"
             );
             Assert.assertNotEquals(offHeapLock, null);
@@ -148,4 +141,3 @@ public class DirtyReadOffender_WriterWriterTest {
         }
     }
 }
-

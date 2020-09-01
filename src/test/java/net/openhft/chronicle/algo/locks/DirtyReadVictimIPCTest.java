@@ -1,7 +1,7 @@
 package net.openhft.chronicle.algo.locks;
 
+import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.map.ChronicleMap;
-//import net.openhft.chronicle.map.fromdocs.BondVOInterface;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,10 +38,10 @@ public class DirtyReadVictimIPCTest {
     public void mainOptimisticNegative() throws IOException {
         try {
             System.out.println("\n*****   Optimistic (-) Test\n");
-            ProcessBuilder pb = new ProcessBuilder(
-                    "/usr/bin/mkdir -p "+
-                    " C:\\Users\\buddy\\dev\\shm\\ "
-            );
+//            ProcessBuilder pb = new ProcessBuilder(
+//                    "/usr/bin/mkdir -p "+
+//                    " C:\\Users\\buddy\\dev\\shm\\ "
+//            );
 
 //            Process p = pb.start();
 //            Scanner scan = new Scanner(p.getInputStream());
@@ -72,18 +72,17 @@ public class DirtyReadVictimIPCTest {
 
             ChronicleMap<String, BondVOInterface> chm =
                     DirtyReadTolerance.offHeap(
-                            "C:\\Users\\buddy\\dev\\shm\\OPERAND_CHRONICLE_MAP"
+                            OS.TARGET + "/shm-OPERAND_CHRONICLE_MAP"
                     );
             Double coupon = 0.00;
             BondVOInterface bond = newNativeReference(BondVOInterface.class);
-            long stamp = 0;
-            long writerStamp = 0;
+            long stamp;
             System.out.println(
                     " ,,@t=" + System.currentTimeMillis() +
                             " DirtyReadVictim CALLING offHeapLock.tryOptimisticRead()"
             );
             ChronicleStampedLock offHeapLock = new ChronicleStampedLock(
-                    "C:\\Users\\buddy\\dev\\shm\\" +
+                    OS.TARGET + "/shm-" +
                             "OPERAND_ChronicleStampedLock"
             );
             while ((stamp = offHeapLock.tryOptimisticRead()) == 0) {
@@ -168,7 +167,7 @@ public class DirtyReadVictimIPCTest {
              */
             ChronicleMap<String, BondVOInterface> chm =
                     DirtyReadTolerance.offHeap(
-                            "C:\\Users\\buddy\\dev\\shm\\OPERAND_CHRONICLE_MAP"
+                            OS.TARGET + "/shm-OPERAND_CHRONICLE_MAP"
                     );
             Double coupon = 0.00;
             BondVOInterface bond = newNativeReference(BondVOInterface.class);
@@ -178,7 +177,7 @@ public class DirtyReadVictimIPCTest {
                             " DirtyReadVictim CALLING offHeapLock.tryOptimisticRead()"
             );
             ChronicleStampedLock offHeapLock = new ChronicleStampedLock(
-                    "C:\\Users\\buddy\\dev\\shm\\"
+                    OS.TARGET + "/shm-"
                             + "OPERAND_ChronicleStampedLock"
             );
             while ((stamp = offHeapLock.tryOptimisticRead()) == 0) {
@@ -231,7 +230,7 @@ public class DirtyReadVictimIPCTest {
                     );
                 }
             }
-            /**
+            /*
              *  ben.cotton@rutgers.edu   END
              */
             System.out.println(
@@ -248,4 +247,3 @@ public class DirtyReadVictimIPCTest {
         }
     }
 }
-

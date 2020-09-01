@@ -1,7 +1,6 @@
 package net.openhft.chronicle.algo.locks;
 
 import net.openhft.chronicle.map.ChronicleMap;
-//import net.openhft.chronicle.map.fromdocs.BondVOInterface;
 
 import java.util.concurrent.locks.StampedLock;
 
@@ -9,7 +8,7 @@ import static net.openhft.chronicle.values.Values.newNativeReference;
 
 public class DirtyReadVictim {
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             String isoLevel = args[0];
             long sleepMock = Long.parseLong(args[1]);
@@ -63,7 +62,7 @@ public class DirtyReadVictim {
                         " ,,@t=" + System.currentTimeMillis() +
                                 " DirtyReadVictim calling chm.get('369604101').getCoupon()"
                 );
-                bond = (BondVOInterface) chm.get("369604101");
+                bond = chm.get("369604101");
                 coupon = bond.getCoupon();
                 System.out.println(
                         " ,,@t=" + System.currentTimeMillis() +
@@ -121,4 +120,3 @@ public class DirtyReadVictim {
         }
     }
 }
-

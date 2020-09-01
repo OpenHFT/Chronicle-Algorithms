@@ -2094,12 +2094,10 @@ public class City64_1_1_Test {
         }
         return data;
     }
-
-    @Test
+@Test
     public void testCityWithoutSeeds() {
         test(LongHashFunction.city_1_1(), HASHES_OF_LOOPING_BYTES_WITHOUT_SEEDS);
     }
-
 // The following numbers is the result of compiling & running this program
 // with city-1.1.1, reference impl:
 //
@@ -2121,11 +2119,10 @@ public class City64_1_1_Test {
 //            printf("%lldL,\n", (long long)CityHash64WithSeeds(src, i, 0, 0));
 //        }
 //    }
-
-    @Test
-    public void testCityWithOneSeed() {
-        test(LongHashFunction.city_1_1(0L, 0L), HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0);
-    }
+@Test
+public void testCityWithOneSeed() {
+    test(LongHashFunction.city_1_1(0L, 0L), HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0);
+}
 
     private void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
         byte[] data = new byte[len];

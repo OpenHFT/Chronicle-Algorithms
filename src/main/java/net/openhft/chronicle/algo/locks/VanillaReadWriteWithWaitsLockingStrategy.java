@@ -69,8 +69,7 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
             if (readersLocked >= RW_LOCK_MASK)
                 throw new IllegalMonitorStateException("readersLocked has reached a limit of " +
                         readersLocked);
-            if (cas(access, t, offset, lock, lock + RW_READ_LOCKED))
-                return true;
+            return cas(access, t, offset, lock, lock + RW_READ_LOCKED);
         }
         return false;
     }
@@ -82,8 +81,7 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
         int writersLocked = rwWriteLocked(lock);
         // writers don't wait for waiting readers.
         if (readersLocked <= 0 && writersLocked <= 0) {
-            if (cas(access, t, offset, lock, lock + RW_WRITE_LOCKED))
-                return true;
+            return cas(access, t, offset, lock, lock + RW_WRITE_LOCKED);
         }
         return false;
     }
@@ -184,8 +182,7 @@ public final class VanillaReadWriteWithWaitsLockingStrategy extends AbstractRead
             if (writersWaiting <= 0)
                 throw new IllegalMonitorStateException("writersWaiting has underflowed");
             // add to the readLock count and decrease the readWaiting count.
-            if (cas(access, t, offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING))
-                return true;
+            return cas(access, t, offset, lock, lock + RW_WRITE_LOCKED - RW_WRITE_WAITING);
         }
         return false;
     }

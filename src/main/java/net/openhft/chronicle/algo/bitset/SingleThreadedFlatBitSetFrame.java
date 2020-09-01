@@ -38,7 +38,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      * @param logicalSize the logical bit set size, should be {@code long}-aligned
      *                    (i. e. a multiple of 8)
      * @throws IllegalArgumentException is the given logicalSize is not a multiple of 8
-     * or non-positive
+     *                                  or non-positive
      */
     public SingleThreadedFlatBitSetFrame(long logicalSize) {
         if (logicalSize <= 0) {
@@ -64,8 +64,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     static long lowerBitsIncludingThis(long bitIndex) {
         return ALL_ONES >>> ~bitIndex;
     }
-
-    // conversions
+// conversions
 
     static long higherBitsExcludingThis(long bitIndex) {
         return ~(ALL_ONES >>> ~bitIndex);
@@ -95,8 +94,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException("Illegal number of bits: " + numberOfBits);
     }
-
-    // checks
+// checks
 
     static boolean checkNotFoundIndex(long fromIndex) {
         if (fromIndex < 0) {
@@ -128,7 +126,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         if (fromIndex < 0 || fromIndex > exclusiveToIndex || toLongIndex >= longLength) {
             throw new IndexOutOfBoundsException(
                     "index range: [" + fromIndex + ", " + exclusiveToIndex + "), " +
-                    "logical size: " + LONGS.toBits(longLength));
+                            "logical size: " + LONGS.toBits(longLength));
         }
         return true;
     }
@@ -170,7 +168,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 access.writeLong(handle, fromByteIndex, l2);
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     writeLong(access, handle, offset, i, ~readLong(access, handle, offset, i));
@@ -179,7 +176,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     writeLong(access, handle, offset, i, ~readLong(access, handle, offset, i));
                 }
-
                 long toByteIndex = firstByte(offset, toLongIndex);
                 long mask = lowerBitsIncludingThis(toIndex);
                 long l = access.readLong(handle, toByteIndex);
@@ -222,7 +218,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void setRange(Access<T> access, T handle, long offset,
-                        long fromIndex, long exclusiveToIndex) {
+                             long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
@@ -238,7 +234,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 access.writeLong(handle, fromByteIndex, l2);
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     writeLong(access, handle, offset, i, ALL_ONES);
@@ -247,7 +242,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     writeLong(access, handle, offset, i, ALL_ONES);
                 }
-
                 long toByteIndex = firstByte(offset, toLongIndex);
                 long mask = lowerBitsIncludingThis(toIndex);
                 long l = access.readLong(handle, toByteIndex);
@@ -297,7 +291,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void clearRange(Access<T> access, T handle, long offset,
-                              long fromIndex, long exclusiveToIndex) {
+                               long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
@@ -313,7 +307,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 access.writeLong(handle, fromByteIndex, l2);
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     writeLong(access, handle, offset, i, 0L);
@@ -322,7 +315,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     writeLong(access, handle, offset, i, 0L);
                 }
-
                 long toByteIndex = firstByte(offset, toLongIndex);
                 long mask = lowerBitsIncludingThis(toIndex);
                 long l = access.readLong(handle, toByteIndex);
@@ -340,7 +332,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean isRangeSet(Access<T> access, T handle, long offset,
-                              long fromIndex, long exclusiveToIndex) {
+                                  long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
@@ -354,7 +346,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                     return false;
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     if (~readLong(access, handle, offset, i) != 0L)
@@ -366,7 +357,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                     if (~readLong(access, handle, offset, i) != 0L)
                         return false;
                 }
-
                 long mask = lowerBitsIncludingThis(toIndex);
                 return ((~readLong(access, handle, offset, toLongIndex)) & mask) == 0L;
             }
@@ -378,7 +368,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean isRangeClear(Access<T> access, T handle, long offset,
-                                long fromIndex, long exclusiveToIndex) {
+                                    long fromIndex, long exclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
@@ -392,7 +382,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                     return false;
                 firstFullLongIndex++;
             }
-
             if ((exclusiveToIndex & 63) == 0) {
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     if (readLong(access, handle, offset, i) != 0L)
@@ -404,7 +393,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                     if (readLong(access, handle, offset, i) != 0L)
                         return false;
                 }
-
                 long mask = lowerBitsIncludingThis(toIndex);
                 return (readLong(access, handle, offset, toLongIndex) & mask) == 0L;
             }

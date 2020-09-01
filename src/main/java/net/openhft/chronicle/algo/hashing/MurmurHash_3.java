@@ -35,7 +35,8 @@ class MurmurHash_3 {
     private static final long C1 = 0x87c37b91114253d5L;
     private static final long C2 = 0x4cf5ad432745937fL;
 
-    private MurmurHash_3() {}
+    private MurmurHash_3() {
+    }
 
     private static long finalize(long length, long h1, long h2) {
         h1 ^= length;
@@ -123,7 +124,6 @@ class MurmurHash_3 {
             h2 += h1;
             h2 = h2 * 5L + 0x38495ab5L;
         }
-
         if (remaining > 0L) {
             long k1 = 0L;
             long k2 = 0L;
@@ -141,7 +141,7 @@ class MurmurHash_3 {
                 case 10:
                     k2 ^= ((long) access.readUnsignedByte(input, offset + 9L)) << 8; // fall through
                 case 9:
-                    k2 ^= ((long) access.readUnsignedByte(input, offset + 8L)); // fall through
+                    k2 ^= access.readUnsignedByte(input, offset + 8L); // fall through
                 case 8:
                     k1 ^= fetch64(access, input, offset);
                     break;
@@ -159,7 +159,7 @@ class MurmurHash_3 {
                 case 2:
                     k1 ^= ((long) access.readUnsignedByte(input, offset + 1L)) << 8; // fall through
                 case 1:
-                    k1 ^= ((long) access.readUnsignedByte(input, offset));
+                    k1 ^= access.readUnsignedByte(input, offset);
                 case 0:
                     break;
                 default:
@@ -168,8 +168,7 @@ class MurmurHash_3 {
             h1 ^= mixK1(k1);
             h2 ^= mixK2(k2);
         }
-
-        // This version appears to be working slower
+// This version appears to be working slower
 
 //        if (remaining > 0L) {
 //            long k1 = 0L;
@@ -237,13 +236,14 @@ class MurmurHash_3 {
 //            h1 ^= mixK1(k1);
 //            h2 ^= mixK2(k2);
 //        }
-
         return finalize(length, h1, h2);
     }
 
     private static class BigEndian extends MurmurHash_3 {
         private static final BigEndian INSTANCE = new BigEndian();
-        private BigEndian() {}
+
+        private BigEndian() {
+        }
 
         @Override
         <T> long fetch64(ReadAccess<T> access, T in, long off) {
@@ -302,17 +302,17 @@ class MurmurHash_3 {
         @Override
         public long hashShort(short input) {
             return hashNativeLong(
-                    (long) NATIVE_MURMUR.toLittleEndianShort(Primitives.unsignedShort(input)), 2L);
+                    NATIVE_MURMUR.toLittleEndianShort(Primitives.unsignedShort(input)), 2L);
         }
 
         @Override
         public long hashChar(char input) {
-            return hashNativeLong((long) NATIVE_MURMUR.toLittleEndianShort((int) input), 2L);
+            return hashNativeLong(NATIVE_MURMUR.toLittleEndianShort(input), 2L);
         }
 
         @Override
         public long hashByte(byte input) {
-            return hashNativeLong((long) Primitives.unsignedByte((int) input), 1L);
+            return hashNativeLong(Primitives.unsignedByte(input), 1L);
         }
 
         @Override
@@ -335,7 +335,7 @@ class MurmurHash_3 {
         private static final long serialVersionUID = 0L;
 
         private final long seed;
-        private transient long voidHash;
+        private final transient long voidHash;
 
         private AsLongHashFunctionSeeded(long seed) {
             this.seed = seed;

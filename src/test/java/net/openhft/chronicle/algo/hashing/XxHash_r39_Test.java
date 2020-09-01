@@ -2117,8 +2117,7 @@ public class XxHash_r39_Test {
         }
         return data;
     }
-
-    @Test
+@Test
     public void testCityWithoutSeeds() {
         test(LongHashFunction.xx_r39(), HASHES_OF_LOOPING_BYTES_WITHOUT_SEED);
     }

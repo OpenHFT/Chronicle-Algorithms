@@ -112,8 +112,7 @@ public interface ReadAccess<T> extends AccessCommon<T> {
             i += 2L;
         }
         if (i < len)
-            if (readByte(handle, offset + i) != sourceAccess.readByte(source, sourceOffset + i))
-                return false;
+            return readByte(handle, offset + i) == sourceAccess.readByte(source, sourceOffset + i);
         return true;
     }
 }

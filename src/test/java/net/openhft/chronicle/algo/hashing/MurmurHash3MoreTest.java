@@ -62,9 +62,8 @@ public class MurmurHash3MoreTest {
         System.out.println("Average score: " + scoreSum / 500);
         System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
     }
-
-    @Ignore("Long running, avg score = 6836")
-    @Test
+@Ignore("Long running, avg score = 6836")
+@Test
     public void testRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
@@ -102,4 +101,3 @@ public class MurmurHash3MoreTest {
         System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
     }
 }
-

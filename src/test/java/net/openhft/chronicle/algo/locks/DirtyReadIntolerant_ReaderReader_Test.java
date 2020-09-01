@@ -1,15 +1,11 @@
 package net.openhft.chronicle.algo.locks;
 
+import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.map.ChronicleMap;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import static net.openhft.chronicle.values.Values.newNativeReference;
-
-//import org.eclipse.jdt.internal.compiler.ReadManager;
-//
-//import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *  This Test efforts to ensure that a READERS-only set of requests to access the CSL
@@ -21,19 +17,15 @@ public class DirtyReadIntolerant_ReaderReader_Test {
     @Test
     public void main() {
         try {
-            String isoLevel = "READER_ONE";
             long sleepMock = Long.parseLong("5");
             long holdTime = Long.parseLong("25");
 
-            /**
-             *  ben.cotton@rutgers.edu   START
-             */
             Thread tooThread = new Thread(new ReaderToo());
             tooThread.start();
 
             ChronicleMap<String, BondVOInterface> chm =
                     DirtyReadTolerance.offHeap(
-                            "C:\\Users\\buddy\\dev\\shm\\OPERAND_CHRONICLE_MAP"
+                            OS.TARGET + "/shm-OPERAND_CHRONICLE_MAP"
                     );
             Double coupon = 0.00;
             BondVOInterface bond = newNativeReference(BondVOInterface.class);
@@ -46,7 +38,7 @@ public class DirtyReadIntolerant_ReaderReader_Test {
             );
             ChronicleStampedLock offHeapLock =
                     new ChronicleStampedLock(
-                            "C:\\Users\\buddy\\dev\\shm\\"
+                            OS.TARGET + "/shm-"
                                     + "OPERAND_ChronicleStampedLock"
                     );
             System.out.println(
@@ -125,8 +117,4 @@ public class DirtyReadIntolerant_ReaderReader_Test {
             throwables.printStackTrace();
         }
     }
-
-
-
 }
-

@@ -1,12 +1,11 @@
 package net.openhft.chronicle.algo.locks;
 
+import net.openhft.chronicle.core.OS;
 import net.openhft.chronicle.map.ChronicleMap;
-//import net.openhft.chronicle.map.fromdocs.BondVOInterface;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Scanner;
 import java.util.concurrent.locks.StampedLock;
 
 import static net.openhft.chronicle.values.Values.newNativeReference;
@@ -22,16 +21,14 @@ public class DirtyReadOffenderIPCTest implements Runnable {
 
     @Test
     public void run() {
-        Scanner sc = new Scanner(System.in);
 
         try {
-            String isoLevel = "WRITER";
             long sleepT = Long.parseLong("5");
             long holdTime = Long.parseLong("10");
 
             ChronicleMap<String, BondVOInterface> chm =
                     DirtyReadTolerance.offHeap(
-                            "C:\\Users\\buddy\\dev\\shm\\"
+                            OS.TARGET + "/shm-"
                                     + "OPERAND_CHRONICLE_MAP"
                     );
             System.out.println(
@@ -39,7 +36,7 @@ public class DirtyReadOffenderIPCTest implements Runnable {
                             " DirtyReadOffender established chm "
             );
             StampedLock offHeapLock = new ChronicleStampedLock(
-                    "C:\\Users\\buddy\\dev\\shm\\"
+                    OS.TARGET + "/shm-"
                             + "OPERAND_ChronicleStampedLock"
             );
             BondVOInterface bond = newNativeReference(BondVOInterface.class);

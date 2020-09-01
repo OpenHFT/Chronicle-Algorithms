@@ -36,8 +36,7 @@ public enum AddressWrappers implements AddressWrapper {
         @Override
         public void setAddress(long address, long length) {
         }
-
-        @Override
+@Override
         public long hash() {
             return rand.nextLong();
         }
@@ -48,8 +47,7 @@ public enum AddressWrappers implements AddressWrapper {
         @Override
         public void setAddress(long address, long length) {
         }
-
-        @Override
+@Override
         public long hash() {
             return rand.nextLong();
         }
@@ -66,8 +64,7 @@ public enum AddressWrappers implements AddressWrapper {
             pbs.set(address, length);
             bytes = pbs.bytesForRead().unchecked(true);
         }
-
-        @Override
+@Override
         public long hash() {
             return OptimisedBytesStoreHash.applyAsLong32bytesMultiple(bytes, length);
         }
@@ -80,8 +77,7 @@ public enum AddressWrappers implements AddressWrapper {
             this.address = address;
             this.length = length;
         }
-
-        @Override
+@Override
         public long hash() {
             return LongHashFunction.city_1_1().hash((Object) null, NativeAccess.instance(), address, length);
         }
@@ -94,8 +90,7 @@ public enum AddressWrappers implements AddressWrapper {
             this.address = address;
             this.length = length;
         }
-
-        @Override
+@Override
         public long hash() {
             return LongHashFunction.murmur_3().hash((Object) null, NativeAccess.instance(), address, length);
         }
@@ -109,8 +104,7 @@ public enum AddressWrappers implements AddressWrapper {
             pbs.set(address, length);
             bytes = pbs.bytesForRead().unchecked(true);
         }
-
-        @Override
+@Override
         public long hash() {
             int hc = 0;
             for (int i = 0; i < bytes.length(); i++)
@@ -118,8 +112,7 @@ public enum AddressWrappers implements AddressWrapper {
 
             return hash(hc);
         }
-
-        // from the hash() function in HashMap
+// from the hash() function in HashMap
         int hash(int h) {
             // This function ensures that hashCodes that differ only by
             // constant multiples at each bit position have a bounded
@@ -137,16 +130,14 @@ public enum AddressWrappers implements AddressWrapper {
             pbs.set(address, length);
             bytes = pbs.bytesForRead().unchecked(true);
         }
-
-        @Override
+@Override
         public long hash() {
             long hc = 0;
             for (int i = 0; i < bytes.length(); i++)
                 hc = hc * 31 + bytes.charAt(i);
             return hash(hc);
         }
-
-        // based on the hash() function in HashMap
+// based on the hash() function in HashMap
         long hash(long h) {
             h ^= (h >>> 41) ^ (h >>> 23);
             return h ^ (h >>> 14) ^ (h >>> 7);
@@ -161,8 +152,7 @@ public enum AddressWrappers implements AddressWrapper {
             pbs.set(address, length);
             bytes = pbs.bytesForRead().unchecked(true);
         }
-
-        @Override
+@Override
         public long hash() {
             int hc = 0;
             for (int i = 0; i < bytes.length(); i++)

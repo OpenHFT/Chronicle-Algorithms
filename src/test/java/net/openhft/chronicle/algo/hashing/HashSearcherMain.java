@@ -80,5 +80,4 @@ public class HashSearcherMain {
         hash ^= (hash >>> 9);
         return hash;
     }
-
 }

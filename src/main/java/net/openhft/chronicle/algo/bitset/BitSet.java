@@ -206,9 +206,10 @@ public interface BitSet {
 
     /**
      * Synonym of {@code !get(long)}.
+     *
      * @param bitIndex the bit index
      * @return {@code true} is the bit at the specified index is clear in this
-     *         bit set; if the bit is set to {@code true} then returns {@code false}
+     * bit set; if the bit is set to {@code true} then returns {@code false}
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -369,12 +370,12 @@ public interface BitSet {
      * {@code setNextNContinuousClearBits(i, 1)} is exact equivalent of
      * {@code setNextClearBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous clear bits to search and set
      * @return the index of the first bit in the found range of clear bits,
      * or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     long setNextNContinuousClearBits(long fromIndex, int numberOfBits);
 
@@ -389,12 +390,12 @@ public interface BitSet {
      * {@code clearNextNContinuousSetBits(i, 1)} is exact equivalent of
      * {@code clearNextSetBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous set bits to search and clear
      * @return the index of the first bit in the found range
      * of {@code true} bits, or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     long clearNextNContinuousSetBits(long fromIndex, int numberOfBits);
 
@@ -410,13 +411,13 @@ public interface BitSet {
      * {@code setPreviousNContinuousClearBits(i, 1)} is exact equivalent of
      * {@code setPreviousClearBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous clear bits to search and set
      * @return the index of the first bit in the found range of clear bits,
      * or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is less
      *                                   than {@code -1}
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     long setPreviousNContinuousClearBits(long fromIndex, int numberOfBits);
 
@@ -432,15 +433,23 @@ public interface BitSet {
      * {@code clearPreviousNContinuousSetBits(i, 1)} is exact equivalent of
      * {@code clearPreviousSetBit(i)}.
      *
-     * @param fromIndex the index to start checking from (inclusive)
+     * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous set bits to search and clear
      * @return the index of the first bit in the found range
      * of {@code true} bits, or {@code -1} if there is no such range
      * @throws IndexOutOfBoundsException if {@code fromIndex} is less
      *                                   than {@code -1}
-     * @throws IllegalArgumentException if {@code numberOfBits <= 0}
+     * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     long clearPreviousNContinuousSetBits(long fromIndex, int numberOfBits);
+
+    /**
+     * Returns an iteration of <i>set</i> bits in <i>direct</i> order
+     * (from 0 to the end of the bit set).
+     *
+     * @return an iteration of <i>set</i> bits in <i>direct</i> order
+     */
+    Bits setBits();
 
     /**
      * An iteration of bits in a bit set.
@@ -464,12 +473,4 @@ public interface BitSet {
          */
         long next();
     }
-
-    /**
-     * Returns an iteration of <i>set</i> bits in <i>direct</i> order
-     * (from 0 to the end of the bit set).
-     *
-     * @return an iteration of <i>set</i> bits in <i>direct</i> order
-     */
-    Bits setBits();
 }

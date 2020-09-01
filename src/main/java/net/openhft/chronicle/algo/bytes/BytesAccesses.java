@@ -26,7 +26,7 @@ final class BytesAccesses {
     private BytesAccesses() {
     }
 
-     enum RandomDataInputReadAccessEnum implements RandomDataInputAccess<RandomDataInput> {
+    enum RandomDataInputReadAccessEnum implements RandomDataInputAccess<RandomDataInput> {
         INSTANCE
     }
 

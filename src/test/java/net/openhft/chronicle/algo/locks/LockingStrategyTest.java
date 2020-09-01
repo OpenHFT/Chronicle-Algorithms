@@ -27,25 +27,18 @@ import org.junit.runners.Parameterized;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static java.util.Arrays.asList;
 import static net.openhft.chronicle.algo.bytes.Accessor.uncheckedByteBufferAccessor;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.ADDRESS;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.BYTES_WITH_OFFSET;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 @RunWith(value = Parameterized.class)
 public class LockingStrategyTest {
-    
+
     private ExecutorService e1, e2;
     @SuppressWarnings("FieldCanBeLocal")
     private ByteBuffer buffer;
@@ -101,7 +94,6 @@ public class LockingStrategyTest {
             handle = accessor.handle(bytesStore);
             offset = accessor.offset(bytesStore, 0);
         }
-
         rwls().reset();
     }
 
@@ -231,8 +223,7 @@ public class LockingStrategyTest {
             rwls().readUnlock();
             assertTrue(rwls().tryWriteLock());
         }
-
-        // write lock is held
+// write lock is held
         readUnlockForbidden();
         upgradeReadToWriteLockForbidden();
 
@@ -246,7 +237,6 @@ public class LockingStrategyTest {
         } catch (UnsupportedOperationException tolerated) {
             // ignore
         }
-
         rwls().reset();
     }
 

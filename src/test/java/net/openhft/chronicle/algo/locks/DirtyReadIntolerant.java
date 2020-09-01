@@ -1,14 +1,13 @@
 package net.openhft.chronicle.algo.locks;
 
 import net.openhft.chronicle.map.ChronicleMap;
-//import net.openhft.chronicle.map.fromdocs.BondVOInterface;
 
 import java.util.concurrent.locks.StampedLock;
 
 import static net.openhft.chronicle.values.Values.newNativeReference;
 
 public class DirtyReadIntolerant {
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         try {
             String isoLevel = args[0];
             long sleepMock = Long.parseLong(args[1]);
@@ -40,7 +39,6 @@ public class DirtyReadIntolerant {
             );
             Thread.sleep(sleepMock * 1_000);
             while ((stamp = offHeapLock.readLock()) < 0) {
-                ;
             }
             System.out.println(
                     " ,,@t=" + System.currentTimeMillis() +
@@ -56,7 +54,7 @@ public class DirtyReadIntolerant {
                         " ,,@t=" + System.currentTimeMillis() +
                                 " DirtyReadIntolerant calling chm.get('369604101').getCoupon()"
                 );
-                bond = (BondVOInterface) chm.get("369604101");
+                bond = chm.get("369604101");
                 coupon = bond.getCoupon();
                 System.out.println(
                         " ,,@t=" + System.currentTimeMillis() +
@@ -75,11 +73,11 @@ public class DirtyReadIntolerant {
 
             } finally {
                 offHeapLock.unlockRead(stamp);
-                    System.out.println(
-                            " ,,@t=" + System.currentTimeMillis() +
-                                    " DirtyReadIntolerant offHeapLock.unlockRead(" +
-                                    stamp + ") completed."
-                    );
+                System.out.println(
+                        " ,,@t=" + System.currentTimeMillis() +
+                                " DirtyReadIntolerant offHeapLock.unlockRead(" +
+                                stamp + ") completed."
+                );
 
             }
             /**

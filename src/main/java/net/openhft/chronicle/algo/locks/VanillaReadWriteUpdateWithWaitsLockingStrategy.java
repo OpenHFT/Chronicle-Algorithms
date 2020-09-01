@@ -177,8 +177,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         int countWord = countWord(lockWord);
         if (!writeLocked(countWord) && waitWord(lockWord) == 0) {
             checkReadCountForIncrement(countWord);
-            if (casCountWord(access, t, offset, countWord, countWord + READ_PARTY))
-                return true;
+            return casCountWord(access, t, offset, countWord, countWord + READ_PARTY);
         }
         return false;
     }
@@ -217,8 +216,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         long lockWord = getLockWord(access, t, offset);
         int countWord = countWord(lockWord);
         if (!updateLocked(countWord) && !writeLocked(countWord) && waitWord(lockWord) == 0) {
-            if (casCountWord(access, t, offset, countWord, countWord + UPDATE_PARTY))
-                return true;
+            return casCountWord(access, t, offset, countWord, countWord + UPDATE_PARTY);
         }
         return false;
     }

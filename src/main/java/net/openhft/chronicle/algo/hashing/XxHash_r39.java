@@ -39,7 +39,25 @@ class XxHash_r39 {
     private static final long P4 = -8796714831421723037L;
     private static final long P5 = 2870177450012600261L;
 
-    private XxHash_r39() {}
+    private XxHash_r39() {
+    }
+
+    private static long finalize(long hash) {
+        hash ^= hash >>> 33;
+        hash *= P2;
+        hash ^= hash >>> 29;
+        hash *= P3;
+        hash ^= hash >>> 32;
+        return hash;
+    }
+
+    public static LongHashFunction asLongHashFunctionWithoutSeed() {
+        return AsLongHashFunction.SEEDLESS_INSTANCE;
+    }
+
+    public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
+        return new AsLongHashFunctionSeeded(seed);
+    }
 
     <T> long fetch64(ReadAccess<T> access, T in, long off) {
         return access.readLong(in, off);
@@ -129,7 +147,6 @@ class XxHash_r39 {
         } else {
             hash = seed + P5;
         }
-
         hash += length;
 
         while (remaining >= 8) {
@@ -142,37 +159,26 @@ class XxHash_r39 {
             off += 8;
             remaining -= 8;
         }
-
         if (remaining >= 4) {
             hash ^= fetch32(access, input, off) * P1;
             hash = Long.rotateLeft(hash, 23) * P2 + P3;
             off += 4;
             remaining -= 4;
         }
-
         while (remaining != 0) {
             hash ^= fetch8(access, input, off) * P5;
             hash = Long.rotateLeft(hash, 11) * P1;
             --remaining;
             ++off;
         }
-
         return finalize(hash);
-    }
-
-    private static long finalize(long hash) {
-        hash ^= hash >>> 33;
-        hash *= P2;
-        hash ^= hash >>> 29;
-        hash *= P3;
-        hash ^= hash >>> 32;
-        return hash;
     }
 
     private static class BigEndian extends XxHash_r39 {
         private static final BigEndian INSTANCE = new BigEndian();
 
-        private BigEndian() {}
+        private BigEndian() {
+        }
 
         @Override
         <T> long fetch64(ReadAccess<T> access, T in, long off) {
@@ -183,8 +189,7 @@ class XxHash_r39 {
         <T> long fetch32(ReadAccess<T> access, T in, long off) {
             return Integer.reverseBytes(access.readInt(in, off)) & 0xFFFFFFFFL;
         }
-
-        // fetch8 is not overloaded, because endianness doesn't matter for single byte
+// fetch8 is not overloaded, because endianness doesn't matter for single byte
 
         @Override
         long toLittleEndian(long v) {
@@ -200,10 +205,6 @@ class XxHash_r39 {
         short toLittleEndian(short v) {
             return Short.reverseBytes(v);
         }
-    }
-
-    public static LongHashFunction asLongHashFunctionWithoutSeed() {
-        return AsLongHashFunction.SEEDLESS_INSTANCE;
     }
 
     private static class AsLongHashFunction extends LongHashFunction {
@@ -279,10 +280,6 @@ class XxHash_r39 {
         }
     }
 
-    public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
-        return new AsLongHashFunctionSeeded(seed);
-    }
-
     private static class AsLongHashFunctionSeeded extends AsLongHashFunction {
         private final long seed;
         private final long voidHash;
@@ -303,4 +300,3 @@ class XxHash_r39 {
         }
     }
 }
-
