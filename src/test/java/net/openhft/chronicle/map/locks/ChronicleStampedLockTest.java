@@ -1,4 +1,4 @@
-package net.openhft.chronicle.algo.locks;
+package net.openhft.chronicle.map.locks;
 
 import org.junit.Assert;
 import org.junit.Test;
