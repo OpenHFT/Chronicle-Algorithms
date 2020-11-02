@@ -154,7 +154,7 @@ public class LongHashFunctionTest {
             assertEquals("string builder off len", eh, f.hashChars(sb, 1, len / 2));
 
             // Test for OpenJDK < 7u6, where substring wasn't copied char[] array
-            assertEquals("substring", eh, f.hashChars(sb.toString().substring(1, len / 2 + 1)));
+            assertEquals("substring", eh, f.hashChars(sb.substring(1, len / 2 + 1)));
 
             if (len >= 2) {
                 bb.order(BIG_ENDIAN);

@@ -38,9 +38,10 @@ public class HashTesterMain {
             throw new AssertionError(e);
         }
     }
-public static void main(String[] args) {
-    new HashTesterRunner(HashTesterMain.class).run();
-}
+
+    public static void main(String[] args) {
+        new HashTesterRunner(HashTesterMain.class).run();
+    }
 
     @HashTest("String.hashCode()")
     public static void generateStringHashCode(Consumer<Integer> hashes) {

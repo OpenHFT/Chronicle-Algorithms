@@ -34,15 +34,16 @@ import static org.junit.Assert.*;
 public class DirectBitSetTest {
 
     private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
-    private ReusableBitSet bs;
-    private boolean singleThreaded;
+    private final ReusableBitSet bs;
+    private final boolean singleThreaded;
 
     public DirectBitSetTest(ReusableBitSet bs) {
         this.bs = bs;
         singleThreaded = bs.frame instanceof SingleThreadedFlatBitSetFrame;
         assertTrue(bs.logicalSize() >= 256);
     }
-@Parameterized.Parameters
+
+    @Parameterized.Parameters
     public static Collection<Object[]> data() {
         int capacityInBytes = (int) MemoryUnit.BITS.toBytes(256);
         BytesStore bytes1 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
@@ -78,7 +79,7 @@ public class DirectBitSetTest {
                 },
 
         });
-}
+    }
 
     private void setIndices() {
         bs.clearAll();

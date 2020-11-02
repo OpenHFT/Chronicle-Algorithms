@@ -29,10 +29,11 @@ public class MurmurHash3Test {
     public void testMurmurWithoutSeed() {
         testMurmur(LongHashFunction.murmur_3(), Hashing.murmur3_128());
     }
-@Test
-public void testMurmurWithSeed() {
-    testMurmur(LongHashFunction.murmur_3(42L), Hashing.murmur3_128(42));
-}
+
+    @Test
+    public void testMurmurWithSeed() {
+        testMurmur(LongHashFunction.murmur_3(42L), Hashing.murmur3_128(42));
+    }
 
     private void testMurmur(LongHashFunction tested, HashFunction referenceFromGuava) {
         byte[] testData = new byte[1024];

@@ -45,18 +45,18 @@ public class LockingStrategyTest {
     @SuppressWarnings("FieldCanBeLocal")
     private BytesStore bytesStore;
     private long offset;
-    private LockingStrategy lockingStrategy;
-    private AccessMethod accessMethod;
+    private final LockingStrategy lockingStrategy;
+    private final AccessMethod accessMethod;
     private Access access;
     private Object handle;
-    private TestReadWriteLockState rwLockState = new TestReadWriteLockState();
-    private Callable<Boolean> tryReadLockTask = () -> rwls().tryReadLock();
-    private TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
-    private Runnable readUnlockTask = () -> rwls().readUnlock();
-    private Callable<Boolean> tryUpdateLockTask = () -> rwuls().tryUpdateLock();
-    private Runnable updateUnlockTask = () -> rwuls().updateUnlock();
-    private Callable<Boolean> tryWriteLockTask = () -> rwls().tryWriteLock();
-    private Runnable writeUnlockTask = () -> rwls().writeUnlock();
+    private final TestReadWriteLockState rwLockState = new TestReadWriteLockState();
+    private final Callable<Boolean> tryReadLockTask = () -> rwls().tryReadLock();
+    private final TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
+    private final Runnable readUnlockTask = () -> rwls().readUnlock();
+    private final Callable<Boolean> tryUpdateLockTask = () -> rwuls().tryUpdateLock();
+    private final Runnable updateUnlockTask = () -> rwuls().updateUnlock();
+    private final Callable<Boolean> tryWriteLockTask = () -> rwls().tryWriteLock();
+    private final Runnable writeUnlockTask = () -> rwls().writeUnlock();
 
     public LockingStrategyTest(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
         this.lockingStrategy = lockingStrategy;
