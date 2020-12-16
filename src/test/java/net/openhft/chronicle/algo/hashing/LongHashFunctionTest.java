@@ -143,6 +143,9 @@ public class LongHashFunctionTest {
     private static void testCharSequences(LongHashFunction f, long eh, int len, ByteBuffer bb) {
         if ((len & 1) == 0) {
             String s = bb.asCharBuffer().toString();
+            for (int i = 0; i < s.length(); i++)
+                if (!Character.isValidCodePoint(s.charAt(i)))
+                    return;
             assertEquals("string", eh, f.hashChars(s));
 
             StringBuilder sb = new StringBuilder();
@@ -156,10 +159,10 @@ public class LongHashFunctionTest {
             // Test for OpenJDK < 7u6, where substring wasn't copied char[] array
             assertEquals("substring", eh, f.hashChars(sb.substring(1, len / 2 + 1)));
 
-            if (len >= 2) {
-                bb.order(BIG_ENDIAN);
+            if (len >= 6) {
+                bb.order(nonNativeOrder());
                 String s2 = bb.asCharBuffer().toString();
-                assert s.charAt(0) != bb.getChar(0);
+                assertEquals(s.charAt(0), Character.reverseBytes(bb.getChar(0)));
                 assertNotEquals("string wrong order", eh, f.hashChars(s2));
 
                 assertEquals("string wrong order fixed", eh,
