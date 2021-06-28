@@ -37,7 +37,6 @@ public interface BitSet {
      * current value.
      *
      * @param bitIndex the index of the bit to flip
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -50,7 +49,6 @@ public interface BitSet {
      *
      * @param fromIndex index of the first bit to flip
      * @param toIndex   index after the last bit to flip
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
      *                                   or {@code fromIndex} is larger than {@code toIndex},
      *                                   or {@code toIndex} is larger or equal to {@code size()}
@@ -61,7 +59,6 @@ public interface BitSet {
      * Sets the bit at the specified index to {@code true}.
      *
      * @param bitIndex a bit index
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -92,7 +89,6 @@ public interface BitSet {
      *
      * @param bitIndex a bit index
      * @param value    a boolean value to set
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -110,7 +106,6 @@ public interface BitSet {
      *
      * @param fromIndex index of the first bit to be set
      * @param toIndex   index after the last bit to be set
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
      *                                   or {@code fromIndex} is larger than {@code toIndex},
      *                                   or {@code toIndex} is larger or equal to {@code size()}
@@ -123,7 +118,6 @@ public interface BitSet {
      * Sets all bits, {@code bs.setAll()} is equivalent
      * of {@code bs.set(0, bs.size()}.
      *
-     * @return this bit set back
      */
     void setAll();
 
@@ -134,7 +128,6 @@ public interface BitSet {
      * @param fromIndex index of the first bit to be set
      * @param toIndex   index after the last bit to be set
      * @param value     value to set the selected bits to
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
      *                                   or {@code fromIndex} is larger than {@code toIndex},
      *                                   or {@code toIndex} is larger or equal to {@code size()}
@@ -151,7 +144,6 @@ public interface BitSet {
      * Sets the bit specified by the index to {@code false}.
      *
      * @param bitIndex the index of the bit to be cleared
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -163,7 +155,6 @@ public interface BitSet {
      *
      * @param fromIndex index of the first bit to be cleared
      * @param toIndex   index after the last bit to be cleared
-     * @return this {@code DirectBitSet} back
      * @throws IndexOutOfBoundsException if {@code fromIndex} is negative,
      *                                   or {@code fromIndex} is larger than {@code toIndex},
      *                                   or {@code toIndex} is larger or equal to {@code size()}
@@ -175,7 +166,6 @@ public interface BitSet {
     /**
      * Sets all of the bits in this BitSet to {@code false}.
      *
-     * @return this {@code DirectBitSet} back
      */
     void clearAll();
 
