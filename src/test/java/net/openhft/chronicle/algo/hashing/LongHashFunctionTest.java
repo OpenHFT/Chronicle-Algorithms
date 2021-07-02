@@ -16,13 +16,12 @@
 
 package net.openhft.chronicle.algo.hashing;
 
-import sun.nio.ch.DirectBuffer;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import static java.nio.ByteOrder.*;
 import static net.openhft.chronicle.algo.bytes.Accessor.checkedCharSequenceAccess;
+import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -176,7 +175,7 @@ public class LongHashFunctionTest {
     private static void testMemory(LongHashFunction f, long eh, int len, ByteBuffer bb) {
         ByteBuffer directBB = ByteBuffer.allocateDirect(len);
         directBB.put(bb);
-        assertEquals("memory", eh, f.hashMemory(((DirectBuffer) directBB).address(), len));
+        assertEquals("memory", eh, f.hashMemory(MEMORY.address(directBB), len));
         bb.clear();
     }
 }

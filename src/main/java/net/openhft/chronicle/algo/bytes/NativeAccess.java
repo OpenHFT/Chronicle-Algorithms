@@ -16,25 +16,13 @@
 
 package net.openhft.chronicle.algo.bytes;
 
-import sun.misc.Unsafe;
-
-import java.lang.reflect.Field;
 import java.nio.ByteOrder;
+
+import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 
 public final class NativeAccess<T> implements Access<T> {
 
-    static final Unsafe U;
     private static final NativeAccess<Object> INSTANCE = new NativeAccess<>();
-
-    static {
-        try {
-            Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            U = (Unsafe) theUnsafe.get(null);
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-    }
 
     private NativeAccess() {
     }
@@ -46,102 +34,102 @@ public final class NativeAccess<T> implements Access<T> {
 
     @Override
     public byte readByte(T handle, long offset) {
-        return U.getByte(handle, offset);
+        return MEMORY.readByte(handle, offset);
     }
 
     @Override
     public short readShort(T handle, long offset) {
-        return U.getShort(handle, offset);
+        return MEMORY.readShort(handle, offset);
     }
 
     @Override
     public char readChar(T handle, long offset) {
-        return U.getChar(handle, offset);
+        return (char) MEMORY.readShort(handle, offset);
     }
 
     @Override
     public int readInt(T handle, long offset) {
-        return U.getInt(handle, offset);
+        return MEMORY.readInt(handle, offset);
     }
 
     @Override
     public long readLong(T handle, long offset) {
-        return U.getLong(handle, offset);
+        return MEMORY.readLong(handle, offset);
     }
 
     @Override
     public float readFloat(T handle, long offset) {
-        return U.getFloat(handle, offset);
+        return MEMORY.readFloat(handle, offset);
     }
 
     @Override
     public double readDouble(T handle, long offset) {
-        return U.getDouble(handle, offset);
+        return MEMORY.readDouble(handle, offset);
     }
 
     @Override
     public int readVolatileInt(T handle, long offset) {
-        return U.getIntVolatile(handle, offset);
+        return MEMORY.readVolatileInt(handle, offset);
     }
 
     @Override
     public long readVolatileLong(T handle, long offset) {
-        return U.getLongVolatile(handle, offset);
+        return MEMORY.readVolatileLong(handle, offset);
     }
 
     @Override
     public void writeByte(T handle, long offset, byte i8) {
-        U.putByte(handle, offset, i8);
+        MEMORY.writeByte(handle, offset, i8);
     }
 
     @Override
     public void writeShort(T handle, long offset, short i) {
-        U.putShort(handle, offset, i);
+        MEMORY.writeShort(handle, offset, i);
     }
 
     @Override
     public void writeChar(T handle, long offset, char c) {
-        U.putChar(handle, offset, c);
+        MEMORY.writeShort(handle, offset, (short) c);
     }
 
     @Override
     public void writeInt(T handle, long offset, int i) {
-        U.putInt(handle, offset, i);
+        MEMORY.writeInt(handle, offset, i);
     }
 
     @Override
     public void writeOrderedInt(T handle, long offset, int i) {
-        U.putOrderedInt(handle, offset, i);
+        MEMORY.writeOrderedInt(handle, offset, i);
     }
 
     @Override
     public void writeLong(T handle, long offset, long i) {
-        U.putLong(handle, offset, i);
+        MEMORY.writeLong(handle, offset, i);
     }
 
     @Override
     public void writeOrderedLong(T handle, long offset, long i) {
-        U.putOrderedLong(handle, offset, i);
+        MEMORY.writeOrderedLong(handle, offset, i);
     }
 
     @Override
     public void writeFloat(T handle, long offset, float d) {
-        U.putFloat(handle, offset, d);
+        MEMORY.writeFloat(handle, offset, d);
     }
 
     @Override
     public void writeDouble(T handle, long offset, double d) {
-        U.putDouble(handle, offset, d);
+        MEMORY.writeDouble(handle, offset, d);
     }
 
     @Override
     public boolean compareAndSwapInt(T handle, long offset, int expected, int value) {
-        return U.compareAndSwapInt(handle, offset, expected, value);
+        return MEMORY.compareAndSwapInt(handle, offset, expected, value);
     }
 
     @Override
     public boolean compareAndSwapLong(T handle, long offset, long expected, long value) {
-        return U.compareAndSwapLong(handle, offset, expected, value);
+        return MEMORY.compareAndSwapLong(handle, offset, expected, value);
     }
 
     @Override
@@ -150,24 +138,12 @@ public final class NativeAccess<T> implements Access<T> {
     }
 
     @Override
-    public <S> void writeFrom(
-            T handle, long offset,
-            ReadAccess<S> sourceAccess, S source, long sourceOffset, long len) {
-        if (sourceAccess instanceof NativeAccess) {
-            U.copyMemory(source, sourceOffset, handle, offset, len);
-
-        } else {
-            Access.super.writeFrom(handle, offset, sourceAccess, source, sourceOffset, len);
-        }
-    }
-
-    @Override
     public void writeBytes(T handle, long offset, long len, byte b) {
-        U.setMemory(handle, offset, len, b);
+        MEMORY.setMemory(handle, offset, len, b);
     }
 
     @Override
     public void zeroOut(T handle, long offset, long len) {
-        U.setMemory(handle, offset, len, (byte) 0);
+        MEMORY.setMemory(handle, offset, len, (byte) 0);
     }
 }

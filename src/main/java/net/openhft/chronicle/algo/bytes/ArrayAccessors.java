@@ -16,7 +16,7 @@
 
 package net.openhft.chronicle.algo.bytes;
 
-import static net.openhft.chronicle.algo.bytes.NativeAccess.U;
+import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 
 final class ArrayAccessors {
 
@@ -29,12 +29,12 @@ final class ArrayAccessors {
 
     static {
         try {
-            BOOLEAN_BASE = U.arrayBaseOffset(boolean[].class);
-            BYTE_BASE = U.arrayBaseOffset(byte[].class);
-            CHAR_BASE = U.arrayBaseOffset(char[].class);
-            SHORT_BASE = U.arrayBaseOffset(short[].class);
-            INT_BASE = U.arrayBaseOffset(int[].class);
-            LONG_BASE = U.arrayBaseOffset(long[].class);
+            BOOLEAN_BASE = MEMORY.arrayBaseOffset(boolean[].class);
+            BYTE_BASE = MEMORY.arrayBaseOffset(byte[].class);
+            CHAR_BASE = MEMORY.arrayBaseOffset(char[].class);
+            SHORT_BASE = MEMORY.arrayBaseOffset(short[].class);
+            INT_BASE = MEMORY.arrayBaseOffset(int[].class);
+            LONG_BASE = MEMORY.arrayBaseOffset(long[].class);
 
         } catch (Exception e) {
             throw new AssertionError(e);

@@ -16,9 +16,10 @@
 
 package net.openhft.chronicle.algo.bytes;
 
-import sun.nio.ch.DirectBuffer;
 
 import java.nio.ByteBuffer;
+
+import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 
 interface ByteBufferAccessor<T> extends Accessor.Full<ByteBuffer, T> {
 
@@ -45,7 +46,7 @@ interface ByteBufferAccessor<T> extends Accessor.Full<ByteBuffer, T> {
 
         @Override
         public long offset(ByteBuffer buffer, long bufferIndex) {
-            return ((DirectBuffer) buffer).address() + bufferIndex;
+            return MEMORY.address(buffer) + bufferIndex;
         }
     }
 
