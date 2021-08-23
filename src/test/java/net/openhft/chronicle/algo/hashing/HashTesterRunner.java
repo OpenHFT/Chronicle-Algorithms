@@ -30,16 +30,16 @@ import java.util.function.Consumer;
  * For a post of customizing hashing strategies.
  */
 public class HashTesterRunner implements Runnable {
-    private final Class testerMainClass;
+    private final Class<?> testerMainClass;
 
-    public HashTesterRunner(Class testerMainClass) {
+    public HashTesterRunner(Class<?> testerMainClass) {
         this.testerMainClass = testerMainClass;
     }
 
     private static void performTest(HashTest hashTest, Method method) {
         AtomicLong counter = new AtomicLong();
-        Set set = new HashSet();
-        Consumer consumer = o -> {
+        Set<Object> set = new HashSet<>();
+        Consumer<?> consumer = o -> {
             set.add(o);
             counter.incrementAndGet();
         };
@@ -53,10 +53,10 @@ public class HashTesterRunner implements Runnable {
         }
     }
 
-    public static int performTest(Consumer<Consumer> consumer2) {
+    public static int performTest(Consumer<Consumer<Object>> consumer2) {
         AtomicInteger counter = new AtomicInteger();
-        Set set = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        Consumer consumer = o -> {
+        Set<Object> set = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        Consumer<Object> consumer = o -> {
             set.add(o);
             counter.incrementAndGet();
         };

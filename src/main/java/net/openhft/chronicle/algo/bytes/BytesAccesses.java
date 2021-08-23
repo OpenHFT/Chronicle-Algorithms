@@ -32,7 +32,8 @@ final class BytesAccesses {
 
     static class Full<B extends BytesStore<B, U>, U> implements RandomDataInputAccess<B>,
             RandomDataOutputAccess<B>, Access<B> {
-        static final Full INSTANCE = new Full();
+
+        static final Full<?, ?> INSTANCE = new Full<>();
 
         @Override
         public boolean compareAndSwapInt(B handle, long offset, int expected, int value) {

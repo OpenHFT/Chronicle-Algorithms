@@ -146,7 +146,7 @@ public interface BitSetFrame {
     <T> boolean get(Access<T> access, T handle, long offset, long bitIndex);
 
     /**
-     * Synonym of {@link #get)}.
+     * Synonym of {@link #get(Access, Object, long, long)} )}.
      *
      * @param bitIndex the bit index
      * @return the value of the bit with the specified index

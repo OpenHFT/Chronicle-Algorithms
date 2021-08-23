@@ -32,7 +32,7 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     }
 
     static <B extends BytesStore<B, U>, U> Access<B> checkedBytesStoreAccess() {
-        return BytesAccesses.Full.INSTANCE;
+        return (Access<B>) BytesAccesses.Full.INSTANCE;
     }
 
     static ReadAccess<RandomDataInput> checkedRandomDataInputAccess() {

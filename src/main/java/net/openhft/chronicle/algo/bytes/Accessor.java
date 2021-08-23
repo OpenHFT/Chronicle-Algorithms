@@ -23,8 +23,9 @@ import java.nio.ByteOrder;
 
 public interface Accessor<S, T, A extends AccessCommon<T>> {
 
+    @SuppressWarnings("unchecked")
     static <B extends BytesStore<B, U>, U> Accessor.Full<B, ?> checkedBytesStoreAccessor() {
-        return BytesAccessors.Generic.INSTANCE;
+        return (Accessor.Full<B, ?>) BytesAccessors.Generic.INSTANCE;
     }
 
     static Accessor.Full<ByteBuffer, ?> uncheckedByteBufferAccessor(

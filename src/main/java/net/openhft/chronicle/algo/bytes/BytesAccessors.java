@@ -23,12 +23,14 @@ final class BytesAccessors {
     private BytesAccessors() {
     }
 
-    static class Generic<S extends BytesStore> implements Accessor.Full<S, S> {
-        static final Generic INSTANCE = new Generic();
+    static class Generic<S extends BytesStore<?, ?>> implements Accessor.Full<S, S> {
 
+        static final Generic<?> INSTANCE = new Generic<>();
+
+        @SuppressWarnings("unchecked")
         @Override
         public Access<S> access() {
-            return BytesAccesses.Full.INSTANCE;
+            return (Access<S>) BytesAccesses.Full.INSTANCE;
         }
 
         @Override
