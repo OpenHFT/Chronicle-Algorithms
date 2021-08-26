@@ -91,7 +91,6 @@ public interface ReadAccess<T> extends AccessCommon<T> {
     /**
      * @deprecated use {@link Access#equivalent} instead
      */
-    @Deprecated(/* to be removed in x.22 */)
     default <S> boolean compareTo(
             T handle, long offset, ReadAccess<S> sourceAccess, S source, long sourceOffset,
             long len) {
