@@ -72,7 +72,6 @@ interface WriteAccess<T> extends AccessCommon<T> {
     /**
      * @deprecated use {@link Access#copy} instead
      */
-    @Deprecated(/* to be removed in x.22 */)
     default <S> void writeFrom(
             T handle, long offset,
             ReadAccess<S> sourceAccess, S source, long sourceOffset, long len) {
