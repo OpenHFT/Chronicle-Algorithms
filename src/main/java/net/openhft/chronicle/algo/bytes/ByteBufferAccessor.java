@@ -16,7 +16,6 @@
 
 package net.openhft.chronicle.algo.bytes;
 
-
 import java.nio.ByteBuffer;
 
 import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
