@@ -17,7 +17,7 @@
 package net.openhft.chronicle.algo.locks;
 
 import net.openhft.chronicle.algo.bytes.Access;
-import net.openhft.chronicle.core.threads.ThreadHints;
+import net.openhft.chronicle.core.Jvm;
 
 import java.util.concurrent.TimeUnit;
 
@@ -60,7 +60,7 @@ public final class AcquisitionStrategies {
             do {
                 if (operation.tryAcquire(strategy, access, t, offset))
                     return true;
-                ThreadHints.onSpinWait();
+                Jvm.nanoPause();
             } while (deadLineNanos - System.nanoTime() >= 0L); // overflow-cautious
             afterLoop(strategy, access, t, offset);
             return end();
