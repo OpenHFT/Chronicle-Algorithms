@@ -184,7 +184,7 @@
         <connection>scm:git:git@github.com:OpenHFT/Chronicle-Algorithms.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/Chronicle-Algorithms.git
         </developerConnection>
-        <tag>master</tag>
+        <tag>release/2.22</tag>
     </scm>
 
 </project>
