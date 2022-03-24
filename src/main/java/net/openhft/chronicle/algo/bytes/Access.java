@@ -39,16 +39,60 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
         return BytesAccesses.RandomDataInputReadAccessEnum.INSTANCE;
     }
 
-    static <S, T> void copy(ReadAccess<S> sourceAccess, S source, long sourceOffset,
-                            WriteAccess<T> targetAccess, T target, long targetOffset,
-                            long len) {
-        targetAccess.writeFrom(target, targetOffset, sourceAccess, source, sourceOffset, len);
+    static <S, T> void copy(final ReadAccess<S> sourceAccess,
+                            final S source,
+                            final long sourceOffset,
+                            final WriteAccess<T> targetAccess,
+                            final T target,
+                            final long targetOffset,
+                            final long len) {
+        if (targetAccess == sourceAccess && target == source && targetOffset == sourceOffset)
+            return;
+        long i = 0;
+        while (len - i >= 8L) {
+            targetAccess.writeLong(target, targetOffset + i, sourceAccess.readLong(source, sourceOffset + i));
+            i += 8L;
+        }
+        if (len - i >= 4L) {
+            targetAccess.writeInt(target, targetOffset + i, sourceAccess.readInt(source, sourceOffset + i));
+            i += 4L;
+        }
+        if (len - i >= 2L) {
+            targetAccess.writeShort(target, targetOffset + i, sourceAccess.readShort(source, sourceOffset + i));
+            i += 2L;
+        }
+        if (i < len) {
+            targetAccess.writeByte(target, targetOffset + i, sourceAccess.readByte(source, sourceOffset + i));
+        }
     }
 
-    static <T, U> boolean equivalent(ReadAccess<T> access1, T handle1, long offset1,
-                                     ReadAccess<U> access2, U handle2, long offset2,
-                                     long len) {
-        return access1.compareTo(handle1, offset1, access2, handle2, offset2, len);
+    static <T, U> boolean equivalent(final ReadAccess<T> access1,
+                                     final T handle1,
+                                     final long offset1,
+                                     final ReadAccess<U> access2,
+                                     final U handle2,
+                                     final long offset2,
+                                     final long len) {
+        long i = 0;
+        while (len - i >= 8L) {
+            if (access1.readLong(handle1, offset1 + i) != access2.readLong(handle2, offset2 + i))
+                return false;
+            i += 8L;
+        }
+        if (len - i >= 4L) {
+            if (access1.readInt(handle1, offset1 + i) != access2.readInt(handle2, offset2 + i))
+                return false;
+            i += 4L;
+        }
+        if (len - i >= 2L) {
+            if (access1.readShort(handle1, offset1 + i) != access2.readShort(handle2, offset2 + i))
+                return false;
+            i += 2L;
+        }
+        if (i < len) {
+            return access1.readByte(handle1, offset1 + i) == access2.readByte(handle2, offset2 + i);
+        }
+        return true;
     }
 
     /**

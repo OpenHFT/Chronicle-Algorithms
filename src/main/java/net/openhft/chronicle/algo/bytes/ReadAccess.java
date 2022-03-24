@@ -88,30 +88,4 @@ public interface ReadAccess<T> extends AccessCommon<T> {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * @deprecated use {@link Access#equivalent} instead
-     */
-    default <S> boolean compareTo(
-            T handle, long offset, ReadAccess<S> sourceAccess, S source, long sourceOffset,
-            long len) {
-        long i = 0;
-        while (len - i >= 8L) {
-            if (readLong(handle, offset + i) != sourceAccess.readLong(source, sourceOffset + i))
-                return false;
-            i += 8L;
-        }
-        if (len - i >= 4L) {
-            if (readInt(handle, offset + i) != sourceAccess.readInt(source, sourceOffset + i))
-                return false;
-            i += 4L;
-        }
-        if (len - i >= 2L) {
-            if (readShort(handle, offset + i) != sourceAccess.readShort(source, sourceOffset + i))
-                return false;
-            i += 2L;
-        }
-        if (i < len)
-            return readByte(handle, offset + i) == sourceAccess.readByte(source, sourceOffset + i);
-        return true;
-    }
 }

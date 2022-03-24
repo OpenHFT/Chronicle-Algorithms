@@ -69,31 +69,6 @@ interface WriteAccess<T> extends AccessCommon<T> {
 
     void writeDouble(T handle, long offset, double d);
 
-    /**
-     * @deprecated use {@link Access#copy} instead
-     */
-    default <S> void writeFrom(
-            T handle, long offset,
-            ReadAccess<S> sourceAccess, S source, long sourceOffset, long len) {
-        if (this == sourceAccess && handle == source && offset == sourceOffset)
-            return;
-        long i = 0;
-        while (len - i >= 8L) {
-            writeLong(handle, offset + i, sourceAccess.readLong(source, sourceOffset + i));
-            i += 8L;
-        }
-        if (len - i >= 4L) {
-            writeInt(handle, offset + i, sourceAccess.readInt(source, sourceOffset + i));
-            i += 4L;
-        }
-        if (len - i >= 2L) {
-            writeShort(handle, offset + i, sourceAccess.readShort(source, sourceOffset + i));
-            i += 2L;
-        }
-        if (i < len)
-            writeByte(handle, offset + i, sourceAccess.readByte(source, sourceOffset + i));
-    }
-
     default void writeBytes(T handle, long offset, long len, byte b) {
         char c;
         int i;
