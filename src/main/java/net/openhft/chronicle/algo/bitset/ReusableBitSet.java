@@ -18,10 +18,9 @@ package net.openhft.chronicle.algo.bitset;
 
 import net.openhft.chronicle.algo.bytes.Access;
 
-@SuppressWarnings("unchecked")
 public class ReusableBitSet implements BitSet {
     protected BitSetFrame frame;
-    protected Access access;
+    protected Access<Object> access;
     protected Object handle;
     protected long offset;
 
@@ -33,7 +32,9 @@ public class ReusableBitSet implements BitSet {
     public final <T> ReusableBitSet reuse(
             BitSetFrame frame, Access<T> access, T handle, long offset) {
         this.frame = frame;
-        this.access = access;
+        @SuppressWarnings("unchecked")
+        Access<Object> access0 = (Access<Object>) access;
+        this.access = access0;
         this.handle = handle;
         this.offset = offset;
         return this;
