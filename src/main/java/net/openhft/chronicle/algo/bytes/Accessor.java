@@ -57,6 +57,7 @@ public interface Accessor<S, T, A extends AccessCommon<T>> {
         return ArrayAccessors.Long.INSTANCE;
     }
 
+    @SuppressWarnings("unchecked")
     static Accessor.Read<String, ?> stringAccessor() {
         return (Read<String, ?>) CharSequenceAccessor.stringAccessor;
     }

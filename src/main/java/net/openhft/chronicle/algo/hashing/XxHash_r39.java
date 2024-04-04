@@ -281,6 +281,7 @@ class XxHash_r39 {
     }
 
     private static class AsLongHashFunctionSeeded extends AsLongHashFunction {
+        private static final long serialVersionUID = 0L;
         private final long seed;
         private final long voidHash;
 

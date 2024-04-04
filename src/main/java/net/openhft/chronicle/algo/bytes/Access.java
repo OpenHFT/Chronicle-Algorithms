@@ -31,6 +31,7 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
         return ByteBufferAccess.INSTANCE;
     }
 
+    @SuppressWarnings("unchecked")
     static <B extends BytesStore<B, U>, U> Access<B> checkedBytesStoreAccess() {
         return (Access<B>) BytesAccesses.Full.INSTANCE;
     }

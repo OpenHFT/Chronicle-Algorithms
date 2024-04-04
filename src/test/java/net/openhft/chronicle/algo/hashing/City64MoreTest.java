@@ -34,7 +34,7 @@ public class City64MoreTest {
         long scoreSum = 0;
         for (int t = 1; t < 500; t++) {
             long[] hashs = new long[8192];
-            NativeBytes b = NativeBytes.nativeBytes(8);
+            NativeBytes<Void> b = NativeBytes.nativeBytes(8);
             for (int i = 0; i < hashs.length; i++) {
                 b.clear();
                 b.append(t);
@@ -70,7 +70,7 @@ public class City64MoreTest {
         long scoreSum = 0;
         for (int t = 0; t < 500; t++) {
             long[] hashs = new long[8192];
-            NativeBytes b = NativeBytes.nativeBytes(hashs.length / 64);
+            NativeBytes<Void> b = NativeBytes.nativeBytes(hashs.length / 64);
             byte[] init = new byte[hashs.length / 64];
             new SecureRandom().nextBytes(init);
             for (int i = 0; i < hashs.length; i++) {
