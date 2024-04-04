@@ -36,6 +36,7 @@ import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
+@SuppressWarnings({"unchecked","rawtypes"})
 @RunWith(value = Parameterized.class)
 public class LockingStrategyTest {
 

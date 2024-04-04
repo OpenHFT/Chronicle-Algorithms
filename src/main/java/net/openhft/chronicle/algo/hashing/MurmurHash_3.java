@@ -103,6 +103,7 @@ class MurmurHash_3 {
         return unsignedShort;
     }
 
+    @SuppressWarnings("fallthrough")
     public <T> long hash(long seed, T input, ReadAccess<T> access, long offset, long length) {
         long h1 = seed;
         long h2 = seed;

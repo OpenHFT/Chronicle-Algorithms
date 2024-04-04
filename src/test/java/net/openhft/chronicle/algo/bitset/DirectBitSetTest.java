@@ -43,16 +43,17 @@ public class DirectBitSetTest {
         assertTrue(bs.logicalSize() >= 256);
     }
 
+    @SuppressWarnings("unchecked")
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         int capacityInBytes = (int) MemoryUnit.BITS.toBytes(256);
-        BytesStore bytes1 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
-        BytesStore bytes2 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
+        BytesStore<?, ByteBuffer> bytes1 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
+        BytesStore<?, ByteBuffer> bytes2 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
         return Arrays.asList(new Object[][]{
                 {
                         new ReusableBitSet(
                                 new ConcurrentFlatBitSetFrame(256),
-                                Access.checkedBytesStoreAccess(),
+                                (Access) Access.checkedBytesStoreAccess(),
                                 bytes1,
                                 0)
                 },
@@ -66,7 +67,7 @@ public class DirectBitSetTest {
                 {
                         new ReusableBitSet(
                                 new ConcurrentFlatBitSetFrame(256),
-                                Access.checkedBytesStoreAccess(),
+                                (Access) Access.checkedBytesStoreAccess(),
                                 bytes2,
                                 0)
                 },
