@@ -44,7 +44,7 @@ public class LockingStrategyTest {
     @SuppressWarnings("FieldCanBeLocal")
     private ByteBuffer buffer;
     @SuppressWarnings("FieldCanBeLocal")
-    private BytesStore bytesStore;
+    private BytesStore<?, ?> bytesStore;
     private long offset;
     private final LockingStrategy lockingStrategy;
     private final AccessMethod accessMethod;
