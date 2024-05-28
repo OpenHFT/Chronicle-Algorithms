@@ -36,6 +36,7 @@ import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
+@SuppressWarnings({"unchecked","rawtypes"})
 @RunWith(value = Parameterized.class)
 public class LockingStrategyTest {
 
@@ -43,7 +44,7 @@ public class LockingStrategyTest {
     @SuppressWarnings("FieldCanBeLocal")
     private ByteBuffer buffer;
     @SuppressWarnings("FieldCanBeLocal")
-    private BytesStore bytesStore;
+    private BytesStore<?, ?> bytesStore;
     private long offset;
     private final LockingStrategy lockingStrategy;
     private final AccessMethod accessMethod;

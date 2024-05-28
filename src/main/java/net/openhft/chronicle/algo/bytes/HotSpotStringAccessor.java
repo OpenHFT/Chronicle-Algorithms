@@ -43,6 +43,7 @@ final class HotSpotStringAccessor<T> implements Accessor.Read<String, T> {
         return NativeAccess.instance();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public T handle(String source) {
         return (T) MEMORY.getObject(source, valueOffset);

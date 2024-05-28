@@ -27,6 +27,7 @@ public final class NativeAccess<T> implements Access<T> {
     private NativeAccess() {
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> NativeAccess<T> instance() {
         //noinspection unchecked
         return (NativeAccess<T>) INSTANCE;

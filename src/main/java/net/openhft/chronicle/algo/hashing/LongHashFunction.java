@@ -52,7 +52,7 @@ import static net.openhft.chronicle.algo.bytes.Accessor.*;
  * results, but performing equally good. This choice should be explicitly documented for all
  * {@code LongHashFunction} implementations.
  *
- * <h3>Subclassing</h3>
+ * <h2>Subclassing</h2>
  * To implement a specific hash function algorithm, this class should be subclassed. Only methods
  * that accept single primitives, {@link #hashVoid()} and {@link #hash(Object, ReadAccess, long,
  * long)} should be implemented; other have default implementations which in the end delegate to

@@ -87,5 +87,4 @@ public interface ReadAccess<T> extends AccessCommon<T> {
     default long readVolatileLong(T handle, long offset) {
         throw new UnsupportedOperationException();
     }
-
 }
