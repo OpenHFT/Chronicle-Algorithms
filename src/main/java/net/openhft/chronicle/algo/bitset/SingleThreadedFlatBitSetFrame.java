@@ -56,7 +56,6 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     }
 
     // Utility methods for bit manipulation and conversions
-
     static long singleBit(long bitIndex) {
         return 1L << bitIndex;
     }
