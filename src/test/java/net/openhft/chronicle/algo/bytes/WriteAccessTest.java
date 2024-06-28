@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 public class WriteAccessTest {
 
     private WriteAccess<byte[]> writeAccess;

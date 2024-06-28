@@ -1065,8 +1065,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     /**
      * Clears the next {@code numberOfBits} consecutive bits that are set to {@code true},
-     * starting from the specified {@code fromIndex}. If no such range of set bits exists,
-     * or if {@code numberOfBits} is greater than 64, this method delegates to {@link #clearNextManyContinuousSetBits}.
+     * starting from the specified {@code fromIndex}.
      *
      * @param access       the access interface for reading and writing bits
      * @param handle       the handle to the underlying data structure
@@ -1179,8 +1178,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     /**
      * Sets the previous {@code numberOfBits} consecutive bits that are set to {@code false},
-     * starting from the specified {@code fromIndex}. If no such range of clear bits exists,
-     * or if {@code numberOfBits} is greater than 64, this method delegates to {@link #setPreviousManyContinuousClearBits}.
+     * starting from the specified {@code fromIndex}.
      *
      * @param access       the access interface for reading and writing bits
      * @param handle       the handle to the underlying data structure

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 public class ConcurrentFlatBitSetFrameTest extends TestCase {
     private ConcurrentFlatBitSetFrame bitSetFrame;
     private Access<Object> access;

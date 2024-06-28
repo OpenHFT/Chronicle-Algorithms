@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 public class AbstractReadWriteLockingStrategyTest {
 
     private AbstractReadWriteLockingStrategy strategy;

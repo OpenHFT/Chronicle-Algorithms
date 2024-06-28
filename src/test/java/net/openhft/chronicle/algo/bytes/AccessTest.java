@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("unchecked")
 public class AccessTest extends TestCase {
 
     private Access<Object> access;
