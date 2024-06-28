@@ -8,7 +8,8 @@
 </a>
 
 Zero allocation, efficient algorithms for
-- hashing 
+
+- hashing
 - bit set operations
 - access the raw bytes of an data type
 - off heap locking

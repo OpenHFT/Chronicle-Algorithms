@@ -166,12 +166,12 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      * Flips the bits from the specified {@code fromIndex} (inclusive) to the
      * specified {@code toIndex} (exclusive).
      *
-     * @param access         the access interface for reading/writing bits
-     * @param handle         the handle to the underlying data structure
-     * @param offset         the offset within the data structure
-     * @param fromIndex      the index of the first bit to flip (inclusive)
+     * @param access           the access interface for reading/writing bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to flip (inclusive)
      * @param exclusiveToIndex the index after the last bit to flip (exclusive)
-     * @param <T>            the type of the handle
+     * @param <T>              the type of the handle
      */
     @Override
     public <T> void flipRange(Access<T> access, T handle, long offset,
@@ -253,12 +253,12 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      * Sets the bits from the specified {@code fromIndex} (inclusive) to the
      * specified {@code toIndex} (exclusive) to {@code true}.
      *
-     * @param access          the access interface for reading/writing bits
-     * @param handle          the handle to the underlying data structure
-     * @param offset          the offset within the data structure
-     * @param fromIndex       the index of the first bit to set (inclusive)
+     * @param access           the access interface for reading/writing bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to set (inclusive)
      * @param exclusiveToIndex the index after the last bit to set (exclusive)
-     * @param <T>             the type of the handle
+     * @param <T>              the type of the handle
      */
     @Override
     public <T> void setRange(Access<T> access, T handle, long offset,
@@ -364,12 +364,12 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      * Clears the bits from the specified {@code fromIndex} (inclusive) to the
      * specified {@code toIndex} (exclusive).
      *
-     * @param access          the access interface for reading/writing bits
-     * @param handle          the handle to the underlying data structure
-     * @param offset          the offset within the data structure
-     * @param fromIndex       the index of the first bit to clear (inclusive)
+     * @param access           the access interface for reading/writing bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to clear (inclusive)
      * @param exclusiveToIndex the index after the last bit to clear (exclusive)
-     * @param <T>             the type of the handle
+     * @param <T>              the type of the handle
      */
     @Override
     public <T> void clearRange(Access<T> access, T handle, long offset,
@@ -415,12 +415,12 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     /**
      * Checks if all bits in the specified range are set to {@code true}.
      *
-     * @param access          the access interface for reading bits
-     * @param handle          the handle to the underlying data structure
-     * @param offset          the offset within the data structure
-     * @param fromIndex       the index of the first bit to check (inclusive)
+     * @param access           the access interface for reading bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to check (inclusive)
      * @param exclusiveToIndex the index after the last bit to check (exclusive)
-     * @param <T>             the type of the handle
+     * @param <T>              the type of the handle
      * @return {@code true} if all bits in the range are set to {@code true}, {@code false} otherwise
      */
     @Override
@@ -462,12 +462,12 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     /**
      * Checks if all bits in the specified range are clear (set to {@code false}).
      *
-     * @param access          the access interface for reading bits
-     * @param handle          the handle to the underlying data structure
-     * @param offset          the offset within the data structure
-     * @param fromIndex       the index of the first bit to check (inclusive)
+     * @param access           the access interface for reading bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to check (inclusive)
      * @param exclusiveToIndex the index after the last bit to check (exclusive)
-     * @param <T>             the type of the handle
+     * @param <T>              the type of the handle
      * @return {@code true} if all bits in the range are clear, {@code false} otherwise
      */
     @Override
@@ -724,12 +724,12 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     /**
      * Returns the index of the last bit that is set to {@code true} within the specified range.
      *
-     * @param access          the access interface for reading bits
-     * @param handle          the handle to the underlying data structure
-     * @param offset          the offset within the data structure
-     * @param fromIndex       the index to start checking from (inclusive)
+     * @param access           the access interface for reading bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index to start checking from (inclusive)
      * @param inclusiveToIndex the index to check to (inclusive)
-     * @param <T>             the type of the handle
+     * @param <T>              the type of the handle
      * @return the index of the previous set bit within the range, or {@code -1} if there is no such bit
      */
     private <T> long previousSetBit(Access<T> access, T handle, long offset,

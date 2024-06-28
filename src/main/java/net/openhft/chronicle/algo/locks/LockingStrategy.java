@@ -28,9 +28,9 @@ public interface LockingStrategy {
      * Attempts to acquire a lock on the specified resource.
      *
      * @param access the access mechanism for the resource
-     * @param t the target resource
+     * @param t      the target resource
      * @param offset the offset within the resource
-     * @param <T> the type of the target resource
+     * @param <T>    the type of the target resource
      * @return {@code true} if the lock was successfully acquired, {@code false} otherwise
      */
     <T> boolean tryLock(Access<T> access, T t, long offset);
@@ -39,9 +39,9 @@ public interface LockingStrategy {
      * Releases the lock on the specified resource.
      *
      * @param access the access mechanism for the resource
-     * @param t the target resource
+     * @param t      the target resource
      * @param offset the offset within the resource
-     * @param <T> the type of the target resource
+     * @param <T>    the type of the target resource
      */
     <T> void unlock(Access<T> access, T t, long offset);
 
@@ -49,9 +49,9 @@ public interface LockingStrategy {
      * Resets the lock on the specified resource.
      *
      * @param access the access mechanism for the resource
-     * @param t the target resource
+     * @param t      the target resource
      * @param offset the offset within the resource
-     * @param <T> the type of the target resource
+     * @param <T>    the type of the target resource
      */
     <T> void reset(Access<T> access, T t, long offset);
 
@@ -66,9 +66,9 @@ public interface LockingStrategy {
      * Retrieves the state of the lock on the specified resource.
      *
      * @param access the read access mechanism for the resource
-     * @param t the target resource
+     * @param t      the target resource
      * @param offset the offset within the resource
-     * @param <T> the type of the target resource
+     * @param <T>    the type of the target resource
      * @return the state of the lock
      */
     <T> long getState(ReadAccess<T> access, T t, long offset);

@@ -52,10 +52,10 @@ final class BytesAccesses {
          * Compares the current value of the int at the given offset with the expected value,
          * and if they are equal, sets the int value to the given value.
          *
-         * @param handle  the BytesStore handle
-         * @param offset  the offset in the BytesStore
+         * @param handle   the BytesStore handle
+         * @param offset   the offset in the BytesStore
          * @param expected the expected int value
-         * @param value   the new int value to set
+         * @param value    the new int value to set
          * @return true if the value was swapped, false otherwise
          */
         @Override
@@ -67,10 +67,10 @@ final class BytesAccesses {
          * Compares the current value of the long at the given offset with the expected value,
          * and if they are equal, sets the long value to the given value.
          *
-         * @param handle  the BytesStore handle
-         * @param offset  the offset in the BytesStore
+         * @param handle   the BytesStore handle
+         * @param offset   the offset in the BytesStore
          * @param expected the expected long value
-         * @param value   the new long value to set
+         * @param value    the new long value to set
          * @return true if the value was swapped, false otherwise
          */
         @Override

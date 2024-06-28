@@ -93,10 +93,10 @@ class CityHash_1_1 {
     /**
      * Hashes a length of 1 to 3 bytes.
      *
-     * @param len          the length
-     * @param firstByte    the first byte
+     * @param len           the length
+     * @param firstByte     the first byte
      * @param midOrLastByte the middle or last byte
-     * @param lastByte     the last byte
+     * @param lastByte      the last byte
      * @return the hashed result
      */
     private static long hash1To3Bytes(int len, int firstByte, int midOrLastByte, int lastByte) {
@@ -108,9 +108,9 @@ class CityHash_1_1 {
     /**
      * Hashes a length of 4 to 7 bytes.
      *
-     * @param len          the length
-     * @param first4Bytes  the first 4 bytes
-     * @param last4Bytes   the last 4 bytes
+     * @param len         the length
+     * @param first4Bytes the first 4 bytes
+     * @param last4Bytes  the last 4 bytes
      * @return the hashed result
      */
     private static long hash4To7Bytes(long len, long first4Bytes, long last4Bytes) {
@@ -121,9 +121,9 @@ class CityHash_1_1 {
     /**
      * Hashes a length of 8 to 16 bytes.
      *
-     * @param len          the length
-     * @param first8Bytes  the first 8 bytes
-     * @param last8Bytes   the last 8 bytes
+     * @param len         the length
+     * @param first8Bytes the first 8 bytes
+     * @param last8Bytes  the last 8 bytes
      * @return the hashed result
      */
     private static long hash8To16Bytes(long len, long first8Bytes, long last8Bytes) {

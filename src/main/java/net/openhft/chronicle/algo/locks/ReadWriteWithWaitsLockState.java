@@ -38,7 +38,7 @@ public interface ReadWriteWithWaitsLockState extends ReadWriteLockState {
      * Attempts to acquire a write lock and deregister the wait.
      *
      * @return {@code true} if the write lock was successfully acquired and the wait deregistered,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     boolean tryWriteLockAndDeregisterWait();
 
@@ -46,7 +46,7 @@ public interface ReadWriteWithWaitsLockState extends ReadWriteLockState {
      * Attempts to upgrade a read lock to a write lock and deregister the wait.
      *
      * @return {@code true} if the lock was successfully upgraded and the wait deregistered,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     boolean tryUpgradeReadToWriteLockAndDeregisterWait();
 

@@ -2,7 +2,6 @@ package net.openhft.chronicle.algo.locks;
 
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.algo.bytes.ReadAccess;
-import net.openhft.chronicle.algo.locks.VanillaReadWriteWithWaitsLockingStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

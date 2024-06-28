@@ -30,7 +30,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the value to write
+     * @param i      the value to write
      */
     default void writeByte(T handle, long offset, int i) {
         writeByte(handle, offset, Maths.toInt8(i));
@@ -41,7 +41,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the value to write
+     * @param i      the value to write
      */
     default void writeUnsignedByte(T handle, long offset, int i) {
         writeByte(handle, offset, (byte) Maths.toUInt8(i));
@@ -52,7 +52,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param flag the boolean value to write
+     * @param flag   the boolean value to write
      */
     default void writeBoolean(T handle, long offset, boolean flag) {
         writeByte(handle, offset, flag ? 'Y' : 0);
@@ -63,7 +63,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the value to write
+     * @param i      the value to write
      */
     default void writeUnsignedShort(T handle, long offset, int i) {
         writeShort(handle, offset, (short) Maths.toUInt16(i));
@@ -74,7 +74,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param c the char value to write
+     * @param c      the char value to write
      */
     default void writeChar(T handle, long offset, char c) {
         writeShort(handle, offset, (short) c);
@@ -85,7 +85,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the value to write
+     * @param i      the value to write
      */
     default void writeUnsignedInt(T handle, long offset, long i) {
         writeInt(handle, offset, (int) Maths.toUInt32(i));
@@ -96,7 +96,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i8 the byte value to write
+     * @param i8     the byte value to write
      */
     void writeByte(T handle, long offset, byte i8);
 
@@ -105,7 +105,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the short value to write
+     * @param i      the short value to write
      */
     void writeShort(T handle, long offset, short i);
 
@@ -114,7 +114,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the int value to write
+     * @param i      the int value to write
      */
     void writeInt(T handle, long offset, int i);
 
@@ -124,7 +124,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the int value to write
+     * @param i      the int value to write
      * @throws UnsupportedOperationException if the method is not supported
      */
     default void writeOrderedInt(T handle, long offset, int i) {
@@ -136,7 +136,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the long value to write
+     * @param i      the long value to write
      */
     void writeLong(T handle, long offset, long i);
 
@@ -146,7 +146,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param i the long value to write
+     * @param i      the long value to write
      * @throws UnsupportedOperationException if the method is not supported
      */
     default void writeOrderedLong(T handle, long offset, long i) {
@@ -158,7 +158,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param d the float value to write
+     * @param d      the float value to write
      */
     void writeFloat(T handle, long offset, float d);
 
@@ -167,7 +167,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to write to
-     * @param d the double value to write
+     * @param d      the double value to write
      */
     void writeDouble(T handle, long offset, double d);
 
@@ -176,8 +176,8 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to start writing from
-     * @param len the number of bytes to write
-     * @param b the byte value to write repeatedly
+     * @param len    the number of bytes to write
+     * @param b      the byte value to write repeatedly
      */
     default void writeBytes(T handle, long offset, long len, byte b) {
         char c;
@@ -222,7 +222,7 @@ interface WriteAccess<T> extends AccessCommon<T> {
      *
      * @param handle the object to write to
      * @param offset the offset to start writing from
-     * @param len the number of bytes to write
+     * @param len    the number of bytes to write
      */
     default void zeroOut(T handle, long offset, long len) {
         long index = 0;

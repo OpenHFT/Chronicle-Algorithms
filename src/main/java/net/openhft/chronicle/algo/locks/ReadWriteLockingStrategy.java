@@ -28,9 +28,9 @@ public interface ReadWriteLockingStrategy extends LockingStrategy {
     /**
      * Attempts to acquire a read lock.
      *
-     * @param <T> the type of the object being locked
+     * @param <T>    the type of the object being locked
      * @param access the access mechanism
-     * @param t the object being locked
+     * @param t      the object being locked
      * @param offset the offset within the object
      * @return {@code true} if the read lock was successfully acquired, {@code false} otherwise
      */
@@ -39,9 +39,9 @@ public interface ReadWriteLockingStrategy extends LockingStrategy {
     /**
      * Attempts to acquire a write lock.
      *
-     * @param <T> the type of the object being locked
+     * @param <T>    the type of the object being locked
      * @param access the access mechanism
-     * @param t the object being locked
+     * @param t      the object being locked
      * @param offset the offset within the object
      * @return {@code true} if the write lock was successfully acquired, {@code false} otherwise
      */
@@ -50,9 +50,9 @@ public interface ReadWriteLockingStrategy extends LockingStrategy {
     /**
      * Attempts to upgrade a read lock to a write lock.
      *
-     * @param <T> the type of the object being locked
+     * @param <T>    the type of the object being locked
      * @param access the access mechanism
-     * @param t the object being locked
+     * @param t      the object being locked
      * @param offset the offset within the object
      * @return {@code true} if the lock was successfully upgraded to a write lock, {@code false} otherwise
      */
@@ -61,9 +61,9 @@ public interface ReadWriteLockingStrategy extends LockingStrategy {
     /**
      * Releases a read lock.
      *
-     * @param <T> the type of the object being locked
+     * @param <T>    the type of the object being locked
      * @param access the access mechanism
-     * @param t the object being locked
+     * @param t      the object being locked
      * @param offset the offset within the object
      */
     <T> void readUnlock(Access<T> access, T t, long offset);
@@ -71,9 +71,9 @@ public interface ReadWriteLockingStrategy extends LockingStrategy {
     /**
      * Releases a write lock.
      *
-     * @param <T> the type of the object being locked
+     * @param <T>    the type of the object being locked
      * @param access the access mechanism
-     * @param t the object being locked
+     * @param t      the object being locked
      * @param offset the offset within the object
      */
     <T> void writeUnlock(Access<T> access, T t, long offset);
@@ -81,9 +81,9 @@ public interface ReadWriteLockingStrategy extends LockingStrategy {
     /**
      * Downgrades a write lock to a read lock.
      *
-     * @param <T> the type of the object being locked
+     * @param <T>    the type of the object being locked
      * @param access the access mechanism
-     * @param t the object being locked
+     * @param t      the object being locked
      * @param offset the offset within the object
      */
     <T> void downgradeWriteToReadLock(Access<T> access, T t, long offset);

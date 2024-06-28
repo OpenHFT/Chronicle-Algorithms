@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class AcquisitionStrategiesTest {
@@ -22,11 +23,6 @@ class AcquisitionStrategiesTest {
         rwWithWaitsStrategy = mock(ReadWriteWithWaitsLockingStrategy.class);
         access = mock(Access.class);
         handle = new Object();
-    }
-
-    @FunctionalInterface
-    interface TryAcquireOperation<S> {
-        <T> boolean tryAcquire(S strategy, Access<T> access, T t, long offset);
     }
 
     @Test
@@ -81,5 +77,10 @@ class AcquisitionStrategiesTest {
 
         verify(rwWithWaitsStrategy).registerWait(any(), any(), anyLong());
         verify(rwWithWaitsStrategy).deregisterWait(any(), any(), anyLong());
+    }
+
+    @FunctionalInterface
+    interface TryAcquireOperation<S> {
+        <T> boolean tryAcquire(S strategy, Access<T> access, T t, long offset);
     }
 }

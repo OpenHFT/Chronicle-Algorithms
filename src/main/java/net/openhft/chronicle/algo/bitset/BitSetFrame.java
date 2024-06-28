@@ -33,11 +33,11 @@ public interface BitSetFrame {
      * Sets the bit at the specified index to the complement of its
      * current value.
      *
-     * @param <T>       the type of the handle
-     * @param access    the access object
-     * @param handle    the handle to the bit set
-     * @param offset    the offset in the bit set
-     * @param bitIndex  the index of the bit to flip
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
+     * @param bitIndex the index of the bit to flip
      */
     <T> void flip(Access<T> access, T handle, long offset, long bitIndex);
 

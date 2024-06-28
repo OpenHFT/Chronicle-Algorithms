@@ -160,11 +160,11 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     /**
      * Writes the count word to the given Access instance.
      *
-     * @param access   The Access instance
-     * @param t        The input handle
-     * @param offset   The offset within the input
+     * @param access    The Access instance
+     * @param t         The input handle
+     * @param offset    The offset within the input
      * @param countWord The count word to write
-     * @param <T>      The type of the input handle
+     * @param <T>       The type of the input handle
      */
     public static <T> void putCountWord(
             Access<T> access, T t, long offset, int countWord) {

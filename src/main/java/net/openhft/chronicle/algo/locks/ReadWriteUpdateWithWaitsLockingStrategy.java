@@ -31,11 +31,11 @@ public interface ReadWriteUpdateWithWaitsLockingStrategy
      * Attempts to upgrade an update lock to a write lock and deregister the wait state.
      *
      * @param access the access strategy for the lock
-     * @param t the object containing the lock
+     * @param t      the object containing the lock
      * @param offset the offset of the lock state within the object
-     * @param <T> the type of the object containing the lock
+     * @param <T>    the type of the object containing the lock
      * @return {@code true} if the lock was successfully upgraded and the wait state deregistered,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     <T> boolean tryUpgradeUpdateToWriteLockAndDeregisterWait(
             Access<T> access, T t, long offset);

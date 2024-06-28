@@ -2,7 +2,6 @@ package net.openhft.chronicle.algo.bitset;
 
 import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class FlatBitSetAlgorithmTest extends TestCase {
     @Test

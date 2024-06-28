@@ -108,9 +108,9 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
     /**
      * Checks if the from and to indices are within bounds.
      *
-     * @param fromIndex       the starting index (inclusive)
+     * @param fromIndex        the starting index (inclusive)
      * @param exclusiveToIndex the ending index (exclusive)
-     * @param toLongIndex     the long index to check
+     * @param toLongIndex      the long index to check
      * @return {@code true} if the indices are within bounds, {@code false} otherwise
      */
     private boolean checkFromTo(long fromIndex, long exclusiveToIndex, long toLongIndex) {

@@ -31,7 +31,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
      * Attempts to acquire an update lock.
      *
      * @param access the access object
-     * @param t the instance to lock
+     * @param t      the instance to lock
      * @param offset the offset for the lock state
      * @return {@code true} if the update lock was successfully acquired, {@code false} otherwise
      */
@@ -41,7 +41,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
      * Attempts to upgrade a read lock to an update lock.
      *
      * @param access the access object
-     * @param t the instance to upgrade
+     * @param t      the instance to upgrade
      * @param offset the offset for the lock state
      * @return {@code true} if the lock was successfully upgraded to an update lock, {@code false} otherwise
      */
@@ -51,7 +51,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
      * Attempts to upgrade an update lock to a write lock.
      *
      * @param access the access object
-     * @param t the instance to upgrade
+     * @param t      the instance to upgrade
      * @param offset the offset for the lock state
      * @return {@code true} if the lock was successfully upgraded to a write lock, {@code false} otherwise
      */
@@ -61,7 +61,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
      * Releases an update lock.
      *
      * @param access the access object
-     * @param t the instance to unlock
+     * @param t      the instance to unlock
      * @param offset the offset for the lock state
      */
     <T> void updateUnlock(Access<T> access, T t, long offset);
@@ -70,7 +70,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
      * Downgrades an update lock to a read lock.
      *
      * @param access the access object
-     * @param t the instance to downgrade
+     * @param t      the instance to downgrade
      * @param offset the offset for the lock state
      */
     <T> void downgradeUpdateToReadLock(Access<T> access, T t, long offset);
@@ -79,7 +79,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
      * Downgrades a write lock to an update lock.
      *
      * @param access the access object
-     * @param t the instance to downgrade
+     * @param t      the instance to downgrade
      * @param offset the offset for the lock state
      */
     <T> void downgradeWriteToUpdateLock(Access<T> access, T t, long offset);

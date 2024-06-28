@@ -73,15 +73,15 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     /**
      * Copies data from the source to the target using the provided access interfaces.
      *
-     * @param sourceAccess   the source access interface
-     * @param source         the source handle
-     * @param sourceOffset   the source offset
-     * @param targetAccess   the target access interface
-     * @param target         the target handle
-     * @param targetOffset   the target offset
-     * @param len            the length of data to copy
-     * @param <S>            the source type
-     * @param <T>            the target type
+     * @param sourceAccess the source access interface
+     * @param source       the source handle
+     * @param sourceOffset the source offset
+     * @param targetAccess the target access interface
+     * @param target       the target handle
+     * @param targetOffset the target offset
+     * @param len          the length of data to copy
+     * @param <S>          the source type
+     * @param <T>          the target type
      */
     static <S, T> void copy(final ReadAccess<S> sourceAccess,
                             final S source,
@@ -114,15 +114,15 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     /**
      * Checks if the data in two different access types are equivalent.
      *
-     * @param access1  the first access interface
-     * @param handle1  the first handle
-     * @param offset1  the first offset
-     * @param access2  the second access interface
-     * @param handle2  the second handle
-     * @param offset2  the second offset
-     * @param len      the length of data to compare
-     * @param <T>      the type of the first handle
-     * @param <U>      the type of the second handle
+     * @param access1 the first access interface
+     * @param handle1 the first handle
+     * @param offset1 the first offset
+     * @param access2 the second access interface
+     * @param handle2 the second handle
+     * @param offset2 the second offset
+     * @param len     the length of data to compare
+     * @param <T>     the type of the first handle
+     * @param <U>     the type of the second handle
      * @return true if the data is equivalent, false otherwise
      */
     static <T, U> boolean equivalent(final ReadAccess<T> access1,
@@ -157,10 +157,10 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     /**
      * Compares and swaps an int value atomically.
      *
-     * @param handle    the handle to the underlying data structure
-     * @param offset    the offset within the data structure
-     * @param expected  the expected int value
-     * @param value     the new int value to set if the current value equals the expected value
+     * @param handle   the handle to the underlying data structure
+     * @param offset   the offset within the data structure
+     * @param expected the expected int value
+     * @param value    the new int value to set if the current value equals the expected value
      * @return true if the swap was successful, false otherwise
      */
     boolean compareAndSwapInt(T handle, long offset, int expected, int value);
@@ -168,10 +168,10 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     /**
      * Compares and swaps a long value atomically.
      *
-     * @param handle    the handle to the underlying data structure
-     * @param offset    the offset within the data structure
-     * @param expected  the expected long value
-     * @param value     the new long value to set if the current value equals the expected value
+     * @param handle   the handle to the underlying data structure
+     * @param offset   the offset within the data structure
+     * @param expected the expected long value
+     * @param value    the new long value to set if the current value equals the expected value
      * @return true if the swap was successful, false otherwise
      */
     boolean compareAndSwapLong(T handle, long offset, long expected, long value);

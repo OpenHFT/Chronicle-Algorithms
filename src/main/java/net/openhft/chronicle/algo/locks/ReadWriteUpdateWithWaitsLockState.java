@@ -29,7 +29,7 @@ public interface ReadWriteUpdateWithWaitsLockState
      * Attempts to upgrade an update lock to a write lock and deregister the wait state.
      *
      * @return {@code true} if the lock was successfully upgraded and the wait state deregistered,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     boolean tryUpgradeUpdateToWriteLockAndDeregisterWait();
 

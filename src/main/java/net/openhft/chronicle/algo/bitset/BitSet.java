@@ -68,7 +68,7 @@ public interface BitSet {
      *
      * @param bitIndex the index of the bit to set
      * @return {@code true} if the bit was {@code false} and is now set to {@code true},
-     *         or {@code false} if the bit was already {@code true}
+     * or {@code false} if the bit was already {@code true}
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -79,7 +79,7 @@ public interface BitSet {
      *
      * @param bitIndex the index of the bit to clear
      * @return {@code true} if the bit was {@code true} and is now cleared,
-     *         or {@code false} if the bit was already {@code false}
+     * or {@code false} if the bit was already {@code false}
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -125,7 +125,6 @@ public interface BitSet {
     /**
      * Sets all bits, {@code bs.setAll()} is equivalent
      * of {@code bs.set(0, bs.size()}.
-     *
      */
     void setAll();
 

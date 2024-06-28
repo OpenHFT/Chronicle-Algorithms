@@ -2,11 +2,9 @@ package net.openhft.chronicle.algo.bitset;
 
 import junit.framework.TestCase;
 import net.openhft.chronicle.algo.bytes.Access;
-import net.openhft.chronicle.core.Jvm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class ConcurrentFlatBitSetFrameTest extends TestCase {
@@ -41,7 +39,7 @@ public class ConcurrentFlatBitSetFrameTest extends TestCase {
         bitSetFrame.flip(access, handle, offset, bitIndex);
         verify(access, times(1)).compareAndSwapLong(handle, byteIndex, mask, 0L);
     }
-    
+
     @Test
     public void testSet() {
         long bitIndex = 5L;

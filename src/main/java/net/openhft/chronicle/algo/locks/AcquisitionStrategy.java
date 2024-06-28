@@ -30,11 +30,11 @@ public interface AcquisitionStrategy<S extends LockingStrategy, E extends Except
      * Attempts to acquire a lock using the specified locking strategy, access, and operation.
      *
      * @param operation the operation to try acquiring
-     * @param strategy the locking strategy to use
-     * @param access the access mechanism for the resource
-     * @param t the target resource
-     * @param offset the offset within the resource
-     * @param <T> the type of the target resource
+     * @param strategy  the locking strategy to use
+     * @param access    the access mechanism for the resource
+     * @param t         the target resource
+     * @param offset    the offset within the resource
+     * @param <T>       the type of the target resource
      * @return {@code true} if the lock was successfully acquired, {@code false} otherwise
      * @throws E if an exception occurs during the acquisition process
      */

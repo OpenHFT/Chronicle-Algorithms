@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteOrder;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class RandomDataInputAccessTest extends TestCase {

@@ -2,8 +2,8 @@ package net.openhft.chronicle.algo.bytes;
 
 import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
+
 import java.nio.ByteOrder;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class CharSequenceAccessTest extends TestCase {
     private static final CharSequence TEST_SEQUENCE = "0123456789ABCDEF";

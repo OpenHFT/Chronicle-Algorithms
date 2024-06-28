@@ -29,9 +29,9 @@ public abstract class AbstractReadWriteLockingStrategy implements ReadWriteLocki
      * This method delegates to {@link #tryWriteLock(Access, Object, long)}.
      *
      * @param access The Access instance for memory operations
-     * @param t The object to lock
+     * @param t      The object to lock
      * @param offset The offset within the object
-     * @param <T> The type of the object
+     * @param <T>    The type of the object
      * @return true if the write lock was successfully acquired, false otherwise
      */
     @Override
@@ -44,9 +44,9 @@ public abstract class AbstractReadWriteLockingStrategy implements ReadWriteLocki
      * This method delegates to {@link #writeUnlock(Access, Object, long)}.
      *
      * @param access The Access instance for memory operations
-     * @param t The object to unlock
+     * @param t      The object to unlock
      * @param offset The offset within the object
-     * @param <T> The type of the object
+     * @param <T>    The type of the object
      */
     @Override
     public <T> void unlock(Access<T> access, T t, long offset) {

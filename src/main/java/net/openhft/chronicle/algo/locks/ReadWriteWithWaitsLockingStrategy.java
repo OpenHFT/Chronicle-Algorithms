@@ -30,9 +30,9 @@ public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrat
      * Registers a wait at the specified offset.
      *
      * @param access the access object used to manipulate the lock state
-     * @param t the target object
+     * @param t      the target object
      * @param offset the offset at which to register the wait
-     * @param <T> the type of the target object
+     * @param <T>    the type of the target object
      */
     <T> void registerWait(Access<T> access, T t, long offset);
 
@@ -40,9 +40,9 @@ public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrat
      * Deregisters a wait at the specified offset.
      *
      * @param access the access object used to manipulate the lock state
-     * @param t the target object
+     * @param t      the target object
      * @param offset the offset at which to deregister the wait
-     * @param <T> the type of the target object
+     * @param <T>    the type of the target object
      */
     <T> void deregisterWait(Access<T> access, T t, long offset);
 
@@ -50,11 +50,11 @@ public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrat
      * Attempts to acquire a write lock and deregister the wait at the specified offset.
      *
      * @param access the access object used to manipulate the lock state
-     * @param t the target object
+     * @param t      the target object
      * @param offset the offset at which to attempt the write lock acquisition and wait deregistration
-     * @param <T> the type of the target object
+     * @param <T>    the type of the target object
      * @return {@code true} if the write lock was successfully acquired and the wait deregistered,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     <T> boolean tryWriteLockAndDeregisterWait(Access<T> access, T t, long offset);
 
@@ -62,11 +62,11 @@ public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrat
      * Attempts to upgrade a read lock to a write lock and deregister the wait at the specified offset.
      *
      * @param access the access object used to manipulate the lock state
-     * @param t the target object
+     * @param t      the target object
      * @param offset the offset at which to attempt the lock upgrade and wait deregistration
-     * @param <T> the type of the target object
+     * @param <T>    the type of the target object
      * @return {@code true} if the lock was successfully upgraded and the wait deregistered,
-     *         {@code false} otherwise
+     * {@code false} otherwise
      */
     <T> boolean tryUpgradeReadToWriteLockAndDeregisterWait(
             Access<T> access, T t, long offset);
@@ -75,9 +75,9 @@ public interface ReadWriteWithWaitsLockingStrategy extends ReadWriteLockingStrat
      * Resets the lock state while keeping the wait registrations.
      *
      * @param access the access object used to manipulate the lock state
-     * @param t the target object
+     * @param t      the target object
      * @param offset the offset at which to reset the lock state
-     * @param <T> the type of the target object
+     * @param <T>    the type of the target object
      */
     <T> void resetKeepingWaits(Access<T> access, T t, long offset);
 
