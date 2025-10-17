@@ -24,7 +24,9 @@ import static net.openhft.chronicle.algo.MemoryUnit.BITS;
 import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
 
 /**
- * DirectBitSet with input validations, This class is not thread safe
+ * This is the SingleThreadedFlatBitSetFrame class implementing BitSetFrame.
+ * It provides methods for bit manipulation with input validations.
+ * This class is not thread-safe.
  */
 public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
@@ -33,7 +35,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     private final long longLength;
 
     /**
-     * Creates a new {@code SingleThreadedFlatBitSetFrame} of the given logical size
+     * Creates a new {@code SingleThreadedFlatBitSetFrame} of the given logical size.
      *
      * @param logicalSize the logical bit set size, should be {@code long}-aligned
      *                    (i. e. a multiple of 8)
@@ -53,6 +55,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
     }
 
+    // Utility methods for bit manipulation and conversions
     static long singleBit(long bitIndex) {
         return 1L << bitIndex;
     }
@@ -140,6 +143,15 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         access.writeLong(handle, firstByte(offset, longIndex), toWrite);
     }
 
+    /**
+     * Flips the bit at the specified index.
+     *
+     * @param access   the access interface for reading/writing bits
+     * @param handle   the handle to the underlying data structure
+     * @param offset   the offset within the data structure
+     * @param bitIndex the index of the bit to flip
+     * @param <T>      the type of the handle
+     */
     @Override
     public <T> void flip(Access<T> access, T handle, long offset, long bitIndex) {
         assert checkIndex(bitIndex);
@@ -150,6 +162,17 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         access.writeLong(handle, byteIndex, l2);
     }
 
+    /**
+     * Flips the bits from the specified {@code fromIndex} (inclusive) to the
+     * specified {@code toIndex} (exclusive).
+     *
+     * @param access           the access interface for reading/writing bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to flip (inclusive)
+     * @param exclusiveToIndex the index after the last bit to flip (exclusive)
+     * @param <T>              the type of the handle
+     */
     @Override
     public <T> void flipRange(Access<T> access, T handle, long offset,
                               long fromIndex, long exclusiveToIndex) {
@@ -193,40 +216,61 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void set(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
-        long byteIndex = byteWithThisBit(offset, bitIndex);
-        long mask = singleBit(bitIndex);
-        long l = access.readLong(handle, byteIndex);
-        if ((l & mask) != 0)
+        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
+        long mask = singleBit(bitIndex);  // Create a mask for the specific bit
+        long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
+        if ((l & mask) != 0)  // If the bit is already set, return
             return;
-        long l2 = l | mask;
-        access.writeLong(handle, byteIndex, l2);
+        long l2 = l | mask;  // Set the bit
+        access.writeLong(handle, byteIndex, l2);  // Write the new value back
     }
 
+    /**
+     * Sets the bit at the specified index to {@code true} if it is not already set.
+     *
+     * @param access   the access interface for reading/writing bits
+     * @param handle   the handle to the underlying data structure
+     * @param offset   the offset within the data structure
+     * @param bitIndex the index of the bit to set
+     * @param <T>      the type of the handle
+     * @return {@code true} if the bit was set, {@code false} if it was already set
+     */
     @Override
     public <T> boolean setIfClear(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
-        long byteIndex = byteWithThisBit(offset, bitIndex);
-        long mask = singleBit(bitIndex);
-        long l = access.readLong(handle, byteIndex);
-        long l2 = l | mask;
-        if (l == l2)
+        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
+        long mask = singleBit(bitIndex);  // Create a mask for the specific bit
+        long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
+        long l2 = l | mask;  // Set the bit
+        if (l == l2)  // If the bit was already set, return false
             return false;
-        access.writeLong(handle, byteIndex, l2);
-        return true;
+        access.writeLong(handle, byteIndex, l2);  // Write the new value back
+        return true;  // Return true as the bit was set
     }
 
+    /**
+     * Sets the bits from the specified {@code fromIndex} (inclusive) to the
+     * specified {@code toIndex} (exclusive) to {@code true}.
+     *
+     * @param access           the access interface for reading/writing bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to set (inclusive)
+     * @param exclusiveToIndex the index after the last bit to set (exclusive)
+     * @param <T>              the type of the handle
+     */
     @Override
     public <T> void setRange(Access<T> access, T handle, long offset,
                              long fromIndex, long exclusiveToIndex) {
-        long fromLongIndex = longWithThisBit(fromIndex);
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
-        long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 63) != 0) {
+            if ((fromIndex & 63) != 0) {  // Handle bits in the first partial long
                 long fromByteIndex = firstByte(offset, fromLongIndex);
                 long mask = higherBitsIncludingThis(fromIndex);
                 long l = access.readLong(handle, fromByteIndex);
@@ -234,11 +278,11 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 access.writeLong(handle, fromByteIndex, l2);
                 firstFullLongIndex++;
             }
-            if ((exclusiveToIndex & 63) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {  // Handle bits in the full longs
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     writeLong(access, handle, offset, i, ALL_ONES);
                 }
-            } else {
+            } else {  // Handle bits in the last partial long
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     writeLong(access, handle, offset, i, ALL_ONES);
                 }
@@ -248,7 +292,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 long l2 = l | mask;
                 access.writeLong(handle, toByteIndex, l2);
             }
-        } else {
+        } else {  // Handle bits within a single long
             long byteIndex = firstByte(offset, fromLongIndex);
             long mask = higherBitsIncludingThis(fromIndex) & lowerBitsIncludingThis(toIndex);
             long l = access.readLong(handle, byteIndex);
@@ -257,49 +301,87 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
     }
 
+    /**
+     * Sets all bits in the bit set to {@code true}.
+     *
+     * @param access the access interface for reading/writing bits
+     * @param handle the handle to the underlying data structure
+     * @param offset the offset within the data structure
+     * @param <T>    the type of the handle
+     */
     @Override
     public <T> void setAll(Access<T> access, T handle, long offset) {
-        for (long i = 0; i < longLength; i++) {
-            writeLong(access, handle, offset, i, ALL_ONES);
+        for (long i = 0; i < longLength; i++) {  // Iterate through all longs
+            writeLong(access, handle, offset, i, ALL_ONES);  // Set all bits to 1
         }
     }
 
+    /**
+     * Clears the bit at the specified index.
+     *
+     * @param access   the access interface for reading/writing bits
+     * @param handle   the handle to the underlying data structure
+     * @param offset   the offset within the data structure
+     * @param bitIndex the index of the bit to clear
+     * @param <T>      the type of the handle
+     */
     @Override
     public <T> void clear(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
-        long byteIndex = byteWithThisBit(offset, bitIndex);
-        long mask = singleBit(bitIndex);
-        long l = access.readLong(handle, byteIndex);
-        if ((l & mask) == 0)
+        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
+        long mask = singleBit(bitIndex);  // Create a mask for the specific bit
+        long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
+        if ((l & mask) == 0)  // If the bit is already clear, return
             return;
-        long l2 = l & ~mask;
-        access.writeLong(handle, byteIndex, l2);
+        long l2 = l & ~mask;  // Clear the bit
+        access.writeLong(handle, byteIndex, l2);  // Write the new value back
     }
 
+    /**
+     * Clears the bit at the specified index if it is currently set.
+     *
+     * @param access   the access interface for reading/writing bits
+     * @param handle   the handle to the underlying data structure
+     * @param offset   the offset within the data structure
+     * @param bitIndex the index of the bit to clear
+     * @param <T>      the type of the handle
+     * @return {@code true} if the bit was cleared, {@code false} if it was already clear
+     */
     @Override
     public <T> boolean clearIfSet(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
-        long byteIndex = byteWithThisBit(offset, bitIndex);
-        long mask = singleBit(bitIndex);
-        long l = access.readLong(handle, byteIndex);
-        if ((l & mask) == 0)
+        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
+        long mask = singleBit(bitIndex);  // Create a mask for the specific bit
+        long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
+        if ((l & mask) == 0)  // If the bit is already clear, return false
             return false;
-        long l2 = l & ~mask;
-        access.writeLong(handle, byteIndex, l2);
-        return true;
+        long l2 = l & ~mask;  // Clear the bit
+        access.writeLong(handle, byteIndex, l2);  // Write the new value back
+        return true;  // Return true as the bit was cleared
     }
 
+    /**
+     * Clears the bits from the specified {@code fromIndex} (inclusive) to the
+     * specified {@code toIndex} (exclusive).
+     *
+     * @param access           the access interface for reading/writing bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to clear (inclusive)
+     * @param exclusiveToIndex the index after the last bit to clear (exclusive)
+     * @param <T>              the type of the handle
+     */
     @Override
     public <T> void clearRange(Access<T> access, T handle, long offset,
                                long fromIndex, long exclusiveToIndex) {
-        long fromLongIndex = longWithThisBit(fromIndex);
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
-        long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 63) != 0) {
+            if ((fromIndex & 63) != 0) {  // Handle bits in the first partial long
                 long fromByteIndex = firstByte(offset, fromLongIndex);
                 long mask = higherBitsIncludingThis(fromIndex);
                 long l = access.readLong(handle, fromByteIndex);
@@ -307,11 +389,11 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 access.writeLong(handle, fromByteIndex, l2);
                 firstFullLongIndex++;
             }
-            if ((exclusiveToIndex & 63) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {  // Handle bits in the full longs
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     writeLong(access, handle, offset, i, 0L);
                 }
-            } else {
+            } else {  // Handle bits in the last partial long
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     writeLong(access, handle, offset, i, 0L);
                 }
@@ -321,7 +403,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 long l2 = l & ~mask;
                 access.writeLong(handle, toByteIndex, l2);
             }
-        } else {
+        } else {  // Handle bits within a single long
             long byteIndex = firstByte(offset, fromLongIndex);
             long mask = higherBitsIncludingThis(fromIndex) & lowerBitsIncludingThis(toIndex);
             long l = access.readLong(handle, byteIndex);
@@ -330,29 +412,40 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
     }
 
+    /**
+     * Checks if all bits in the specified range are set to {@code true}.
+     *
+     * @param access           the access interface for reading bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to check (inclusive)
+     * @param exclusiveToIndex the index after the last bit to check (exclusive)
+     * @param <T>              the type of the handle
+     * @return {@code true} if all bits in the range are set to {@code true}, {@code false} otherwise
+     */
     @Override
     public <T> boolean isRangeSet(Access<T> access, T handle, long offset,
                                   long fromIndex, long exclusiveToIndex) {
-        long fromLongIndex = longWithThisBit(fromIndex);
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
-        long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 63) != 0) {
+            if ((fromIndex & 63) != 0) {  // Check bits in the first partial long
                 long mask = higherBitsIncludingThis(fromIndex);
                 if ((~(readLong(access, handle, offset, fromLongIndex)) & mask) != 0L)
                     return false;
                 firstFullLongIndex++;
             }
-            if ((exclusiveToIndex & 63) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {  // Check bits in the full longs
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     if (~readLong(access, handle, offset, i) != 0L)
                         return false;
                 }
                 return true;
-            } else {
+            } else {  // Check bits in the last partial long
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     if (~readLong(access, handle, offset, i) != 0L)
                         return false;
@@ -360,35 +453,46 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 long mask = lowerBitsIncludingThis(toIndex);
                 return ((~readLong(access, handle, offset, toLongIndex)) & mask) == 0L;
             }
-        } else {
+        } else {  // Check bits within a single long
             long mask = higherBitsIncludingThis(fromIndex) & lowerBitsIncludingThis(toIndex);
             return ((~readLong(access, handle, offset, fromLongIndex)) & mask) == 0L;
         }
     }
 
+    /**
+     * Checks if all bits in the specified range are clear (set to {@code false}).
+     *
+     * @param access           the access interface for reading bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index of the first bit to check (inclusive)
+     * @param exclusiveToIndex the index after the last bit to check (exclusive)
+     * @param <T>              the type of the handle
+     * @return {@code true} if all bits in the range are clear, {@code false} otherwise
+     */
     @Override
     public <T> boolean isRangeClear(Access<T> access, T handle, long offset,
                                     long fromIndex, long exclusiveToIndex) {
-        long fromLongIndex = longWithThisBit(fromIndex);
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
-        long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
+        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
-            if ((fromIndex & 63) != 0) {
+            if ((fromIndex & 63) != 0) {  // Check bits in the first partial long
                 long mask = higherBitsIncludingThis(fromIndex);
                 if ((readLong(access, handle, offset, fromLongIndex) & mask) != 0L)
                     return false;
                 firstFullLongIndex++;
             }
-            if ((exclusiveToIndex & 63) == 0) {
+            if ((exclusiveToIndex & 63) == 0) {  // Check bits in the full longs
                 for (long i = firstFullLongIndex; i <= toLongIndex; i++) {
                     if (readLong(access, handle, offset, i) != 0L)
                         return false;
                 }
                 return true;
-            } else {
+            } else {  // Check bits in the last partial long
                 for (long i = firstFullLongIndex; i < toLongIndex; i++) {
                     if (readLong(access, handle, offset, i) != 0L)
                         return false;
@@ -396,168 +500,253 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 long mask = lowerBitsIncludingThis(toIndex);
                 return (readLong(access, handle, offset, toLongIndex) & mask) == 0L;
             }
-        } else {
+        } else {  // Check bits within a single long
             long mask = higherBitsIncludingThis(fromIndex) & lowerBitsIncludingThis(toIndex);
             return (readLong(access, handle, offset, fromLongIndex) & mask) == 0L;
         }
     }
 
+    /**
+     * Clears all bits in the bit set.
+     *
+     * @param access the access interface for writing bits
+     * @param handle the handle to the underlying data structure
+     * @param offset the offset within the data structure
+     * @param <T>    the type of the handle
+     */
     @Override
     public <T> void clearAll(Access<T> access, T handle, long offset) {
-        access.writeBytes(handle, offset, LONGS.toBytes(longLength), (byte) 0);
+        access.writeBytes(handle, offset, LONGS.toBytes(longLength), (byte) 0);  // Clear all bytes
     }
 
+    /**
+     * Returns the value of the bit with the specified index.
+     *
+     * @param access   the access interface for reading bits
+     * @param handle   the handle to the underlying data structure
+     * @param offset   the offset within the data structure
+     * @param bitIndex the index of the bit to check
+     * @param <T>      the type of the handle
+     * @return {@code true} if the bit is set, {@code false} otherwise
+     */
     @Override
     public <T> boolean get(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
-        long byteIndex = byteWithThisBit(offset, bitIndex);
-        long l = access.readLong(handle, byteIndex);
-        return (l & (singleBit(bitIndex))) != 0;
+        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
+        long l = access.readLong(handle, byteIndex);  // Read the value at the byte index
+        return (l & (singleBit(bitIndex))) != 0;  // Check if the specific bit is set
     }
 
+    /**
+     * Returns the index of the first bit that is set to {@code true} on or after the specified starting index.
+     *
+     * @param access    the access interface for reading bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the next set bit, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long nextSetBit(Access<T> access, T handle, long offset, long fromIndex) {
-        checkFromIndex(fromIndex);
-        long fromLongIndex = longWithThisBit(fromIndex);
+        checkFromIndex(fromIndex);  // Ensure the start index is valid
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         if (fromLongIndex >= longLength)
-            return NOT_FOUND;
-        long l = readLong(access, handle, offset, fromLongIndex) >>> fromIndex;
+            return NOT_FOUND;  // Return -1 if the start index is out of bounds
+        long l = readLong(access, handle, offset, fromLongIndex) >>> fromIndex;  // Check the current long
         if (l != 0) {
-            return fromIndex + numberOfTrailingZeros(l);
+            return fromIndex + numberOfTrailingZeros(l);  // Return the index of the first set bit
         }
-        for (long i = fromLongIndex + 1; i < longLength; i++) {
+        for (long i = fromLongIndex + 1; i < longLength; i++) {  // Check subsequent longs
             l = readLong(access, handle, offset, i);
             if (l != 0)
                 return firstBit(i) + numberOfTrailingZeros(l);
         }
-        return NOT_FOUND;
+        return NOT_FOUND;  // Return -1 if no set bit is found
     }
 
+    /**
+     * Returns an iteration of <i>set</i> bits in <i>direct</i> order (from 0 to the end of the bit set).
+     *
+     * @return an iteration of <i>set</i> bits in <i>direct</i> order
+     */
     @Override
     public Bits setBits() {
         return new SetBits();
     }
 
+    /**
+     * Returns the bit set algorithm used by this bit set.
+     *
+     * @return the bit set algorithm
+     */
     @Override
     public BitSetAlgorithm algorithm() {
         return FlatBitSetAlgorithm.INSTANCE;
     }
 
+    /**
+     * Clears the next bit that is set to {@code true} on or after the specified starting index.
+     *
+     * @param access    the access interface for reading and writing bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the next set bit that was cleared, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long clearNextSetBit(Access<T> access, T handle, long offset, long fromIndex) {
-        checkFromIndex(fromIndex);
-        long fromLongIndex = longWithThisBit(fromIndex);
+        checkFromIndex(fromIndex);  // Ensure the start index is valid
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         if (fromLongIndex >= longLength)
-            return NOT_FOUND;
+            return NOT_FOUND;  // Return -1 if the start index is out of bounds
         long fromByteIndex = firstByte(offset, fromLongIndex);
         long w = access.readLong(handle, fromByteIndex);
         long l = w >>> fromIndex;
         if (l != 0) {
             long indexOfSetBit = fromIndex + numberOfTrailingZeros(l);
             long mask = singleBit(indexOfSetBit);
-            access.writeLong(handle, fromByteIndex, w ^ mask);
-            return indexOfSetBit;
+            access.writeLong(handle, fromByteIndex, w ^ mask);  // Clear the set bit
+            return indexOfSetBit;  // Return the index of the cleared bit
         }
-        for (long i = fromLongIndex + 1; i < longLength; i++) {
+        for (long i = fromLongIndex + 1; i < longLength; i++) {  // Check subsequent longs
             long byteIndex = firstByte(offset, i);
             l = access.readLong(handle, byteIndex);
             if (l != 0) {
                 long indexOfSetBit = firstBit(i) + numberOfTrailingZeros(l);
                 long mask = singleBit(indexOfSetBit);
-                access.writeLong(handle, byteIndex, l ^ mask);
-                return indexOfSetBit;
+                access.writeLong(handle, byteIndex, l ^ mask);  // Clear the set bit
+                return indexOfSetBit;  // Return the index of the cleared bit
             }
         }
-        return NOT_FOUND;
+        return NOT_FOUND;  // Return -1 if no set bit is found
     }
 
+    /**
+     * Returns the index of the first bit that is set to {@code false} on or after the specified starting index.
+     *
+     * @param access    the access interface for reading bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the next clear bit, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long nextClearBit(Access<T> access, T handle, long offset, long fromIndex) {
-        checkFromIndex(fromIndex);
-        long fromLongIndex = longWithThisBit(fromIndex);
+        checkFromIndex(fromIndex);  // Ensure the start index is valid
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         if (fromLongIndex >= longLength)
-            return NOT_FOUND;
-        long l = (~readLong(access, handle, offset, fromLongIndex)) >>> fromIndex;
+            return NOT_FOUND;  // Return -1 if the start index is out of bounds
+        long l = (~readLong(access, handle, offset, fromLongIndex)) >>> fromIndex;  // Check the current long
         if (l != 0) {
-            return fromIndex + numberOfTrailingZeros(l);
+            return fromIndex + numberOfTrailingZeros(l);  // Return the index of the first clear bit
         }
-        for (long i = fromLongIndex + 1; i < longLength; i++) {
+        for (long i = fromLongIndex + 1; i < longLength; i++) {  // Check subsequent longs
             l = ~readLong(access, handle, offset, i);
             if (l != 0)
                 return firstBit(i) + numberOfTrailingZeros(l);
         }
-        return NOT_FOUND;
+        return NOT_FOUND;  // Return -1 if no clear bit is found
     }
 
+    /**
+     * Sets the next bit that is set to {@code false} on or after the specified starting index.
+     *
+     * @param access    the access interface for reading and writing bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the next clear bit that was set, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long setNextClearBit(Access<T> access, T handle, long offset, long fromIndex) {
-        checkFromIndex(fromIndex);
-        long fromLongIndex = longWithThisBit(fromIndex);
+        checkFromIndex(fromIndex);  // Ensure the start index is valid
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         if (fromLongIndex >= longLength)
-            return NOT_FOUND;
+            return NOT_FOUND;  // Return -1 if the start index is out of bounds
         long fromByteIndex = firstByte(offset, fromLongIndex);
         long w = access.readLong(handle, fromByteIndex);
         long l = (~w) >>> fromIndex;
         if (l != 0) {
             long indexOfClearBit = fromIndex + numberOfTrailingZeros(l);
             long mask = singleBit(indexOfClearBit);
-            access.writeLong(handle, fromByteIndex, w ^ mask);
-            return indexOfClearBit;
+            access.writeLong(handle, fromByteIndex, w ^ mask);  // Set the clear bit
+            return indexOfClearBit;  // Return the index of the set bit
         }
-        for (long i = fromLongIndex + 1; i < longLength; i++) {
+        for (long i = fromLongIndex + 1; i < longLength; i++) {  // Check subsequent longs
             long byteIndex = firstByte(offset, i);
             w = access.readLong(handle, byteIndex);
             l = ~w;
             if (l != 0) {
                 long indexOfClearBit = firstBit(i) + numberOfTrailingZeros(l);
                 long mask = singleBit(indexOfClearBit);
-                access.writeLong(handle, byteIndex, w ^ mask);
-                return indexOfClearBit;
+                access.writeLong(handle, byteIndex, w ^ mask);  // Set the clear bit
+                return indexOfClearBit;  // Return the index of the set bit
             }
         }
-        return NOT_FOUND;
+        return NOT_FOUND;  // Return -1 if no clear bit is found
     }
 
+    /**
+     * Returns the index of the last bit that is set to {@code true} on or before the specified starting index.
+     *
+     * @param access    the access interface for reading bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the previous set bit, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long previousSetBit(Access<T> access, T handle, long offset, long fromIndex) {
-        if (checkNotFoundIndex(fromIndex))
+        if (checkNotFoundIndex(fromIndex))  // Ensure the start index is valid
             return NOT_FOUND;
-        long fromLongIndex = longWithThisBit(fromIndex);
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         if (fromLongIndex >= longLength) {
-            // the same policy for this "index out of bounds" situation
-            // as in j.u.BitSet
-            fromLongIndex = longLength - 1;
+            fromLongIndex = longLength - 1;  // Adjust the start index if out of bounds
             fromIndex = logicalSize() - 1;
         }
-        // << ~fromIndex === << (63 - (fromIndex & 63))
+        // Shift to check bits from the start index downwards
         long l = readLong(access, handle, offset, fromLongIndex) << ~fromIndex;
         if (l != 0)
-            return fromIndex - numberOfLeadingZeros(l);
-        for (long i = fromLongIndex - 1; i >= 0; i--) {
+            return fromIndex - numberOfLeadingZeros(l);  // Return the index of the previous set bit
+        for (long i = fromLongIndex - 1; i >= 0; i--) {  // Check previous longs
             l = readLong(access, handle, offset, i);
             if (l != 0)
                 return lastBit(i) - numberOfLeadingZeros(l);
         }
-        return NOT_FOUND;
+        return NOT_FOUND;  // Return -1 if no set bit is found
     }
 
+    /**
+     * Returns the index of the last bit that is set to {@code true} within the specified range.
+     *
+     * @param access           the access interface for reading bits
+     * @param handle           the handle to the underlying data structure
+     * @param offset           the offset within the data structure
+     * @param fromIndex        the index to start checking from (inclusive)
+     * @param inclusiveToIndex the index to check to (inclusive)
+     * @param <T>              the type of the handle
+     * @return the index of the previous set bit within the range, or {@code -1} if there is no such bit
+     */
     private <T> long previousSetBit(Access<T> access, T handle, long offset,
                                     long fromIndex, long inclusiveToIndex) {
-        long fromLongIndex = longWithThisBit(fromIndex);
-        long toLongIndex = longWithThisBit(inclusiveToIndex);
-        assert checkFromTo(inclusiveToIndex, fromIndex + 1, toLongIndex);
+        long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
+        long toLongIndex = longWithThisBit(inclusiveToIndex);  // Calculate the long index for the end bit
+        assert checkFromTo(inclusiveToIndex, fromIndex + 1, toLongIndex);  // Ensure the range is valid
         if (fromLongIndex >= longLength) {
-            // the same policy for this "index out of bounds" situation
-            // as in j.u.BitSet
-            fromLongIndex = longLength - 1;
+            fromLongIndex = longLength - 1;  // Adjust the start index if out of bounds
             fromIndex = logicalSize() - 1;
         }
         if (fromLongIndex != toLongIndex) {
             // << ~fromIndex === << (63 - (fromIndex & 63))
             long l = readLong(access, handle, offset, fromLongIndex) << ~fromIndex;
             if (l != 0)
-                return fromIndex - numberOfLeadingZeros(l);
-            for (long i = fromLongIndex - 1; i > toLongIndex; i--) {
+                return fromIndex - numberOfLeadingZeros(l);  // Return the index of the previous set bit
+            for (long i = fromLongIndex - 1; i > toLongIndex; i--) {  // Check previous longs
                 l = readLong(access, handle, offset, i);
                 if (l != 0)
                     return lastBit(i) - numberOfLeadingZeros(l);
@@ -570,9 +759,19 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         if (l != 0) {
             return lastBit(toLongIndex) - numberOfLeadingZeros(l);
         }
-        return NOT_FOUND;
+        return NOT_FOUND;  // Return -1 if no set bit is found
     }
 
+    /**
+     * Clears the previous set bit (set to {@code true}) on or before the specified starting index.
+     *
+     * @param access    the access interface for reading and writing bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the previous set bit that was cleared, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long clearPreviousSetBit(Access<T> access, T handle, long offset, long fromIndex) {
         if (checkNotFoundIndex(fromIndex))
@@ -604,6 +803,16 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         return NOT_FOUND;
     }
 
+    /**
+     * Returns the index of the last bit that is set to {@code false} on or before the specified starting index.
+     *
+     * @param access    the access interface for reading bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the previous clear bit, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long previousClearBit(Access<T> access, T handle, long offset, long fromIndex) {
         if (checkNotFoundIndex(fromIndex))
@@ -624,6 +833,16 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         return NOT_FOUND;
     }
 
+    /**
+     * Sets the previous bit that is set to {@code false} on or before the specified starting index.
+     *
+     * @param access    the access interface for reading and writing bits
+     * @param handle    the handle to the underlying data structure
+     * @param offset    the offset within the data structure
+     * @param fromIndex the index to start checking from (inclusive)
+     * @param <T>       the type of the handle
+     * @return the index of the previous clear bit that was set, or {@code -1} if there is no such bit
+     */
     @Override
     public <T> long setPreviousClearBit(Access<T> access, T handle, long offset, long fromIndex) {
         if (checkNotFoundIndex(fromIndex))
@@ -656,16 +875,35 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         return NOT_FOUND;
     }
 
+    /**
+     * Returns the logical size (number of bits) of this bit set.
+     *
+     * @return the logical size of the bit set
+     */
     @Override
     public long logicalSize() {
         return LONGS.toBits(longLength);
     }
 
+    /**
+     * Returns the size in bytes of this bit set.
+     *
+     * @return the size in bytes of the bit set
+     */
     @Override
     public long sizeInBytes() {
         return LONGS.toBytes(longLength);
     }
 
+    /**
+     * Returns the number of bits set to {@code true} in the bit set.
+     *
+     * @param access the access interface for reading bits
+     * @param handle the handle to the underlying data structure
+     * @param offset the offset within the data structure
+     * @param <T>    the type of the handle
+     * @return the number of bits set to {@code true}
+     */
     @Override
     public <T> long cardinality(Access<T> access, T handle, long offset) {
         long count = 0;
@@ -676,7 +914,18 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     }
 
     /**
-     * @throws IllegalArgumentException if {@code numberOfBits} is negative
+     * Sets the next {@code numberOfBits} consecutive bits that are set to {@code false},
+     * starting from the specified {@code fromIndex}. If no such range of clear bits exists,
+     * or if {@code numberOfBits} is greater than 64, this method delegates to {@link #setNextManyContinuousClearBits}.
+     *
+     * @param access       the access interface for reading and writing bits
+     * @param handle       the handle to the underlying data structure
+     * @param offset       the offset within the data structure
+     * @param fromIndex    the index to start checking from (inclusive)
+     * @param numberOfBits the number of consecutive clear bits to set
+     * @param <T>          the type of the handle
+     * @return the index of the first bit in the found range of clear bits, or {@code -1} if there is no such range
+     * @throws IllegalArgumentException if {@code numberOfBits} is negative or zero
      */
     @Override
     public <T> long setNextNContinuousClearBits(Access<T> access, T handle, long offset,
@@ -782,6 +1031,18 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
     }
 
+    /**
+     * Sets the next continuous block of clear bits to {@code true}.
+     * If the block size is greater than 64 bits, it uses this method to handle the operation.
+     *
+     * @param access       the access interface for reading and writing bits
+     * @param handle       the handle to the underlying data structure
+     * @param offset       the offset within the data structure
+     * @param fromIndex    the index to start checking from (inclusive)
+     * @param numberOfBits the number of consecutive clear bits to set
+     * @param <T>          the type of the handle
+     * @return the index of the first bit in the found range of clear bits, or {@code -1} if there is no such range
+     */
     private <T> long setNextManyContinuousClearBits(Access<T> access, T handle, long offset,
                                                     long fromIndex, int numberOfBits) {
         long size = logicalSize();
@@ -803,8 +1064,17 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     }
 
     /**
-     * @throws IllegalArgumentException if {@code numberOfBits} is out of range {@code 0 <
-     *                                  numberOfBits && numberOfBits <= 64}
+     * Clears the next {@code numberOfBits} consecutive bits that are set to {@code true},
+     * starting from the specified {@code fromIndex}.
+     *
+     * @param access       the access interface for reading and writing bits
+     * @param handle       the handle to the underlying data structure
+     * @param offset       the offset within the data structure
+     * @param fromIndex    the index to start checking from (inclusive)
+     * @param numberOfBits the number of consecutive set bits to clear
+     * @param <T>          the type of the handle
+     * @return the index of the first bit in the found range of set bits, or {@code -1} if there is no such range
+     * @throws IllegalArgumentException if {@code numberOfBits} is out of range {@code 0 < numberOfBits <= 64}
      */
     @Override
     public <T> long clearNextNContinuousSetBits(Access<T> access, T handle, long offset,
@@ -906,6 +1176,19 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
     }
 
+    /**
+     * Sets the previous {@code numberOfBits} consecutive bits that are set to {@code false},
+     * starting from the specified {@code fromIndex}.
+     *
+     * @param access       the access interface for reading and writing bits
+     * @param handle       the handle to the underlying data structure
+     * @param offset       the offset within the data structure
+     * @param fromIndex    the index to start checking from (inclusive)
+     * @param numberOfBits the number of consecutive clear bits to set
+     * @param <T>          the type of the handle
+     * @return the index of the first bit in the found range of clear bits, or {@code -1} if there is no such range
+     * @throws IllegalArgumentException if {@code numberOfBits} is out of range {@code 0 < numberOfBits <= 64}
+     */
     @Override
     public <T> long setPreviousNContinuousClearBits(Access<T> access, T handle, long offset,
                                                     long fromIndex, int numberOfBits) {
@@ -1017,6 +1300,20 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
     }
 
+    /**
+     * Clears the previous {@code numberOfBits} consecutive bits that are set to {@code true},
+     * starting from the specified {@code fromIndex}. If no such range of set bits exists,
+     * or if {@code numberOfBits} is greater than 64, this method clears the bits in a loop.
+     *
+     * @param access       the access interface for reading and writing bits
+     * @param handle       the handle to the underlying data structure
+     * @param offset       the offset within the data structure
+     * @param fromIndex    the index to start checking from (inclusive)
+     * @param numberOfBits the number of consecutive set bits to clear
+     * @param <T>          the type of the handle
+     * @return the index of the first bit in the found range of set bits, or {@code -1} if there is no such range
+     * @throws IllegalArgumentException if {@code numberOfBits} is out of range {@code 0 < numberOfBits <= 64}
+     */
     @Override
     public <T> long clearPreviousNContinuousSetBits(Access<T> access, T handle, long offset,
                                                     long fromIndex, int numberOfBits) {
@@ -1124,12 +1421,24 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         }
     }
 
+    /**
+     * Implementation of {@link BitSetFrame.Bits} for iterating over set bits.
+     */
     private class SetBits implements Bits {
         private final long byteLength = longLength << 3;
         private long byteIndex;
         private long bitIndex;
         private long currentWord;
 
+        /**
+         * Resets the iterator to the start of the bit set.
+         *
+         * @param access the access interface for reading bits
+         * @param handle the handle to the underlying data structure
+         * @param offset the offset within the data structure
+         * @param <T>    the type of the handle
+         * @return the {@link Bits} instance for method chaining
+         */
         @Override
         public <T> Bits reset(Access<T> access, T handle, long offset) {
             byteIndex = 0;
@@ -1138,6 +1447,15 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
             return this;
         }
 
+        /**
+         * Finds the next set bit in the bit set.
+         *
+         * @param access the access interface for reading bits
+         * @param handle the handle to the underlying data structure
+         * @param offset the offset within the data structure
+         * @param <T>    the type of the handle
+         * @return the index of the next set bit, or {@code -1} if there are no more set bits
+         */
         @Override
         public <T> long next(Access<T> access, T handle, long offset) {
             long l;

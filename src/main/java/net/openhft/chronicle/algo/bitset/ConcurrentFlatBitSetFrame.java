@@ -26,31 +26,77 @@ import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
 import static net.openhft.chronicle.algo.bitset.SingleThreadedFlatBitSetFrame.*;
 
 /**
- * DirectBitSet with input validations and ThreadSafe memory access.
+ * DirectBitSet with input validations and thread-safe memory access.
+ * This class provides a concurrent implementation of a BitSet frame.
  */
 public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
     private final long longLength;
 
+    /**
+     * Constructs a {@code ConcurrentFlatBitSetFrame} with the specified logical size.
+     *
+     * @param logicalSize the logical size in bits
+     */
     public ConcurrentFlatBitSetFrame(long logicalSize) {
         longLength = BITS.toLongs(logicalSize);
     }
 
+    /**
+     * Right shifts a long value with one-fill.
+     *
+     * @param l     the long value
+     * @param shift the shift amount
+     * @return the shifted long value
+     */
     private static long rightShiftOneFill(long l, long shift) {
         return (l >> shift) | ~(ALL_ONES >>> shift);
     }
 
+    /**
+     * Left shifts a long value with one-fill.
+     *
+     * @param l     the long value
+     * @param shift the shift amount
+     * @return the shifted long value
+     */
     private static long leftShiftOneFill(long l, long shift) {
         return (l << shift) | ((1L << shift) - 1L);
     }
 
+    /**
+     * Reads a long value from the given offset and index.
+     *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param longIndex the index of the long to read
+     * @return the long value read
+     */
     private <T> long readLong(Access<T> access, T handle, long offset, long longIndex) {
         return access.readLong(handle, firstByte(offset, longIndex));
     }
 
+    /**
+     * Reads a volatile long value from the given offset and index.
+     *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param longIndex the index of the long to read
+     * @return the volatile long value read
+     */
     private <T> long readVolatileLong(Access<T> access, T handle, long offset, long longIndex) {
         return access.readVolatileLong(handle, firstByte(offset, longIndex));
     }
 
+    /**
+     * Checks if the bit index is within bounds.
+     *
+     * @param bitIndex the bit index to check
+     * @return {@code true} if the bit index is within bounds, {@code false} otherwise
+     */
     private boolean checkIndex(long bitIndex) {
         if (bitIndex < 0 || (bitIndex >> 6) >= longLength) {
             throw new IndexOutOfBoundsException(
@@ -59,6 +105,14 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         return true;
     }
 
+    /**
+     * Checks if the from and to indices are within bounds.
+     *
+     * @param fromIndex        the starting index (inclusive)
+     * @param exclusiveToIndex the ending index (exclusive)
+     * @param toLongIndex      the long index to check
+     * @return {@code true} if the indices are within bounds, {@code false} otherwise
+     */
     private boolean checkFromTo(long fromIndex, long exclusiveToIndex, long toLongIndex) {
         if (fromIndex < 0 || fromIndex > exclusiveToIndex || toLongIndex >= longLength) {
             throw new IndexOutOfBoundsException(
@@ -77,8 +131,8 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long mask = singleBit(bitIndex);
         while (true) {
             long l = access.readVolatileLong(handle, byteIndex);
-            long l2 = l ^ mask;
-            if (access.compareAndSwapLong(handle, byteIndex, l, l2))
+            long l2 = l ^ mask; // Flip the bit
+            if (access.compareAndSwapLong(handle, byteIndex, l, l2)) // Atomic operation
                 return;
             Jvm.nanoPause();
         }
@@ -157,10 +211,10 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long mask = singleBit(bitIndex);
         while (true) {
             long l = access.readVolatileLong(handle, byteIndex);
-            if ((l & mask) != 0)
+            if ((l & mask) != 0) // If bit is already set, return
                 return;
-            long l2 = l | mask;
-            if (access.compareAndSwapLong(handle, byteIndex, l, l2))
+            long l2 = l | mask; // Set the bit
+            if (access.compareAndSwapLong(handle, byteIndex, l, l2)) // Atomic operation
                 return;
             Jvm.nanoPause();
         }
@@ -174,10 +228,10 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long mask = singleBit(bitIndex);
         while (true) {
             long l = access.readVolatileLong(handle, byteIndex);
-            long l2 = l | mask;
-            if (l == l2)
+            long l2 = l | mask; // Set the bit
+            if (l == l2) // If bit was already set, return false
                 return false;
-            if (access.compareAndSwapLong(handle, byteIndex, l, l2))
+            if (access.compareAndSwapLong(handle, byteIndex, l, l2)) // Atomic operation
                 return true;
             Jvm.nanoPause();
         }
@@ -238,6 +292,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void setAll(Access<T> access, T handle, long offset) {
+        // Set all bits to 1
         for (long i = 0; i < longLength; i++) {
             access.writeOrderedLong(handle, firstByte(offset, i), ALL_ONES);
         }
@@ -251,10 +306,10 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long mask = singleBit(bitIndex);
         while (true) {
             long l = access.readVolatileLong(handle, byteIndex);
-            if ((l & mask) == 0)
+            if ((l & mask) == 0) // If the bit is already clear, return
                 return;
-            long l2 = l & ~mask;
-            if (access.compareAndSwapLong(handle, byteIndex, l, l2))
+            long l2 = l & ~mask; // Clear the bit
+            if (access.compareAndSwapLong(handle, byteIndex, l, l2)) // Atomic operation
                 return;
             Jvm.nanoPause();
         }
@@ -268,9 +323,10 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long mask = singleBit(bitIndex);
         while (true) {
             long l = access.readVolatileLong(handle, byteIndex);
-            if ((l & mask) == 0) return false;
-            long l2 = l & ~mask;
-            if (access.compareAndSwapLong(handle, byteIndex, l, l2))
+            if ((l & mask) == 0) // If the bit is already clear, return false
+                return false;
+            long l2 = l & ~mask; // Clear the bit
+            if (access.compareAndSwapLong(handle, byteIndex, l, l2)) // Atomic operation
                 return true;
             Jvm.nanoPause();
         }
@@ -318,7 +374,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             }
         } else {
             long byteIndex = firstByte(offset, fromLongIndex);
-            long mask = lowerBitsExcludingThis(fromIndex) | (higherBitsExcludingThis(toIndex));
+            long mask = lowerBitsExcludingThis(fromIndex) | higherBitsExcludingThis(toIndex);
             while (true) {
                 long l = access.readVolatileLong(handle, byteIndex);
                 long l2 = l & mask;
@@ -331,6 +387,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void clearAll(Access<T> access, T handle, long offset) {
+        // Clear all bits
         access.writeBytes(handle, offset, LONGS.toBytes(longLength), (byte) 0);
     }
 
@@ -339,7 +396,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         assert checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
         long l = readVolatileLong(access, handle, offset, longIndex);
-        return (l & (singleBit(bitIndex))) != 0;
+        return (l & (singleBit(bitIndex))) != 0; // Check if the bit is set
     }
 
     @Override
@@ -362,12 +419,12 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             return NOT_FOUND;
         long l = readVolatileLong(access, handle, offset, fromLongIndex) >>> fromIndex;
         if (l != 0) {
-            return fromIndex + numberOfTrailingZeros(l);
+            return fromIndex + numberOfTrailingZeros(l); // Return the index of the next set bit
         }
         for (long i = fromLongIndex + 1; i < longLength; i++) {
             l = readLong(access, handle, offset, i);
             if (l != 0)
-                return firstBit(i) + numberOfTrailingZeros(l);
+                return firstBit(i) + numberOfTrailingZeros(l); // Return the index of the next set bit
         }
         return NOT_FOUND;
     }
@@ -396,7 +453,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long indexOfSetBit = fromIndex + numberOfTrailingZeros(l);
                 long mask = singleBit(indexOfSetBit);
                 if (access.compareAndSwapLong(handle, fromByteIndex, w, w ^ mask))
-                    return indexOfSetBit;
+                    return indexOfSetBit; // Return the index of the cleared bit
                 Jvm.nanoPause();
             } else {
                 break;
@@ -411,7 +468,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long indexOfSetBit = firstBit(i) + numberOfTrailingZeros(l);
                     long mask = singleBit(indexOfSetBit);
                     if (access.compareAndSwapLong(handle, byteIndex, l, l ^ mask))
-                        return indexOfSetBit;
+                        return indexOfSetBit; // Return the index of the cleared bit
                     Jvm.nanoPause();
                 } else {
                     continue longLoop;
@@ -429,12 +486,12 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             return NOT_FOUND;
         long l = (~readVolatileLong(access, handle, offset, fromLongIndex)) >>> fromIndex;
         if (l != 0) {
-            return fromIndex + numberOfTrailingZeros(l);
+            return fromIndex + numberOfTrailingZeros(l); // Return the index of the next clear bit
         }
         for (long i = fromLongIndex + 1; i < longLength; i++) {
             l = ~readLong(access, handle, offset, i);
             if (l != 0)
-                return firstBit(i) + numberOfTrailingZeros(l);
+                return firstBit(i) + numberOfTrailingZeros(l); // Return the index of the next clear bit
         }
         return NOT_FOUND;
     }
@@ -454,7 +511,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                         fromIndex + numberOfTrailingZeros(l);
                 long mask = singleBit(indexOfClearBit);
                 if (access.compareAndSwapLong(handle, fromByteIndex, w, w ^ mask))
-                    return indexOfClearBit;
+                    return indexOfClearBit; // Return the index of the set bit
                 Jvm.nanoPause();
             } else {
                 break;
@@ -470,7 +527,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long indexOfClearBit = firstBit(i) + numberOfTrailingZeros(l);
                     long mask = singleBit(indexOfClearBit);
                     if (access.compareAndSwapLong(handle, byteIndex, w, w ^ mask))
-                        return indexOfClearBit;
+                        return indexOfClearBit; // Return the index of the set bit
                     Jvm.nanoPause();
                 } else {
                     continue longLoop;
@@ -486,19 +543,18 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
             return NOT_FOUND;
         long fromLongIndex = longWithThisBit(fromIndex);
         if (fromLongIndex >= longLength) {
-            // the same policy for this "index out of bounds" situation
-            // as in j.u.BitSet
+            // Handle "index out of bounds" situation similar to java.util.BitSet
             fromLongIndex = longLength - 1;
             fromIndex = logicalSize() - 1;
         }
         // << ~fromIndex === << (63 - (fromIndex & 63))
         long l = readVolatileLong(access, handle, offset, fromLongIndex) << ~fromIndex;
         if (l != 0)
-            return fromIndex - numberOfLeadingZeros(l);
+            return fromIndex - numberOfLeadingZeros(l); // Return the index of the previous set bit
         for (long i = fromLongIndex - 1; i >= 0; i--) {
             l = readLong(access, handle, offset, i);
             if (l != 0)
-                return lastBit(i) - numberOfLeadingZeros(l);
+                return lastBit(i) - numberOfLeadingZeros(l); // Return the index of the previous set bit
         }
         return NOT_FOUND;
     }
@@ -520,7 +576,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long indexOfSetBit = fromIndex - numberOfLeadingZeros(l);
                 long mask = singleBit(indexOfSetBit);
                 if (access.compareAndSwapLong(handle, fromByteIndex, w, w ^ mask))
-                    return indexOfSetBit;
+                    return indexOfSetBit; // Return the index of the cleared bit
                 Jvm.nanoPause();
             } else {
                 break;
@@ -535,7 +591,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long indexOfSetBit = lastBit(i) - numberOfLeadingZeros(l);
                     long mask = singleBit(indexOfSetBit);
                     if (access.compareAndSwapLong(handle, byteIndex, l, l ^ mask))
-                        return indexOfSetBit;
+                        return indexOfSetBit; // Return the index of the cleared bit
                     Jvm.nanoPause();
                 } else {
                     continue longLoop;
@@ -556,11 +612,11 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         }
         long l = (~readVolatileLong(access, handle, offset, fromLongIndex)) << ~fromIndex;
         if (l != 0)
-            return fromIndex - numberOfLeadingZeros(l);
+            return fromIndex - numberOfLeadingZeros(l); // Return the index of the previous clear bit
         for (long i = fromLongIndex - 1; i >= 0; i--) {
             l = ~readLong(access, handle, offset, i);
             if (l != 0)
-                return lastBit(i) - numberOfLeadingZeros(l);
+                return lastBit(i) - numberOfLeadingZeros(l); // Return the index of the previous clear bit
         }
         return NOT_FOUND;
     }
@@ -582,7 +638,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 long indexOfClearBit = fromIndex - numberOfLeadingZeros(l);
                 long mask = singleBit(indexOfClearBit);
                 if (access.compareAndSwapLong(handle, fromByteIndex, w, w ^ mask))
-                    return indexOfClearBit;
+                    return indexOfClearBit; // Return the index of the set bit
             } else {
                 break;
             }
@@ -597,7 +653,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     long indexOfClearBit = lastBit(i) - numberOfLeadingZeros(l);
                     long mask = singleBit(indexOfClearBit);
                     if (access.compareAndSwapLong(handle, byteIndex, w, w ^ mask))
-                        return indexOfClearBit;
+                        return indexOfClearBit; // Return the index of the set bit
                 } else {
                     continue longLoop;
                 }
@@ -608,28 +664,28 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public long logicalSize() {
-        return LONGS.toBits(longLength);
+        return LONGS.toBits(longLength); // Return the logical size in bits
     }
 
     @Override
     public long sizeInBytes() {
-        return LONGS.toBytes(longLength);
+        return LONGS.toBytes(longLength); // Return the size in bytes
     }
 
     @Override
     public <T> long cardinality(Access<T> access, T handle, long offset) {
-        long count = Long.bitCount(access.readVolatileLong(handle, 0));
+        long count = Long.bitCount(access.readVolatileLong(handle, 0)); // Count bits in the first long
         for (long i = 1; i < longLength; i++) {
-            count += Long.bitCount(readLong(access, handle, offset, i));
+            count += Long.bitCount(readLong(access, handle, offset, i)); // Sum the count of bits in each long
         }
-        return count;
+        return count; // Return the total count of set bits
     }
 
     /**
      * WARNING! This implementation doesn't strictly follow the contract
-     * from {@code DirectBitSet} interface. For the sake of atomicity this
-     * implementation couldn't find and flip the range crossing native word
-     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     * from {@code DirectBitSet} interface. For the sake of atomicity, this
+     * implementation couldn't find and flip the range crossing the native word
+     * boundary, e.g., bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
      *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
@@ -727,9 +783,9 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     /**
      * WARNING! This implementation doesn't strictly follow the contract
-     * from {@code BitSetFrame} interface. For the sake of atomicity this
-     * implementation couldn't find and flip the range crossing native word
-     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     * from {@code BitSetFrame} interface. For the sake of atomicity, this
+     * implementation couldn't find and flip the range crossing the native word
+     * boundary, e.g., bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
      *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
@@ -818,9 +874,9 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     /**
      * WARNING! This implementation doesn't strictly follow the contract
-     * from {@code DirectBitSet} interface. For the sake of atomicity this
-     * implementation couldn't find and flip the range crossing native word
-     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     * from {@code DirectBitSet} interface. For the sake of atomicity, this
+     * implementation couldn't find and flip the range crossing the native word
+     * boundary, e.g., bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
      *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}
@@ -880,7 +936,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                         // >>> ~bitIndex === >>> (63 - (butIndex & 63))
                         long mask = nLeadingOnes >>> ~bitIndex;
                         if (access.compareAndSwapLong(handle, byteIndex, w, w ^ mask)) {
-                            return bitIndex - numberOfBitsMinusOne;
+                            return bitIndex - numberOfBitsMinusOne; // Return the index of the set bits
                         } else {
                             w = access.readLong(handle, byteIndex);
                             l = leftShiftOneFill(w, ~bitIndex);
@@ -974,7 +1030,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                         // >>> ~bitIndex === >>> (63 - (butIndex & 63))
                         long mask = nLeadingOnes >>> ~bitIndex;
                         if (access.compareAndSwapLong(handle, byteIndex, w, w ^ mask)) {
-                            return bitIndex - numberOfBitsMinusOne;
+                            return bitIndex - numberOfBitsMinusOne; // Return the index of the cleared bits
                         } else {
                             w = access.readLong(handle, byteIndex);
                             l = w << ~bitIndex;

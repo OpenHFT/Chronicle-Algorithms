@@ -19,7 +19,9 @@ package net.openhft.chronicle.algo.bitset;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
- *
+ * The {@code BitSetFrame} interface defines a set of operations for manipulating bits within a bit set.
+ * It provides methods to set, clear, flip, and check the state of bits at specified indices.
+ * The operations are parameterized with an {@code Access} object, a handle, and an offset for flexibility.
  */
 public interface BitSetFrame {
     /**
@@ -31,6 +33,10 @@ public interface BitSetFrame {
      * Sets the bit at the specified index to the complement of its
      * current value.
      *
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
      * @param bitIndex the index of the bit to flip
      */
     <T> void flip(Access<T> access, T handle, long offset, long bitIndex);
@@ -40,39 +46,59 @@ public interface BitSetFrame {
      * specified {@code toIndex} (exclusive) to the complement of its current
      * value.
      *
-     * @param fromIndex index of the first bit to flip
-     * @param toIndex   index after the last bit to flip
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param fromIndex the index of the first bit to flip
+     * @param toIndex   the index after the last bit to flip
      */
     <T> void flipRange(Access<T> access, T handle, long offset, long fromIndex, long toIndex);
 
     /**
      * Sets the bit at the specified index to {@code true}.
      *
-     * @param bitIndex the bit index
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
+     * @param bitIndex the index of the bit to set
      */
     <T> void set(Access<T> access, T handle, long offset, long bitIndex);
 
     /**
      * Sets the bit at the specified index to {@code true}.
      *
-     * @param bitIndex the bit index
-     * @return {@code true} if the bit was zeroOut, or false if the bit was already set
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
+     * @param bitIndex the index of the bit to set
+     * @return {@code true} if the bit was {@code false} and is now set to {@code true}, {@code false} if the bit was already {@code true}
      */
     <T> boolean setIfClear(Access<T> access, T handle, long offset, long bitIndex);
 
     /**
      * Clears the bit at the specified index (sets it to {@code false}).
      *
-     * @param bitIndex a bit index
-     * @return the previous value of the bit at the specified index
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
+     * @param bitIndex the index of the bit to clear
+     * @return {@code true} if the bit was {@code true} and is now cleared, {@code false} if the bit was already {@code false}
      */
     <T> boolean clearIfSet(Access<T> access, T handle, long offset, long bitIndex);
 
     /**
      * Sets the bit at the specified index to the specified value.
      *
-     * @param bitIndex the bit index
-     * @param value    the boolean value to set
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
+     * @param bitIndex the index of the bit to set
+     * @param value    the boolean value to set the bit to
      */
     default <T> void set(Access<T> access, T handle, long offset, long bitIndex, boolean value) {
         if (value) {
@@ -86,13 +112,22 @@ public interface BitSetFrame {
      * Sets the bits from the specified {@code fromIndex} (inclusive) to the
      * specified {@code toIndex} (exclusive) to {@code true}.
      *
-     * @param fromIndex index of the first bit to be set
-     * @param toIndex   index after the last bit to be set
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param fromIndex the index of the first bit to set
+     * @param toIndex   the index after the last bit to set
      */
     <T> void setRange(Access<T> access, T handle, long offset, long fromIndex, long toIndex);
 
     /**
      * Equivalent to {@code setRange(0, logicalSize())}.
+     *
+     * @param <T>    the type of the handle
+     * @param access the access object
+     * @param handle the handle to the bit set
+     * @param offset the offset in the bit set
      */
     <T> void setAll(Access<T> access, T handle, long offset);
 
@@ -100,9 +135,13 @@ public interface BitSetFrame {
      * Sets the bits from the specified {@code fromIndex} (inclusive) to the
      * specified {@code toIndex} (exclusive) to the specified value.
      *
-     * @param fromIndex index of the first bit to be set
-     * @param toIndex   index after the last bit to be set
-     * @param value     value to set the selected bits to
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param fromIndex the index of the first bit to set
+     * @param toIndex   the index after the last bit to set
+     * @param value     the value to set the bits to
      */
     default <T> void setRange(Access<T> access, T handle, long offset,
                               long fromIndex, long toIndex, boolean value) {
@@ -116,6 +155,10 @@ public interface BitSetFrame {
     /**
      * Sets the bit specified by the index to {@code false}.
      *
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
      * @param bitIndex the index of the bit to be cleared
      */
     <T> void clear(Access<T> access, T handle, long offset, long bitIndex);
@@ -124,13 +167,22 @@ public interface BitSetFrame {
      * Sets the bits from the specified {@code fromIndex} (inclusive) to the
      * specified {@code toIndex} (exclusive) to {@code false}.
      *
-     * @param fromIndex index of the first bit to be cleared
-     * @param toIndex   index after the last bit to be cleared
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param fromIndex the index of the first bit to be cleared
+     * @param toIndex   the index after the last bit to be cleared
      */
     <T> void clearRange(Access<T> access, T handle, long offset, long fromIndex, long toIndex);
 
     /**
      * Equivalent to {@code clearRange(0, logicalSize())}.
+     *
+     * @param <T>    the type of the handle
+     * @param access the access object
+     * @param handle the handle to the bit set
+     * @param offset the offset in the bit set
      */
     <T> void clearAll(Access<T> access, T handle, long offset);
 
@@ -140,6 +192,10 @@ public interface BitSetFrame {
      * is currently set in this {@code DirectBitSet}; otherwise, the result
      * is {@code false}.
      *
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
      * @param bitIndex the bit index
      * @return the value of the bit with the specified index
      */
@@ -148,6 +204,10 @@ public interface BitSetFrame {
     /**
      * Synonym of {@link #get(Access, Object, long, long)} )}.
      *
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
      * @param bitIndex the bit index
      * @return the value of the bit with the specified index
      */
@@ -159,19 +219,25 @@ public interface BitSetFrame {
      * Checks if each bit from the specified {@code fromIndex} (inclusive) to the specified {@code
      * exclusiveToIndex} is set to {@code true}.
      *
-     * @param fromIndex index of the first bit to check
-     * @param toIndex   index after the last bit to check
-     * @return {@code true} if all bits in the specified range are set to {@code true},
-     * {@code false} otherwise
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param fromIndex the index of the first bit to check
+     * @param toIndex   the index after the last bit to check
+     * @return {@code true} if all bits in the specified range are set to {@code true}, {@code false} otherwise
      */
     <T> boolean isRangeSet(Access<T> access, T handle, long offset, long fromIndex, long toIndex);
 
     /**
      * Synonym of {@code !get(long)}.
      *
+     * @param <T>      the type of the handle
+     * @param access   the access object
+     * @param handle   the handle to the bit set
+     * @param offset   the offset in the bit set
      * @param bitIndex the bit index
-     * @return {@code true} is the bit at the specified index is clear in this
-     * bit set; if the bit is set to {@code true} then returns {@code false}
+     * @return {@code true} if the bit at the specified index is clear in this bit set; {@code false} if the bit is set to {@code true}
      */
     default <T> boolean isClear(Access<T> access, T handle, long offset, long bitIndex) {
         return !get(access, handle, offset, bitIndex);
@@ -181,10 +247,13 @@ public interface BitSetFrame {
      * Checks if each bit from the specified {@code fromIndex} (inclusive) to the specified {@code
      * exclusiveToIndex} is set to {@code false}.
      *
-     * @param fromIndex index of the first bit to check
-     * @param toIndex   index after the last bit to check
-     * @return {@code true} if all bits in the specified range are set to {@code false},
-     * {@code false} otherwise
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
+     * @param fromIndex the index of the first bit to check
+     * @param toIndex   the index after the last bit to check
+     * @return {@code true} if all bits in the specified range are set to {@code false}, {@code false} otherwise
      */
     <T> boolean isRangeClear(Access<T> access, T handle, long offset, long fromIndex, long toIndex);
 
@@ -193,6 +262,10 @@ public interface BitSetFrame {
      * that occurs on or after the specified starting index. If no such
      * bit exists then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the next set bit, or {@code -1} if there is no such bit
      * @see #clearNextSetBit
@@ -204,6 +277,10 @@ public interface BitSetFrame {
      * that occurs on or after the specified starting index. If no such
      * bit exists then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the next zeroOut bit, or {@code -1} if there is no such bit
      * @see #setNextClearBit
@@ -216,6 +293,10 @@ public interface BitSetFrame {
      * If no such bit exists, or if {@code -1} is given as the
      * starting index, then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the previous set bit, or {@code -1} if there is no such bit
      * @see #clearPreviousSetBit
@@ -228,6 +309,10 @@ public interface BitSetFrame {
      * If no such bit exists, or if {@code -1} is given as the
      * starting index, then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the previous zeroOut bit, or {@code -1} if there is no such bit
      * @see #setPreviousClearBit
@@ -235,8 +320,8 @@ public interface BitSetFrame {
     <T> long previousClearBit(Access<T> access, T handle, long offset, long fromIndex);
 
     /**
-     * Number of bits in this frame.
-     * The index of the last bit in the set eligible to be set or zeroOut
+     * Returns the number of bits in this frame.
+     * The index of the last bit in the set eligible to be set or cleared
      * is {@code logicalSize() - 1}.
      *
      * @return the number of bits in this bit set
@@ -244,12 +329,20 @@ public interface BitSetFrame {
     long logicalSize();
 
     /**
-     * Number of bytes taken by this frame.
+     * Returns the number of bytes taken by this frame.
+     *
+     * @return the number of bytes taken by this frame
      */
     long sizeInBytes();
 
     /**
      * Returns the number of bits set to {@code true} in the bit set.
+     *
+     * @param <T>    the type of the handle
+     * @param access the access object
+     * @param handle the handle to the bit set
+     * @param offset the offset in the bit set
+     * @return the number of bits set to {@code true}
      */
     <T> long cardinality(Access<T> access, T handle, long offset);
 
@@ -258,6 +351,10 @@ public interface BitSetFrame {
      * that occurs on or after the specified starting index. If no such
      * bit exists then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the next zeroOut bit, or {@code -1} if there is no such bit
      * @see #nextClearBit
@@ -269,6 +366,10 @@ public interface BitSetFrame {
      * that occurs on or after the specified starting index. If no such
      * bit exists then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the next set bit, or {@code -1} if there is no such bit
      * @see #nextSetBit
@@ -281,6 +382,10 @@ public interface BitSetFrame {
      * If no such bit exists, or if {@code -1} is given as the
      * starting index, then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the previous zeroOut bit, or {@code -1} if there is no such bit
      * @see #previousClearBit
@@ -293,6 +398,10 @@ public interface BitSetFrame {
      * If no such bit exists, or if {@code -1} is given as the
      * starting index, then {@code -1} is returned.
      *
+     * @param <T>       the type of the handle
+     * @param access    the access object
+     * @param handle    the handle to the bit set
+     * @param offset    the offset in the bit set
      * @param fromIndex the index to start checking from (inclusive)
      * @return the index of the previous set bit, or {@code -1} if there is no such bit
      * @see #previousSetBit
@@ -310,6 +419,10 @@ public interface BitSetFrame {
      * {@code setNextNContinuousClearBits(i, 1)} is exact equivalent of
      * {@code setNextClearBit(i)}.
      *
+     * @param <T>          the type of the handle
+     * @param access       the access object
+     * @param handle       the handle to the bit set
+     * @param offset       the offset in the bit set
      * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous clear bits to search and set
      * @return the index of the first bit in the found range of clear bits,
@@ -331,6 +444,10 @@ public interface BitSetFrame {
      * {@code clearNextNContinuousSetBits(i, 1)} is exact equivalent of
      * {@code clearNextSetBit(i)}.
      *
+     * @param <T>          the type of the handle
+     * @param access       the access object
+     * @param handle       the handle to the bit set
+     * @param offset       the offset in the bit set
      * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous set bits to search and clear
      * @return the index of the first bit in the found range
@@ -353,12 +470,14 @@ public interface BitSetFrame {
      * {@code setPreviousNContinuousClearBits(i, 1)} is exact equivalent of
      * {@code setPreviousClearBit(i)}.
      *
+     * @param <T>          the type of the handle
+     * @param access       the access object
+     * @param handle       the handle to the bit set
+     * @param offset       the offset in the bit set
      * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous clear bits to search and set
-     * @return the index of the first bit in the found range of clear bits,
-     * or {@code -1} if there is no such range
-     * @throws IndexOutOfBoundsException if {@code fromIndex} is less
-     *                                   than {@code -1}
+     * @return the index of the first bit in the found range of clear bits, or {@code -1} if there is no such range
+     * @throws IndexOutOfBoundsException if {@code fromIndex} is less than {@code -1}
      * @throws IllegalArgumentException  if {@code numberOfBits <= 0}
      */
     <T> long setPreviousNContinuousClearBits(Access<T> access, T handle, long offset,
@@ -376,6 +495,10 @@ public interface BitSetFrame {
      * {@code clearPreviousNContinuousSetBits(i, 1)} is exact equivalent of
      * {@code clearPreviousSetBit(i)}.
      *
+     * @param <T>          the type of the handle
+     * @param access       the access object
+     * @param handle       the handle to the bit set
+     * @param offset       the offset in the bit set
      * @param fromIndex    the index to start checking from (inclusive)
      * @param numberOfBits how many continuous set bits to search and clear
      * @return the index of the first bit in the found range
@@ -395,6 +518,11 @@ public interface BitSetFrame {
      */
     Bits setBits();
 
+    /**
+     * Returns the algorithm used for bit set operations.
+     *
+     * @return the algorithm used for bit set operations
+     */
     BitSetAlgorithm algorithm();
 
     /**
@@ -408,12 +536,25 @@ public interface BitSetFrame {
      */
     interface Bits {
 
+        /**
+         * Resets the iterator to the beginning.
+         *
+         * @param <T>    the type of the handle
+         * @param access the access object
+         * @param handle the handle to the bit set
+         * @param offset the offset in the bit set
+         * @return the current Bits instance for method chaining
+         */
         <T> Bits reset(Access<T> access, T handle, long offset);
 
         /**
          * Returns index of the next bit in the iteration,
          * or {@code -1} if there are no more bits.
          *
+         * @param <T>    the type of the handle
+         * @param access the access object
+         * @param handle the handle to the bit set
+         * @param offset the offset in the bit set
          * @return index of the next bit in the iteration,
          * or {@code -1} if there are no more bits
          */

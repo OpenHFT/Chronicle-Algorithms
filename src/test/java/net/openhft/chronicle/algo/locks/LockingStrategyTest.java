@@ -36,20 +36,12 @@ import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
-@SuppressWarnings({"unchecked","rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes"})
 @RunWith(value = Parameterized.class)
 public class LockingStrategyTest {
 
-    private ExecutorService e1, e2;
-    @SuppressWarnings("FieldCanBeLocal")
-    private ByteBuffer buffer;
-    @SuppressWarnings("FieldCanBeLocal")
-    private BytesStore<?, ?> bytesStore;
-    private long offset;
     private final LockingStrategy lockingStrategy;
     private final AccessMethod accessMethod;
-    private Access access;
-    private Object handle;
     private final TestReadWriteLockState rwLockState = new TestReadWriteLockState();
     private final Callable<Boolean> tryReadLockTask = () -> rwls().tryReadLock();
     private final TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
@@ -58,6 +50,14 @@ public class LockingStrategyTest {
     private final Runnable updateUnlockTask = () -> rwuls().updateUnlock();
     private final Callable<Boolean> tryWriteLockTask = () -> rwls().tryWriteLock();
     private final Runnable writeUnlockTask = () -> rwls().writeUnlock();
+    private ExecutorService e1, e2;
+    @SuppressWarnings("FieldCanBeLocal")
+    private ByteBuffer buffer;
+    @SuppressWarnings("FieldCanBeLocal")
+    private BytesStore<?, ?> bytesStore;
+    private long offset;
+    private Access access;
+    private Object handle;
 
     public LockingStrategyTest(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
         this.lockingStrategy = lockingStrategy;

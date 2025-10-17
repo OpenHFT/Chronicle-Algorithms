@@ -27,9 +27,8 @@ package net.openhft.chronicle.algo.bitset;
  * @see java.util.BitSet
  */
 public interface BitSet {
-    /**
-     * Returned if no entry is found
-     */
+
+    // Constant representing a not found entry
     long NOT_FOUND = -1L;
 
     /**
@@ -65,10 +64,11 @@ public interface BitSet {
     void set(long bitIndex);
 
     /**
-     * Sets the bit at the specified index to {@code true}.
+     * Sets the bit at the specified index to {@code true} if it is currently {@code false}.
      *
-     * @param bitIndex a bit index
-     * @return true if the bit was zeroOut, or false if the bit was already set.
+     * @param bitIndex the index of the bit to set
+     * @return {@code true} if the bit was {@code false} and is now set to {@code true},
+     * or {@code false} if the bit was already {@code true}
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -77,8 +77,9 @@ public interface BitSet {
     /**
      * Clears the bit at the specified index (sets it to {@code false}).
      *
-     * @param bitIndex a bit index
-     * @return the previous value of the bit at the specified index
+     * @param bitIndex the index of the bit to clear
+     * @return {@code true} if the bit was {@code true} and is now cleared,
+     * or {@code false} if the bit was already {@code false}
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
@@ -87,16 +88,16 @@ public interface BitSet {
     /**
      * Sets the bit at the specified index to the specified value.
      *
-     * @param bitIndex a bit index
-     * @param value    a boolean value to set
+     * @param bitIndex the index of the bit to set
+     * @param value    the value to set the bit to
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
      */
     default void set(long bitIndex, boolean value) {
         if (value) {
-            set(bitIndex);
+            set(bitIndex);  // Set the bit if the value is true
         } else {
-            clear(bitIndex);
+            clear(bitIndex);  // Clear the bit if the value is false
         }
     }
 
@@ -112,12 +113,18 @@ public interface BitSet {
      */
     void setRange(long fromIndex, long toIndex);
 
+    /**
+     * Checks if all bits in the specified range are set to {@code true}.
+     *
+     * @param fromIndex index of the first bit to check
+     * @param toIndex   index after the last bit to check
+     * @return {@code true} if all bits in the range are set to {@code true}, {@code false} otherwise
+     */
     boolean isRangeSet(long fromIndex, long toIndex);
 
     /**
      * Sets all bits, {@code bs.setAll()} is equivalent
      * of {@code bs.set(0, bs.size()}.
-     *
      */
     void setAll();
 
@@ -134,9 +141,9 @@ public interface BitSet {
      */
     default void setRange(long fromIndex, long toIndex, boolean value) {
         if (value) {
-            setRange(fromIndex, toIndex);
+            setRange(fromIndex, toIndex);  // Set the range if the value is true
         } else {
-            clearRange(fromIndex, toIndex);
+            clearRange(fromIndex, toIndex);  // Clear the range if the value is false
         }
     }
 
@@ -161,11 +168,17 @@ public interface BitSet {
      */
     void clearRange(long fromIndex, long toIndex);
 
+    /**
+     * Checks if all bits in the specified range are cleared (set to {@code false}).
+     *
+     * @param fromIndex index of the first bit to check
+     * @param toIndex   index after the last bit to check
+     * @return {@code true} if all bits in the range are cleared, {@code false} otherwise
+     */
     boolean isRangeClear(long fromIndex, long toIndex);
 
     /**
-     * Sets all of the bits in this BitSet to {@code false}.
-     *
+     * Clears all of the bits in this BitSet (sets all bits to {@code false}).
      */
     void clearAll();
 
@@ -185,7 +198,7 @@ public interface BitSet {
     /**
      * Synonym of {@link #get(long)}.
      *
-     * @param bitIndex the bit index
+     * @param bitIndex the index of the bit to check
      * @return the value of the bit with the specified index
      * @throws IndexOutOfBoundsException if the index is out of range
      *                                   {@code (index < 0 || index >= size())}
@@ -452,6 +465,11 @@ public interface BitSet {
      */
     interface Bits {
 
+        /**
+         * Resets the iterator to the beginning.
+         *
+         * @return the current Bits instance for method chaining
+         */
         Bits reset();
 
         /**

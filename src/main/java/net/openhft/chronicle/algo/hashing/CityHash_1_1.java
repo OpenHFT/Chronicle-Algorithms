@@ -28,46 +28,104 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
  * http://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
  */
 class CityHash_1_1 {
+
+    // Singleton instance of CityHash_1_1
     private static final CityHash_1_1 INSTANCE = new CityHash_1_1();
 
+    // Singleton instance with native byte order
     private static final CityHash_1_1 NATIVE_CITY = NATIVE_LITTLE_ENDIAN ?
             CityHash_1_1.INSTANCE : BigEndian.INSTANCE;
+
+    // Constants used in the hashing algorithm
     private static final long K0 = 0xc3a5c85c97cb3127L;
     private static final long K1 = 0xb492b66fbe98f273L;
     private static final long K2 = 0x9ae16a3b2f90404fL;
     private static final long K_MUL = 0x9ddfea08eb382d69L;
 
+    // Private constructor to prevent instantiation
     private CityHash_1_1() {
     }
 
+    /**
+     * Applies a bitwise shift and mix operation to the given value.
+     *
+     * @param val the value to be shifted and mixed
+     * @return the result of the shift and mix operation
+     */
     private static long shiftMix(long val) {
         return val ^ (val >>> 47);
     }
 
+    /**
+     * Hashes two long values using a default multiplier.
+     *
+     * @param u the first value
+     * @param v the second value
+     * @return the hashed result
+     */
     private static long hashLen16(long u, long v) {
         return hashLen16(u, v, K_MUL);
     }
 
+    /**
+     * Hashes two long values using the specified multiplier.
+     *
+     * @param u   the first value
+     * @param v   the second value
+     * @param mul the multiplier
+     * @return the hashed result
+     */
     private static long hashLen16(long u, long v, long mul) {
         long a = shiftMix((u ^ v) * mul);
         return shiftMix((v ^ a) * mul) * mul;
     }
 
+    /**
+     * Computes the multiplier based on the length.
+     *
+     * @param len the length
+     * @return the multiplier
+     */
     private static long mul(long len) {
         return K2 + (len << 1);
     }
 
+    /**
+     * Hashes a length of 1 to 3 bytes.
+     *
+     * @param len           the length
+     * @param firstByte     the first byte
+     * @param midOrLastByte the middle or last byte
+     * @param lastByte      the last byte
+     * @return the hashed result
+     */
     private static long hash1To3Bytes(int len, int firstByte, int midOrLastByte, int lastByte) {
         int y = firstByte + (midOrLastByte << 8);
         int z = len + (lastByte << 2);
         return shiftMix((((long) y) * K2) ^ (((long) z) * K0)) * K2;
     }
 
+    /**
+     * Hashes a length of 4 to 7 bytes.
+     *
+     * @param len         the length
+     * @param first4Bytes the first 4 bytes
+     * @param last4Bytes  the last 4 bytes
+     * @return the hashed result
+     */
     private static long hash4To7Bytes(long len, long first4Bytes, long last4Bytes) {
         long mul = mul(len);
         return hashLen16(len + (first4Bytes << 3), last4Bytes, mul);
     }
 
+    /**
+     * Hashes a length of 8 to 16 bytes.
+     *
+     * @param len         the length
+     * @param first8Bytes the first 8 bytes
+     * @param last8Bytes  the last 8 bytes
+     * @return the hashed result
+     */
     private static long hash8To16Bytes(long len, long first8Bytes, long last8Bytes) {
         long mul = mul(len);
         long a = first8Bytes + K2;
@@ -76,34 +134,92 @@ class CityHash_1_1 {
         return hashLen16(c, d, mul);
     }
 
+    /**
+     * Provides an instance of LongHashFunction without a seed.
+     *
+     * @return an instance of LongHashFunction without a seed
+     */
     public static LongHashFunction asLongHashFunctionWithoutSeed() {
         return AsLongHashFunction.INSTANCE;
     }
 
+    /**
+     * Provides an instance of LongHashFunction with a seed.
+     *
+     * @param seed the seed
+     * @return an instance of LongHashFunction with the seed
+     */
     public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
         return new AsLongHashFunctionSeeded(K2, seed);
     }
 
+    /**
+     * Provides an instance of LongHashFunction with two seeds.
+     *
+     * @param seed0 the first seed
+     * @param seed1 the second seed
+     * @return an instance of LongHashFunction with the seeds
+     */
     public static LongHashFunction asLongHashFunctionWithTwoSeeds(long seed0, long seed1) {
         return new AsLongHashFunctionSeeded(seed0, seed1);
     }
 
+    /**
+     * Fetches a 64-bit long value from the given offset.
+     *
+     * @param access the ReadAccess
+     * @param in     the input source
+     * @param off    the offset
+     * @param <T>    the type of the input source
+     * @return the fetched 64-bit long value
+     */
     <T> long fetch64(ReadAccess<T> access, T in, long off) {
         return access.readLong(in, off);
     }
 
+    /**
+     * Fetches a 32-bit integer value from the given offset.
+     *
+     * @param access the ReadAccess
+     * @param in     the input source
+     * @param off    the offset
+     * @param <T>    the type of the input source
+     * @return the fetched 32-bit integer value
+     */
     <T> int fetch32(ReadAccess<T> access, T in, long off) {
         return access.readInt(in, off);
     }
 
+    /**
+     * Converts the given value to little endian format.
+     *
+     * @param v the value
+     * @return the little endian representation of the value
+     */
     long toLittleEndian(long v) {
         return v;
     }
 
+    /**
+     * Converts the given value to little endian format.
+     *
+     * @param v the value
+     * @return the little endian representation of the value
+     */
     int toLittleEndian(int v) {
         return v;
     }
 
+    /**
+     * Hashes a length of 0 to 16 bytes.
+     *
+     * @param access the ReadAccess
+     * @param in     the input source
+     * @param off    the offset
+     * @param len    the length
+     * @param <T>    the type of the input source
+     * @return the hashed result
+     */
     private <T> long hashLen0To16(ReadAccess<T> access, T in, long off, long len) {
         if (len >= 8L) {
             long a = fetch64(access, in, off);
@@ -122,6 +238,16 @@ class CityHash_1_1 {
         return K2;
     }
 
+    /**
+     * Hashes a length of 17 to 32 bytes.
+     *
+     * @param access the ReadAccess
+     * @param in     the input source
+     * @param off    the offset
+     * @param len    the length
+     * @param <T>    the type of the input source
+     * @return the hashed result
+     */
     private <T> long hashLen17To32(ReadAccess<T> access, T in, long off, long len) {
         long mul = mul(len);
         long a = fetch64(access, in, off) * K1;
@@ -132,6 +258,16 @@ class CityHash_1_1 {
                 a + rotateRight(b + K2, 18) + c, mul);
     }
 
+    /**
+     * Hashes a length of 33 to 64 bytes.
+     *
+     * @param access the ReadAccess
+     * @param in     the input source
+     * @param off    the offset
+     * @param len    the length
+     * @param <T>    the type of the input source
+     * @return the hashed result
+     */
     private <T> long hashLen33To64(ReadAccess<T> access, T in, long off, long len) {
         long mul = mul(len);
         long a = fetch64(access, in, off) * K2;
@@ -153,6 +289,16 @@ class CityHash_1_1 {
         return b + x;
     }
 
+    /**
+     * Hashes the given input data to a 64-bit value.
+     *
+     * @param access the ReadAccess
+     * @param in     the input source
+     * @param off    the offset
+     * @param len    the length
+     * @param <T>    the type of the input source
+     * @return the hashed 64-bit value
+     */
     <T> long cityHash64(ReadAccess<T> access, T in, long off, long len) {
         if (len <= 32L) {
             if (len <= 16L) {
@@ -253,6 +399,9 @@ class CityHash_1_1 {
                 hashLen16(vSecond, wSecond) + x);
     }
 
+    /**
+     * Nested static class for BigEndian variant of CityHash_1_1.
+     */
     private static class BigEndian extends CityHash_1_1 {
         private static final BigEndian INSTANCE = new BigEndian();
 
@@ -280,6 +429,9 @@ class CityHash_1_1 {
         }
     }
 
+    /**
+     * Nested static class for providing a LongHashFunction without a seed.
+     */
     private static class AsLongHashFunction extends LongHashFunction {
         public static final AsLongHashFunction INSTANCE = new AsLongHashFunction();
         private static final long serialVersionUID = 0L;
@@ -350,6 +502,9 @@ class CityHash_1_1 {
         }
     }
 
+    /**
+     * Nested static class for providing a LongHashFunction with seeds.
+     */
     private static class AsLongHashFunctionSeeded extends AsLongHashFunction {
         private static final long serialVersionUID = 0L;
 

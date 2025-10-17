@@ -18,17 +18,40 @@ package net.openhft.chronicle.algo.bitset;
 
 import net.openhft.chronicle.algo.bytes.Access;
 
+/**
+ * This class implements the {@link BitSet} interface and provides a reusable bit set implementation.
+ * It allows for efficient bit manipulations using an underlying {@link BitSetFrame}.
+ */
 public class ReusableBitSet implements BitSet {
     protected BitSetFrame frame;
     protected Access<Object> access;
     protected Object handle;
     protected long offset;
 
+    /**
+     * Constructs a new ReusableBitSet with the specified frame, access, handle, and offset.
+     *
+     * @param frame  the bit set frame to use
+     * @param access the access interface for reading/writing bits
+     * @param handle the handle to the underlying data structure
+     * @param offset the offset within the data structure
+     * @param <T>    the type of the handle
+     */
     public <T> ReusableBitSet(
             BitSetFrame frame, Access<T> access, T handle, long offset) {
         reuse(frame, access, handle, offset);
     }
 
+    /**
+     * Reuses the current ReusableBitSet with the specified frame, access, handle, and offset.
+     *
+     * @param frame  the bit set frame to use
+     * @param access the access interface for reading/writing bits
+     * @param handle the handle to the underlying data structure
+     * @param offset the offset within the data structure
+     * @param <T>    the type of the handle
+     * @return the current instance of ReusableBitSet
+     */
     public final <T> ReusableBitSet reuse(
             BitSetFrame frame, Access<T> access, T handle, long offset) {
         this.frame = frame;
@@ -40,6 +63,11 @@ public class ReusableBitSet implements BitSet {
         return this;
     }
 
+    /**
+     * Sets the offset within the data structure.
+     *
+     * @param offset the new offset
+     */
     public void setOffset(long offset) {
         this.offset = offset;
     }
@@ -186,9 +214,18 @@ public class ReusableBitSet implements BitSet {
         return new Bits(frame.setBits());
     }
 
+    /**
+     * This class provides an implementation of the {@link BitSet.Bits} interface
+     * for iterating over set bits in the bit set.
+     */
     protected class Bits implements BitSet.Bits {
         protected BitSetFrame.Bits frameBits;
 
+        /**
+         * Constructs a new Bits instance with the specified frame bits.
+         *
+         * @param frameBits the frame bits to use
+         */
         public Bits(BitSetFrame.Bits frameBits) {
             this.frameBits = frameBits;
         }
