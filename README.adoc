@@ -1,0 +1,12 @@
+= Chronicle Algorithms
+:toc:
+:lang: en-GB
+
+Chronicle Algorithms delivers zero-allocation primitives for hashing, bit sets,
+raw-byte access, and lock-free coordination. These building blocks underpin
+high-performance analytics and AI pipelines that require deterministic latency.
+
+== Documentation
+
+The legacy `README.md` provides a lightweight overview for scenarios where
+Markdown is required.
