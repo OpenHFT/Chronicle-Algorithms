@@ -4,37 +4,4 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/4.8.0/spotbugs/etc/findbugsfilter.xsd">
 
-    <Match>
-        <Class name="~net\.openhft\.chronicle\.algo\.hashing\..*"/>
-        <Or>
-            <Bug pattern="IC_SUPERCLASS_USES_SUBCLASS_DURING_INITIALIZATION"/>
-            <Bug pattern="SE_PRIVATE_READ_RESOLVE_NOT_INHERITED"/>
-            <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED"/>
-            <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
-        </Or>
-        <Or>
-            <Comment>ALG-HASH-LEGACY-001: Hash implementations mirror published algorithms; behaviour changes require upstream validation.</Comment>
-        </Or>
-    </Match>
-
-    <Match>
-        <Class name="net.openhft.chronicle.algo.locks.VanillaReadWriteWithWaitsLockingStrategy"/>
-        <Or>
-            <Bug pattern="MS_EXPOSE_REP"/>
-        </Or>
-        <Or>
-            <Comment>ALG-LOCKS-LEGACY-001: Singleton exposure intentional for lock strategy reuse.</Comment>
-        </Or>
-    </Match>
-
-    <Match>
-        <Class name="net.openhft.chronicle.algo.locks.VanillaReadWriteUpdateWithWaitsLockingStrategy"/>
-        <Or>
-            <Bug pattern="MS_EXPOSE_REP"/>
-        </Or>
-        <Or>
-            <Comment>ALG-LOCKS-LEGACY-001: Singleton exposure intentional for lock strategy reuse.</Comment>
-        </Or>
-    </Match>
-
 </FindBugsFilter>

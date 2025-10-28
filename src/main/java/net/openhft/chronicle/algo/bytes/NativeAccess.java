@@ -16,6 +16,7 @@
 
 package net.openhft.chronicle.algo.bytes;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.ByteOrder;
 
 import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
@@ -42,6 +43,7 @@ public final class NativeAccess<T> implements Access<T> {
      * @return the singleton instance of NativeAccess
      */
     @SuppressWarnings("unchecked")
+    @SuppressFBWarnings(value = "MS_EXPOSE_REP", justification = "Singleton is immutable and intentionally shared.")
     public static <T> NativeAccess<T> instance() {
         //noinspection unchecked
         return (NativeAccess<T>) INSTANCE;

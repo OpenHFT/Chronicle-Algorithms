@@ -114,7 +114,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     }
 
     long byteWithThisBit(long offset, long bitIndex) {
-        return offset + ((bitIndex >> 6) << 3);
+        return firstByte(offset, longWithThisBit(bitIndex));
     }
 
     private boolean checkIndex(long bitIndex) {
@@ -154,7 +154,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      */
     @Override
     public <T> void flip(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
+        checkIndex(bitIndex);
         long byteIndex = byteWithThisBit(offset, bitIndex);
         long mask = singleBit(bitIndex);
         long l = access.readLong(handle, byteIndex);
@@ -179,7 +179,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -216,7 +216,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void set(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        checkIndex(bitIndex);  // Ensure the bit index is within bounds
         long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
         long mask = singleBit(bitIndex);  // Create a mask for the specific bit
         long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
@@ -238,7 +238,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      */
     @Override
     public <T> boolean setIfClear(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        checkIndex(bitIndex);  // Ensure the bit index is within bounds
         long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
         long mask = singleBit(bitIndex);  // Create a mask for the specific bit
         long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
@@ -266,7 +266,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -327,7 +327,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      */
     @Override
     public <T> void clear(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        checkIndex(bitIndex);  // Ensure the bit index is within bounds
         long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
         long mask = singleBit(bitIndex);  // Create a mask for the specific bit
         long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
@@ -349,7 +349,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      */
     @Override
     public <T> boolean clearIfSet(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        checkIndex(bitIndex);  // Ensure the bit index is within bounds
         long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
         long mask = singleBit(bitIndex);  // Create a mask for the specific bit
         long l = access.readLong(handle, byteIndex);  // Read the current value at the byte index
@@ -377,7 +377,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -429,13 +429,13 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
             if ((fromIndex & 63) != 0) {  // Check bits in the first partial long
                 long mask = higherBitsIncludingThis(fromIndex);
-                if ((~(readLong(access, handle, offset, fromLongIndex)) & mask) != 0L)
+                if ((~readLong(access, handle, offset, fromLongIndex) & mask) != 0L)
                     return false;
                 firstFullLongIndex++;
             }
@@ -451,11 +451,11 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                         return false;
                 }
                 long mask = lowerBitsIncludingThis(toIndex);
-                return ((~readLong(access, handle, offset, toLongIndex)) & mask) == 0L;
+                return (~readLong(access, handle, offset, toLongIndex) & mask) == 0L;
             }
         } else {  // Check bits within a single long
             long mask = higherBitsIncludingThis(fromIndex) & lowerBitsIncludingThis(toIndex);
-            return ((~readLong(access, handle, offset, fromLongIndex)) & mask) == 0L;
+            return (~readLong(access, handle, offset, fromLongIndex) & mask) == 0L;
         }
     }
 
@@ -476,7 +476,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);  // Calculate the long index for the end bit
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);  // Ensure the range is valid
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -531,10 +531,10 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      */
     @Override
     public <T> boolean get(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);  // Ensure the bit index is within bounds
+        checkIndex(bitIndex);  // Ensure the bit index is within bounds
         long byteIndex = byteWithThisBit(offset, bitIndex);  // Calculate the byte index for the bit
         long l = access.readLong(handle, byteIndex);  // Read the value at the byte index
-        return (l & (singleBit(bitIndex))) != 0;  // Check if the specific bit is set
+        return (l & singleBit(bitIndex)) != 0;  // Check if the specific bit is set
     }
 
     /**
@@ -736,7 +736,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                                     long fromIndex, long inclusiveToIndex) {
         long fromLongIndex = longWithThisBit(fromIndex);  // Calculate the long index for the start bit
         long toLongIndex = longWithThisBit(inclusiveToIndex);  // Calculate the long index for the end bit
-        assert checkFromTo(inclusiveToIndex, fromIndex + 1, toLongIndex);  // Ensure the range is valid
+        checkFromTo(inclusiveToIndex, fromIndex + 1, toLongIndex);  // Ensure the range is valid
         if (fromLongIndex >= longLength) {
             fromLongIndex = longLength - 1;  // Adjust the start index if out of bounds
             fromIndex = logicalSize() - 1;
@@ -992,7 +992,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                     int bitsFromSecondWordToSwitch =
                             numberOfBits - bitsFromFirstWord;
                     if (bitsFromSecondWordToSwitch > 0) {
-                        long mask2 = (singleBit(bitsFromSecondWordToSwitch)) - 1;
+                        long mask2 = singleBit(bitsFromSecondWordToSwitch) - 1;
                         access.writeLong(handle, byteIndex2, w2 ^ mask2);
                     }
                     return bitIndex;
@@ -1114,22 +1114,20 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 l = w1;
             }
             // (2)
-            if ((l & 1) == 0) {
-                if (l != 0) {
-                    int trailingZeros = numberOfTrailingZeros(l);
-                    bitIndex += trailingZeros;
-                    // (3)
-                    if ((bitsFromFirstWord -= trailingZeros) <= 0) {
-                        bitsFromFirstWord += 64;
-                        continue; // long loop
-                    }
-                    l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
-                } else {
-                    // all bits are zeros, skip a whole word,
-                    // bitsFromFirstWord not changed
-                    bitIndex += 64;
+            if ((l & 1) == 0 && l != 0) {
+                int trailingZeros = numberOfTrailingZeros(l);
+                bitIndex += trailingZeros;
+                // (3)
+                if ((bitsFromFirstWord -= trailingZeros) <= 0) {
+                    bitsFromFirstWord += 64;
                     continue; // long loop
                 }
+                l = (w1 >>> bitIndex) | (w2 << bitsFromFirstWord);
+            } else if (l == 0) {
+                // all bits are zeros, skip a whole word,
+                // bitsFromFirstWord not changed
+                bitIndex += 64;
+                continue; // long loop
             }
             while (true) {
                 if (((~l) & nTrailingOnes) == 0) {
@@ -1138,7 +1136,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                     int bitsFromSecondWordToSwitch =
                             numberOfBits - bitsFromFirstWord;
                     if (bitsFromSecondWordToSwitch > 0) {
-                        long mask2 = (singleBit(bitsFromSecondWordToSwitch)) - 1;
+                        long mask2 = singleBit(bitsFromSecondWordToSwitch) - 1;
                         access.writeLong(handle, byteIndex2, w2 ^ mask2);
                     }
                     return bitIndex;
@@ -1461,14 +1459,14 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
             long l;
             if ((l = currentWord) != 0) {
                 int trailingZeros = numberOfTrailingZeros(l);
-                currentWord = (l >>> trailingZeros) >>> 1;
+                currentWord = l >>> trailingZeros >>> 1;
                 return bitIndex += trailingZeros + 1;
             }
             for (long i = byteIndex, lim = byteLength; (i += 8) < lim; ) {
                 if ((l = access.readLong(handle, i)) != 0) {
                     byteIndex = i;
                     int trailingZeros = numberOfTrailingZeros(l);
-                    currentWord = (l >>> trailingZeros) >>> 1;
+                    currentWord = l >>> trailingZeros >>> 1;
                     return bitIndex = (i << 3) + trailingZeros;
                 }
             }

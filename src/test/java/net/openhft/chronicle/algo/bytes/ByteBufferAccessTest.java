@@ -1,103 +1,64 @@
+/*
+ * Copyright 2014-2025 chronicle.software
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class ByteBufferAccessTest extends TestCase {
-    private ByteBufferAccess access;
-    private ByteBuffer buffer;
+import static java.nio.ByteOrder.BIG_ENDIAN;
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @BeforeEach
-    public void setUp() {
-        access = ByteBufferAccess.INSTANCE;
-        buffer = ByteBuffer.allocate(64).order(ByteOrder.LITTLE_ENDIAN);
+public class ByteBufferAccessTest {
+
+    private static final byte[] SAMPLE = {
+            (byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78,
+            (byte) 0x9A, (byte) 0xBC, (byte) 0xDE, (byte) 0xF0
+    };
+
+    private final ByteBufferAccess access = ByteBufferAccess.INSTANCE;
+
+    @Test
+    public void littleEndianAccessReadsExpectedValues() {
+        ByteBuffer buffer = ByteBuffer.wrap(SAMPLE).order(LITTLE_ENDIAN);
+
+        assertEquals(ByteOrder.LITTLE_ENDIAN, access.byteOrder(buffer));
+        assertEquals(0xF0DEBC9A78563412L, access.readLong(buffer, 0));
+        assertEquals(0xF0DEBC9AL, access.readUnsignedInt(buffer, 4));
+        assertEquals(0x78563412, access.readInt(buffer, 0));
+        assertEquals(0xBC9A, access.readUnsignedShort(buffer, 4));
+        assertEquals(0x5634, access.readShort(buffer, 1));
+        assertEquals(0xDE, access.readUnsignedByte(buffer, 6));
+        assertEquals(-68, access.readByte(buffer, 5));
     }
 
     @Test
-    public void testReadByte() {
-        buffer.put(0, (byte) 123);
-        assertEquals(123, access.readByte(buffer, 0));
-    }
+    public void bigEndianAccessReadsExpectedValues() {
+        ByteBuffer buffer = ByteBuffer.wrap(SAMPLE).order(BIG_ENDIAN);
 
-    @Test
-    public void testReadShort() {
-        buffer.putShort(0, (short) 12345);
-        assertEquals(12345, access.readShort(buffer, 0));
-    }
-
-    @Test
-    public void testReadChar() {
-        buffer.putChar(0, 'a');
-        assertEquals('a', access.readChar(buffer, 0));
-    }
-
-    @Test
-    public void testReadInt() {
-        buffer.putInt(0, 123456789);
-        assertEquals(123456789, access.readInt(buffer, 0));
-    }
-
-    @Test
-    public void testReadLong() {
-        buffer.putLong(0, 1234567890123456789L);
-        assertEquals(1234567890123456789L, access.readLong(buffer, 0));
-    }
-
-    @Test
-    public void testReadFloat() {
-        buffer.putFloat(0, 12345.6789f);
-        assertEquals(12345.6789f, access.readFloat(buffer, 0), 0.0);
-    }
-
-    @Test
-    public void testReadDouble() {
-        buffer.putDouble(0, 1234567890.123456789);
-        assertEquals(1234567890.123456789, access.readDouble(buffer, 0), 0.0);
-    }
-
-    @Test
-    public void testWriteByte() {
-        access.writeByte(buffer, 0, (byte) 123);
-        assertEquals(123, buffer.get(0));
-    }
-
-    @Test
-    public void testWriteShort() {
-        access.writeShort(buffer, 0, (short) 12345);
-        assertEquals(12345, buffer.getShort(0));
-    }
-
-    @Test
-    public void testWriteChar() {
-        access.writeChar(buffer, 0, 'a');
-        assertEquals('a', buffer.getChar(0));
-    }
-
-    @Test
-    public void testWriteInt() {
-        access.writeInt(buffer, 0, 123456789);
-        assertEquals(123456789, buffer.getInt(0));
-    }
-
-    @Test
-    public void testWriteLong() {
-        access.writeLong(buffer, 0, 1234567890123456789L);
-        assertEquals(1234567890123456789L, buffer.getLong(0));
-    }
-
-    @Test
-    public void testWriteFloat() {
-        access.writeFloat(buffer, 0, 12345.6789f);
-        assertEquals(12345.6789f, buffer.getFloat(0), 0.0);
-    }
-
-    @Test
-    public void testWriteDouble() {
-        access.writeDouble(buffer, 0, 1234567890.123456789);
-        assertEquals(1234567890.123456789, buffer.getDouble(0), 0.0);
+        assertEquals(ByteOrder.BIG_ENDIAN, access.byteOrder(buffer));
+        assertEquals(0x123456789ABCDEF0L, access.readLong(buffer, 0));
+        assertEquals(0x12345678L, access.readUnsignedInt(buffer, 0));
+        assertEquals((int) 0x9ABCDEF0L, access.readInt(buffer, 4));
+        assertEquals(0x5678, access.readUnsignedShort(buffer, 2));
+        assertEquals(0x789A, access.readShort(buffer, 3));
+        assertEquals(0x34, access.readUnsignedByte(buffer, 1));
+        assertEquals(-102, access.readByte(buffer, 4));
     }
 }

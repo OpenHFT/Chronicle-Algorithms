@@ -29,9 +29,6 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
  */
 class XxHash_r39 {
     private static final XxHash_r39 INSTANCE = new XxHash_r39();
-    private static final XxHash_r39 NATIVE_XX = NATIVE_LITTLE_ENDIAN ?
-            XxHash_r39.INSTANCE : BigEndian.INSTANCE;
-
     // Primes if treated as unsigned
     private static final long P1 = -7046029288634856825L;
     private static final long P2 = -4417276706812531889L;
@@ -43,13 +40,17 @@ class XxHash_r39 {
     private XxHash_r39() {
     }
 
+    private static XxHash_r39 nativeXx() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
+    }
+
     /**
      * Finalizes the hash value with additional mixing of bits.
      *
      * @param hash The initial hash value to finalize
      * @return The finalized hash value
      */
-    private static long finalize(long hash) {
+    private static long finalizeHash(long hash) {
         hash ^= hash >>> 33;
         hash *= P2;
         hash ^= hash >>> 29;
@@ -251,7 +252,7 @@ class XxHash_r39 {
         }
 
         // Finalize the hash value
-        return finalize(hash);
+        return finalizeHash(hash);
     }
 
     /**
@@ -304,7 +305,7 @@ class XxHash_r39 {
         private static final long serialVersionUID = 0L;
 
         // Ensure a singleton instance upon deserialization
-        private Object readResolve() {
+        protected Object readResolve() {
             return SEEDLESS_INSTANCE;
         }
 
@@ -320,36 +321,36 @@ class XxHash_r39 {
         @Override
         public long hashLong(long input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             long hash = seed() + P5 + 8;
             input *= P2;
             input = Long.rotateLeft(input, 31);
             input *= P1;
             hash ^= input;
             hash = Long.rotateLeft(hash, 27) * P1 + P4;
-            return XxHash_r39.finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
         public long hashInt(int input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             long hash = seed() + P5 + 4;
             hash ^= Primitives.unsignedInt(input) * P1;
             hash = Long.rotateLeft(hash, 23) * P2 + P3;
-            return XxHash_r39.finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
         public long hashShort(short input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             long hash = seed() + P5 + 2;
             hash ^= Primitives.unsignedByte(input) * P5;
             hash = Long.rotateLeft(hash, 11) * P1;
             hash ^= Primitives.unsignedByte(input >> 8) * P5;
             hash = Long.rotateLeft(hash, 11) * P1;
-            return XxHash_r39.finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
@@ -363,12 +364,12 @@ class XxHash_r39 {
             long hash = seed() + P5 + 1;
             hash ^= Primitives.unsignedByte(input) * P5;
             hash = Long.rotateLeft(hash, 11) * P1;
-            return XxHash_r39.finalize(hash);
+            return finalizeHash(hash);
         }
 
         @Override
         public long hashVoid() {
-            return XxHash_r39.finalize(P5);
+            return finalizeHash(P5);
         }
 
         @Override
@@ -376,7 +377,7 @@ class XxHash_r39 {
             // Compute hash based on byte order of the input
             long seed = seed();
             if (access.byteOrder(input) == LITTLE_ENDIAN) {
-                return XxHash_r39.INSTANCE.xxHash64(seed, input, access, off, len);
+                return INSTANCE.xxHash64(seed, input, access, off, len);
             } else {
                 return BigEndian.INSTANCE.xxHash64(seed, input, access, off, len);
             }
@@ -398,7 +399,7 @@ class XxHash_r39 {
          */
         private AsLongHashFunctionSeeded(long seed) {
             this.seed = seed;
-            voidHash = XxHash_r39.finalize(seed + P5);
+            voidHash = finalizeHash(seed + P5);
         }
 
         @Override

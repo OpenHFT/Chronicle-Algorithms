@@ -18,6 +18,9 @@ package net.openhft.chronicle.algo.hashing;
 
 import net.openhft.chronicle.algo.bytes.ReadAccess;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import static java.lang.Long.reverseBytes;
 import static java.lang.Long.rotateRight;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
@@ -32,10 +35,6 @@ class CityHash_1_1 {
     // Singleton instance of CityHash_1_1
     private static final CityHash_1_1 INSTANCE = new CityHash_1_1();
 
-    // Singleton instance with native byte order
-    private static final CityHash_1_1 NATIVE_CITY = NATIVE_LITTLE_ENDIAN ?
-            CityHash_1_1.INSTANCE : BigEndian.INSTANCE;
-
     // Constants used in the hashing algorithm
     private static final long K0 = 0xc3a5c85c97cb3127L;
     private static final long K1 = 0xb492b66fbe98f273L;
@@ -44,6 +43,10 @@ class CityHash_1_1 {
 
     // Private constructor to prevent instantiation
     private CityHash_1_1() {
+    }
+
+    private static CityHash_1_1 nativeCity() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }
 
     /**
@@ -441,20 +444,20 @@ class CityHash_1_1 {
         private static final int SECOND_SHORT_BYTE_SHIFT = 8 - FIRST_SHORT_BYTE_SHIFT;
         private static final int SECOND_SHORT_BYTE_MASK = NATIVE_LITTLE_ENDIAN ? -1 : 0xFF;
 
-        private Object readResolve() {
+        protected Object readResolve() {
             return INSTANCE;
         }
 
         @Override
         public long hashLong(long input) {
-            input = NATIVE_CITY.toLittleEndian(input);
+            input = nativeCity().toLittleEndian(input);
             long hash = hash8To16Bytes(8L, input, input);
             return finalizeHash(hash);
         }
 
         @Override
         public long hashInt(int input) {
-            input = NATIVE_CITY.toLittleEndian(input);
+            input = nativeCity().toLittleEndian(input);
             long unsignedInt = Primitives.unsignedInt(input);
             long hash = hash4To7Bytes(4L, unsignedInt, unsignedInt);
             return finalizeHash(hash);
@@ -509,7 +512,7 @@ class CityHash_1_1 {
         private static final long serialVersionUID = 0L;
 
         private final long seed0, seed1;
-        private final transient long voidHash;
+        private transient long voidHash;
 
         private AsLongHashFunctionSeeded(long seed0, long seed1) {
             this.seed0 = seed0;
@@ -525,6 +528,15 @@ class CityHash_1_1 {
         @Override
         protected final long finalizeHash(long hash) {
             return hashLen16(hash - seed0, seed1);
+        }
+
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            voidHash = finalizeHash(K2);
+        }
+
+        protected Object readResolve() {
+            return new AsLongHashFunctionSeeded(seed0, seed1);
         }
     }
 }

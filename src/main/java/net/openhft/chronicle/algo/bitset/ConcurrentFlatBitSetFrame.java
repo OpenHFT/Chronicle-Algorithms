@@ -16,13 +16,12 @@
 
 package net.openhft.chronicle.algo.bitset;
 
+import net.openhft.chronicle.algo.MemoryUnit;
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.core.Jvm;
 
 import static java.lang.Long.numberOfLeadingZeros;
 import static java.lang.Long.numberOfTrailingZeros;
-import static net.openhft.chronicle.algo.MemoryUnit.BITS;
-import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
 import static net.openhft.chronicle.algo.bitset.SingleThreadedFlatBitSetFrame.*;
 
 /**
@@ -38,7 +37,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      * @param logicalSize the logical size in bits
      */
     public ConcurrentFlatBitSetFrame(long logicalSize) {
-        longLength = BITS.toLongs(logicalSize);
+        longLength = MemoryUnit.BITS.toLongs(logicalSize);
     }
 
     /**
@@ -100,7 +99,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
     private boolean checkIndex(long bitIndex) {
         if (bitIndex < 0 || (bitIndex >> 6) >= longLength) {
             throw new IndexOutOfBoundsException(
-                    "index: " + bitIndex + ", logical size: " + LONGS.toBits(longLength));
+                    "index: " + bitIndex + ", logical size: " + MemoryUnit.LONGS.toBits(longLength));
         }
         return true;
     }
@@ -117,14 +116,14 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         if (fromIndex < 0 || fromIndex > exclusiveToIndex || toLongIndex >= longLength) {
             throw new IndexOutOfBoundsException(
                     "index range: [" + fromIndex + ", " + exclusiveToIndex + "), " +
-                            "logical size: " + LONGS.toBits(longLength));
+                            "logical size: " + MemoryUnit.LONGS.toBits(longLength));
         }
         return true;
     }
 
     @Override
     public <T> void flip(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
+        checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
         long byteIndex = firstByte(offset, longIndex);
         // only 6 lowest-order bits used, JLS 15.19
@@ -144,7 +143,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -205,7 +204,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void set(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
+        checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
@@ -222,7 +221,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean setIfClear(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
+        checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
@@ -243,7 +242,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -300,7 +299,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> void clear(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
+        checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
@@ -317,7 +316,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> boolean clearIfSet(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
+        checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
         long byteIndex = firstByte(offset, longIndex);
         long mask = singleBit(bitIndex);
@@ -338,7 +337,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         long fromLongIndex = longWithThisBit(fromIndex);
         long toIndex = exclusiveToIndex - 1;
         long toLongIndex = longWithThisBit(toIndex);
-        assert checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
+        checkFromTo(fromIndex, exclusiveToIndex, toLongIndex);
 
         if (fromLongIndex != toLongIndex) {
             long firstFullLongIndex = fromLongIndex;
@@ -388,15 +387,15 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
     @Override
     public <T> void clearAll(Access<T> access, T handle, long offset) {
         // Clear all bits
-        access.writeBytes(handle, offset, LONGS.toBytes(longLength), (byte) 0);
+        access.writeBytes(handle, offset, MemoryUnit.LONGS.toBytes(longLength), (byte) 0);
     }
 
     @Override
     public <T> boolean get(Access<T> access, T handle, long offset, long bitIndex) {
-        assert checkIndex(bitIndex);
+        checkIndex(bitIndex);
         long longIndex = longWithThisBit(bitIndex);
         long l = readVolatileLong(access, handle, offset, longIndex);
-        return (l & (singleBit(bitIndex))) != 0; // Check if the bit is set
+        return (l & singleBit(bitIndex)) != 0; // Check if the bit is set
     }
 
     @Override
@@ -664,12 +663,12 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public long logicalSize() {
-        return LONGS.toBits(longLength); // Return the logical size in bits
+        return MemoryUnit.LONGS.toBits(longLength); // Return the logical size in bits
     }
 
     @Override
     public long sizeInBytes() {
-        return LONGS.toBytes(longLength); // Return the size in bytes
+        return MemoryUnit.LONGS.toBytes(longLength); // Return the size in bytes
     }
 
     @Override
@@ -1082,9 +1081,12 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 if (l != 0) {
                     int trailingZeros = numberOfTrailingZeros(l);
                     long index = bitIndex + trailingZeros;
-                    if (((this.bitIndex = index + 1) & 63) == 0) {
-                        if ((byteIndex = i + 8) == byteLength)
-                            this.bitIndex = -1;
+                    boolean aligned = ((this.bitIndex = index + 1) & 63) == 0;
+                    if (aligned) {
+                        byteIndex = i + 8;
+                    }
+                    if (aligned && byteIndex == byteLength) {
+                        this.bitIndex = -1;
                     }
                     return index;
                 }
@@ -1092,11 +1094,10 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     if ((l = access.readLong(handle, i)) != 0) {
                         int trailingZeros = numberOfTrailingZeros(l);
                         long index = (i << 3) + trailingZeros;
-                        if (((this.bitIndex = index + 1) & 63) != 0) {
-                            byteIndex = i;
-                        } else {
-                            if ((byteIndex = i + 8) == lim)
-                                this.bitIndex = -1;
+                        boolean aligned = ((this.bitIndex = index + 1) & 63) == 0;
+                        byteIndex = aligned ? i + 8 : i;
+                        if (aligned && byteIndex == lim) {
+                            this.bitIndex = -1;
                         }
                         return index;
                     }
