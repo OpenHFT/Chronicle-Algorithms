@@ -16,13 +16,11 @@
 
 package net.openhft.chronicle.algo.hashing;
 
-import net.openhft.chronicle.algo.bytes.NativeAccess;
-import net.openhft.chronicle.algo.bytes.ReadAccess;
 import net.openhft.chronicle.algo.bytes.Access;
+import net.openhft.chronicle.algo.bytes.NativeAccess;
 import net.openhft.chronicle.core.Jvm;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Arrays;
 
 import static java.nio.ByteOrder.nativeOrder;

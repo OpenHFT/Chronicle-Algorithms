@@ -17,6 +17,7 @@
 package net.openhft.chronicle.algo.bytes;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.nio.ByteOrder;
 
 import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;

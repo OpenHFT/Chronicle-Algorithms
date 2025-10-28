@@ -25,7 +25,7 @@
         <groupId>net.openhft</groupId>
         <artifactId>java-parent-pom</artifactId>
         <version>1.27ea1</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <artifactId>chronicle-algorithms</artifactId>
@@ -286,7 +286,8 @@
                         <configuration>
                             <failOnViolation>true</failOnViolation>
                             <printFailingErrors>true</printFailingErrors>
-                            <excludeFromFailureFile>${project.basedir}/src/main/config/pmd-exclude.properties</excludeFromFailureFile>
+                            <excludeFromFailureFile>${project.basedir}/src/main/config/pmd-exclude.properties
+                            </excludeFromFailureFile>
                         </configuration>
                     </plugin>
                     <plugin>
