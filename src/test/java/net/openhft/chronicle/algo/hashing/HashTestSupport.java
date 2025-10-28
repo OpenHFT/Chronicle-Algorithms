@@ -173,7 +173,9 @@ final class HashTestSupport {
 
     private static byte[] dataWithPadding(ByteBuffer source, int len) {
         byte[] copy = new byte[len];
-        source.duplicate().get(0, copy, 0, len);
+        ByteBuffer duplicate = source.duplicate();
+        duplicate.position(0);
+        duplicate.get(copy, 0, len);
         return copy;
     }
 

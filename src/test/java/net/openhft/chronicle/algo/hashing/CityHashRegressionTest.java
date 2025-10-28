@@ -4,6 +4,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,7 +48,8 @@ class CityHashRegressionTest {
                 "net", "openhft", "hashing", fileName);
         String content;
         try {
-            content = Files.readString(source);
+            byte[] bytes = Files.readAllBytes(source);
+            content = new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read reference vectors from " + source, e);
         }
