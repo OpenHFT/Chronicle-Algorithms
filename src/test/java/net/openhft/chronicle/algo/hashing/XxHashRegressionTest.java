@@ -3,11 +3,6 @@ package net.openhft.chronicle.algo.hashing;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -44,19 +39,11 @@ class XxHashRegressionTest {
     }
 
     private static long[] loadVector(String fileName, String arrayName) {
-        Path source = Paths.get("..", "Zero-Allocation-Hashing", "src", "test", "java",
-                "net", "openhft", "hashing", fileName);
-        String content;
-        try {
-            byte[] bytes = Files.readAllBytes(source);
-            content = new String(bytes, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to read reference vectors from " + source, e);
-        }
+        String content = ReferenceData.load(fileName);
         Pattern pattern = Pattern.compile(arrayName + "\\s*=\\s*(?:new\\s+long\\s*\\[\\s*\\]\\s*)?\\{([^}]*)\\}", Pattern.DOTALL);
         Matcher matcher = pattern.matcher(content);
         if (!matcher.find()) {
-            throw new IllegalStateException("Array " + arrayName + " not found in " + source);
+            throw new IllegalStateException("Array " + arrayName + " not found in " + fileName);
         }
         String body = matcher.group(1);
         return Stream.of(body.split(","))
