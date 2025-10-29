@@ -15,8 +15,6 @@
  */
 
 package net.openhft.chronicle.algo.hashing;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.openhft.chronicle.algo.bytes.ReadAccess;
 
 import java.io.IOException;
@@ -196,7 +194,6 @@ class MurmurHash_3 {
      * @return The computed hash value.
      */
     @SuppressWarnings("fallthrough")
-    @SuppressFBWarnings(value = "SF_SWITCH_FALLTHROUGH", justification = "Tail mixing relies on switch fallthrough to pack remaining bytes.")
     public <T> long hash(long seed, T input, ReadAccess<T> access, long offset, long length) {
         long h1 = seed;
         long h2 = seed;

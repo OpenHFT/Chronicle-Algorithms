@@ -4,4 +4,42 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/4.8.0/spotbugs/etc/findbugsfilter.xsd">
 
+    <!-- Chronicle Algorithms: replacements for former @SuppressFBWarnings annotations. -->
+    <Match>
+        <Class name="net.openhft.chronicle.algo.bitset.ReusableBitSet"/>
+        <Method name="reuse"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Comment>Reusable container stores delegate references by design.</Comment>
+    </Match>
+    <Match>
+        <Class name="net.openhft.chronicle.algo.bitset.ReusableBitSet$Bits"/>
+        <Method name="&lt;init&gt;"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Comment>Iterator wrapper must share frame-backed state.</Comment>
+    </Match>
+    <Match>
+        <Class name="net.openhft.chronicle.algo.bytes.NativeAccess"/>
+        <Method name="instance"/>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Comment>Singleton is immutable and intentionally shared.</Comment>
+    </Match>
+    <Match>
+        <Class name="net.openhft.chronicle.algo.locks.VanillaReadWriteUpdateWithWaitsLockingStrategy"/>
+        <Method name="instance"/>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Comment>Strategy is stateless singleton shared safely.</Comment>
+    </Match>
+    <Match>
+        <Class name="net.openhft.chronicle.algo.locks.VanillaReadWriteWithWaitsLockingStrategy"/>
+        <Method name="instance"/>
+        <Bug pattern="MS_EXPOSE_REP"/>
+        <Comment>Strategy is stateless singleton shared safely.</Comment>
+    </Match>
+    <Match>
+        <Class name="net.openhft.chronicle.algo.hashing.MurmurHash_3"/>
+        <Method name="hash"/>
+        <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
+        <Comment>Tail mixing relies on switch fallthrough to pack remaining bytes.</Comment>
+    </Match>
+
 </FindBugsFilter>

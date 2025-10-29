@@ -15,8 +15,6 @@
  */
 
 package net.openhft.chronicle.algo.bitset;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
@@ -53,7 +51,6 @@ public class ReusableBitSet implements BitSet {
      * @param <T>    the type of the handle
      * @return the current instance of ReusableBitSet
      */
-    @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Reusable container stores delegate references by design.")
     public final <T> ReusableBitSet reuse(
             BitSetFrame frame, Access<T> access, T handle, long offset) {
         this.frame = frame;
@@ -228,7 +225,6 @@ public class ReusableBitSet implements BitSet {
          *
          * @param frameBits the frame bits to use
          */
-        @SuppressFBWarnings(value = "EI_EXPOSE_REP2", justification = "Iterator wrapper must share frame-backed state.")
         public Bits(BitSetFrame.Bits frameBits) {
             this.frameBits = frameBits;
         }

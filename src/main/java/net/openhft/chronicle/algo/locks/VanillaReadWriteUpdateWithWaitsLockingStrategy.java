@@ -15,8 +15,6 @@
  */
 
 package net.openhft.chronicle.algo.locks;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.algo.bytes.ReadAccess;
 
@@ -57,7 +55,6 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
      *
      * @return The singleton instance of the VanillaReadWriteUpdateWithWaitsLockingStrategy
      */
-    @SuppressFBWarnings(value = "MS_EXPOSE_REP", justification = "Strategy is stateless singleton shared safely.")
     public static ReadWriteUpdateWithWaitsLockingStrategy instance() {
         return INSTANCE;
     }
