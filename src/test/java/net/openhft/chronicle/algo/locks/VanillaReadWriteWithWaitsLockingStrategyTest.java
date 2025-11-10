@@ -1,3 +1,7 @@
+//
+// Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+//
+
 package net.openhft.chronicle.algo.locks;
 
 import net.openhft.chronicle.algo.bytes.Access;
@@ -9,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class VanillaReadWriteWithWaitsLockingStrategyTest {
+class VanillaReadWriteWithWaitsLockingStrategyTest {
 
     private Access<Object> access;
     private ReadAccess<Object> readAccess;

@@ -1,3 +1,7 @@
+//
+// Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+//
+
 /*
  * Copyright 2014-2020 chronicle.software
  *
@@ -25,7 +29,7 @@ import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-public class LongHashFunctionTest {
+class LongHashFunctionTest {
 
     private static ByteOrder nonNativeOrder() {
         return nativeOrder() == LITTLE_ENDIAN ? BIG_ENDIAN : LITTLE_ENDIAN;
@@ -48,7 +52,7 @@ public class LongHashFunctionTest {
             assertEquals("void", eh, f.hashVoid());
     }
 
-    public static void testBoolean(LongHashFunction f, int len) {
+    private static void testBoolean(LongHashFunction f, int len) {
         if (len != 1)
             return;
         for (boolean b : new boolean[]{true, false}) {

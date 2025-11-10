@@ -1,3 +1,7 @@
+//
+// Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+//
+
 /*
  * Copyright 2014-2020 chronicle.software
  *
@@ -644,7 +648,7 @@ public class DirectBitSetTest {
         }
     }
 
-    public boolean concurrentBS() {
+    private boolean concurrentBS() {
         return bs.frame instanceof ConcurrentFlatBitSetFrame;
     }
 

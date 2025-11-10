@@ -1,3 +1,7 @@
+//
+// Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+//
+
 /*
  *     Copyright (C) 2015-2020 chronicle.software
  *
@@ -24,14 +28,14 @@ import java.util.stream.IntStream;
 /**
  * Created by peter on 14/09/15.
  */
-public class RandomOptimiser<T> {
-    final Supplier<T> inputSupplier;
+class RandomOptimiser<T> {
+    private final Supplier<T> inputSupplier;
     private final Comparator<T> tieBreaker;
     private final int samples;
-    T lowest;
-    int lowestScore = Integer.MAX_VALUE;
-    T highest;
-    int highestScore = Integer.MIN_VALUE;
+    private T lowest;
+    private int lowestScore = Integer.MAX_VALUE;
+    private T highest;
+    private int highestScore = Integer.MIN_VALUE;
 
     public RandomOptimiser(Supplier<T> inputSupplier, Comparator<T> tieBreaker, int samples) {
         this.inputSupplier = inputSupplier;

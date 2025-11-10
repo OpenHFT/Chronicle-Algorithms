@@ -1,3 +1,7 @@
+//
+// Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+//
+
 package net.openhft.chronicle.algo.bitset;
 
 import net.openhft.chronicle.algo.bytes.Access;
@@ -8,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class BitSetFrameTest {
+class BitSetFrameTest {
 
     private BitSetFrame bitSetFrame;
     private Access<Object> access;
@@ -16,7 +20,7 @@ public class BitSetFrameTest {
     private long offset;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bitSetFrame = mock(BitSetFrame.class);
         access = mock(Access.class);
         handle = new Object();
@@ -24,14 +28,14 @@ public class BitSetFrameTest {
     }
 
     @Test
-    public void testFlip() {
+    void testFlip() {
         long bitIndex = 5L;
         bitSetFrame.flip(access, handle, offset, bitIndex);
         verify(bitSetFrame).flip(access, handle, offset, bitIndex);
     }
 
     @Test
-    public void testFlipRange() {
+    void testFlipRange() {
         long fromIndex = 5L;
         long toIndex = 10L;
         bitSetFrame.flipRange(access, handle, offset, fromIndex, toIndex);
@@ -39,14 +43,14 @@ public class BitSetFrameTest {
     }
 
     @Test
-    public void testSet() {
+    void testSet() {
         long bitIndex = 5L;
         bitSetFrame.set(access, handle, offset, bitIndex);
         verify(bitSetFrame).set(access, handle, offset, bitIndex);
     }
 
     @Test
-    public void testSetIfClear() {
+    void testSetIfClear() {
         long bitIndex = 5L;
         when(bitSetFrame.setIfClear(access, handle, offset, bitIndex)).thenReturn(true);
         assertTrue(bitSetFrame.setIfClear(access, handle, offset, bitIndex));
@@ -54,7 +58,7 @@ public class BitSetFrameTest {
     }
 
     @Test
-    public void testClearIfSet() {
+    void testClearIfSet() {
         long bitIndex = 5L;
         when(bitSetFrame.clearIfSet(access, handle, offset, bitIndex)).thenReturn(true);
         assertTrue(bitSetFrame.clearIfSet(access, handle, offset, bitIndex));
@@ -62,7 +66,7 @@ public class BitSetFrameTest {
     }
 
     @Test
-    public void testSetWithBooleanValue() {
+    void testSetWithBooleanValue() {
         long bitIndex = 5L;
         boolean value = true;
         bitSetFrame.set(access, handle, offset, bitIndex, value);
@@ -70,7 +74,7 @@ public class BitSetFrameTest {
     }
 
     @Test
-    public void testSetRangeWithBooleanValue() {
+    void testSetRangeWithBooleanValue() {
         long fromIndex = 5L;
         long toIndex = 10L;
         boolean value = true;
@@ -79,7 +83,7 @@ public class BitSetFrameTest {
     }
 
     @Test
-    public void testIsSet() {
+    void testIsSet() {
         long bitIndex = 5L;
         when(bitSetFrame.isSet(access, handle, offset, bitIndex)).thenReturn(true);
         assertTrue(bitSetFrame.isSet(access, handle, offset, bitIndex));
@@ -87,7 +91,7 @@ public class BitSetFrameTest {
     }
 
     @Test
-    public void testIsClear() {
+    void testIsClear() {
         long bitIndex = 5L;
         when(bitSetFrame.isClear(access, handle, offset, bitIndex)).thenReturn(true);
         assertTrue(bitSetFrame.isClear(access, handle, offset, bitIndex));
