@@ -631,7 +631,7 @@ public class DirectBitSetTest {
         }
     }
 
-    public boolean concurrentBS() {
+    private boolean concurrentBS() {
         return bs.frame instanceof ConcurrentFlatBitSetFrame;
     }
 

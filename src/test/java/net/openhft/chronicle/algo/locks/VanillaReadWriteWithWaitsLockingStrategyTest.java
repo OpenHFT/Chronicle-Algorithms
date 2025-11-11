@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class VanillaReadWriteWithWaitsLockingStrategyTest {
+class VanillaReadWriteWithWaitsLockingStrategyTest {
 
     private Access<Object> access;
     private ReadAccess<Object> readAccess;

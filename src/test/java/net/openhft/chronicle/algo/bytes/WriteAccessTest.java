@@ -14,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class WriteAccessTest {
+class WriteAccessTest {
 
     private WriteAccess<byte[]> writeAccess;
     private byte[] handle;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         assumeFalse(Jvm.isJava21Plus());
         writeAccess = Mockito.spy(WriteAccess.class);
         handle = new byte[16];
@@ -104,13 +104,13 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteByte() {
+    void testWriteByte() {
         writeAccess.writeByte(handle, 0, (byte) 0x7F);
         assertArrayEquals(new byte[]{0x7F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle);
     }
 
     @Test
-    public void testWriteUnsignedByte() {
+    void testWriteUnsignedByte() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         expected[0] = (byte) Maths.toUInt8(0xFF);
 
@@ -120,7 +120,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteBoolean() {
+    void testWriteBoolean() {
         writeAccess.writeBoolean(handle, 0, true);
         verify(writeAccess).writeByte(handle, 0, (byte) 'Y');
         assertArrayEquals(new byte[]{'Y', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle);
@@ -131,14 +131,14 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteUnsignedShort() {
+    void testWriteUnsignedShort() {
         writeAccess.writeUnsignedShort(handle, 0, 0xFFFF);
         verify(writeAccess).writeShort(handle, 0, (short) Maths.toUInt16(0xFFFF));
         assertArrayEquals(new byte[]{(byte) 0xFF, (byte) 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle);
     }
 
     @Test
-    public void testWriteChar() {
+    void testWriteChar() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         expected[0] = 0x00;
         expected[1] = 0x41;
@@ -149,7 +149,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteUnsignedInt() {
+    void testWriteUnsignedInt() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         expected[0] = (byte) 0xFF;
         expected[1] = (byte) 0xFF;
@@ -162,7 +162,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteInt() {
+    void testWriteInt() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         expected[0] = 0x12;
         expected[1] = 0x34;
@@ -175,7 +175,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteLong() {
+    void testWriteLong() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         expected[0] = 0x12;
         expected[1] = 0x34;
@@ -192,7 +192,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteFloat() {
+    void testWriteFloat() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         int intValue = Float.floatToIntBits(1.0f);
         expected[0] = (byte) (intValue >> 24);
@@ -206,7 +206,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteDouble() {
+    void testWriteDouble() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         long longValue = Double.doubleToLongBits(1.0);
         expected[0] = (byte) (longValue >> 56);
@@ -224,7 +224,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testWriteBytes() {
+    void testWriteBytes() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
         for (int i = 0; i < 16; i++) {
             expected[i] = (byte) 0xAA;
@@ -238,7 +238,7 @@ public class WriteAccessTest {
     }
 
     @Test
-    public void testZeroOut() {
+    void testZeroOut() {
         byte[] expected = new byte[16];  // Ensure expected array has the correct length
 
         writeAccess.zeroOut(handle, 0, 16);

@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class TryAcquireOperationsTest {
+class TryAcquireOperationsTest {
 
     private LockingStrategy lockingStrategy;
     private ReadWriteLockingStrategy readWriteLockingStrategy;

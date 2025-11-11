@@ -10,17 +10,17 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-public class AbstractReadWriteLockStateTest {
+class AbstractReadWriteLockStateTest {
 
     private AbstractReadWriteLockState lockState;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         lockState = Mockito.mock(AbstractReadWriteLockState.class, Mockito.CALLS_REAL_METHODS);
     }
 
     @Test
-    public void testTryLock() {
+    void testTryLock() {
         when(lockState.tryWriteLock()).thenReturn(true);
         boolean result = lockState.tryLock();
         assertTrue(result);
@@ -28,7 +28,7 @@ public class AbstractReadWriteLockStateTest {
     }
 
     @Test
-    public void testUnlock() {
+    void testUnlock() {
         doNothing().when(lockState).writeUnlock();
         lockState.unlock();
         verify(lockState).writeUnlock();

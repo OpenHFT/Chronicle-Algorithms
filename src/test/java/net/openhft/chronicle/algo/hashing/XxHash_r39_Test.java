@@ -39,7 +39,7 @@ public class XxHash_r39_Test {
      * }
      * }
      */
-    public static final long[] HASHES_OF_LOOPING_BYTES_WITHOUT_SEED = {
+    private static final long[] HASHES_OF_LOOPING_BYTES_WITHOUT_SEED = {
             -1205034819632174695L,
             -1642502924627794072L,
             5216751715308240086L,
@@ -1066,7 +1066,7 @@ public class XxHash_r39_Test {
             1887955086977822594L,
             8014460039616323415L
     };
-    public static final long[] HASHES_OF_LOOPING_BYTES_WITH_SEED_42 = {
+    private static final long[] HASHES_OF_LOOPING_BYTES_WITH_SEED_42 = {
             -7444071767201028348L,
             -8959994473701255385L,
             7116559933691734543L,
@@ -2115,7 +2115,7 @@ public class XxHash_r39_Test {
         test(LongHashFunction.xx_r39(42L), HASHES_OF_LOOPING_BYTES_WITH_SEED_42);
     }
 
-    public void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
+    private void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
         byte[] data = new byte[len];
         for (int j = 0; j < data.length; j++) {
             data[j] = (byte) j;

@@ -170,12 +170,12 @@ public class HashTesterMain {
         FTSE.stream().map(s -> hash(s, 11) & 511).forEach(hashes);
     }
 
-    public static int hashMap_hash(Object key) {
+    private static int hashMap_hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
-    public static int hash(String s, int multiplier) {
+    private static int hash(String s, int multiplier) {
         int h = 0;
         for (int i = 0; i < s.length(); i++)
             h = multiplier * h + s.charAt(i);

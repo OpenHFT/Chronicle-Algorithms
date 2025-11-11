@@ -46,7 +46,7 @@ public class HashSearcherMain {
         System.out.println("xorShift16n9(hash): " + optimiser);
     }
 
-    public static int hash(String s, int multiplier) {
+    private static int hash(String s, int multiplier) {
         int h = 0;
         for (int i = 0; i < s.length(); i++) {
             h = multiplier * h + s.charAt(i);

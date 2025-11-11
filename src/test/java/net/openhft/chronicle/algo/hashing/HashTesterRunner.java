@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * Created by peter on 14/09/15.
  * For a post of customizing hashing strategies.
  */
-public class HashTesterRunner implements Runnable {
+class HashTesterRunner implements Runnable {
     private final Class<?> testerMainClass;
 
     public HashTesterRunner(Class<?> testerMainClass) {
