@@ -1,7 +1,6 @@
-//
-// Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
-//
-
+/*
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ */
 package net.openhft.chronicle.algo.hashing;
 
 import net.openhft.chronicle.algo.bytes.ReadAccess;
@@ -13,7 +12,7 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
 
 /**
  * Adapted from the C++ CityHash implementation from Google at
- * http://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
+ * https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
  */
 class CityHash_1_1 {
 
