@@ -21,8 +21,8 @@
     <description>Chronicle-Algorithms</description>
 
     <properties>
-        <jacoco.line.coverage>0.1</jacoco.line.coverage>
-        <jacoco.branch.coverage>0.0</jacoco.branch.coverage>
+        <jacoco.line.coverage>0.579</jacoco.line.coverage>
+        <jacoco.branch.coverage>0.364</jacoco.branch.coverage>
     </properties>
 
     <dependencyManagement>
