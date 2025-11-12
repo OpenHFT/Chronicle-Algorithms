@@ -14,14 +14,14 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
  * Adapted from the C++ CityHash implementation from Google at
  * http://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
  */
-class CityHash_1_1 {
+class CityHash11 {
 
-    // Singleton instance of CityHash_1_1
-    private static final CityHash_1_1 INSTANCE = new CityHash_1_1();
+    // Singleton instance of CityHash11
+    private static final CityHash11 INSTANCE = new CityHash11();
 
     // Singleton instance with native byte order
-    private static final CityHash_1_1 NATIVE_CITY = NATIVE_LITTLE_ENDIAN ?
-            CityHash_1_1.INSTANCE : BigEndian.INSTANCE;
+    private static final CityHash11 NATIVE_CITY = NATIVE_LITTLE_ENDIAN ?
+            CityHash11.INSTANCE : BigEndian.INSTANCE;
 
     // Constants used in the hashing algorithm
     private static final long K0 = 0xc3a5c85c97cb3127L;
@@ -30,7 +30,7 @@ class CityHash_1_1 {
     private static final long K_MUL = 0x9ddfea08eb382d69L;
 
     // Private constructor to prevent instantiation
-    private CityHash_1_1() {
+    private CityHash11() {
     }
 
     /**
@@ -296,12 +296,8 @@ class CityHash_1_1 {
         } else if (len <= 64L) {
             return hashLen33To64(access, in, off, len);
         }
-        long x = fetch64(access, in, off + len - 40L);
-        long y = fetch64(access, in, off + len - 16L) + fetch64(access, in, off + len - 56L);
         long z = hashLen16(fetch64(access, in, off + len - 48L) + len,
                 fetch64(access, in, off + len - 24L));
-
-        long vFirst, vSecond, wFirst, wSecond;
 
         // This and following 3 blocks are produced by a single-click inline-function refactoring.
         // IntelliJ IDEA ftw
@@ -317,9 +313,11 @@ class CityHash_1_1 {
         long c3 = a3;
         a3 += x4 + y4;
         b3 += rotateRight(a3, 44);
-        vFirst = a3 + z4;
-        vSecond = b3 + c3;
+        long vSecond = b3 + c3;
+        long vFirst = a3 + z4;
 
+        long x = fetch64(access, in, off + len - 40L);
+        long y = fetch64(access, in, off + len - 16L) + fetch64(access, in, off + len - 56L);
         // WeakHashLen32WithSeeds
         long a2 = y + K1;
         long b2 = x;
@@ -332,8 +330,8 @@ class CityHash_1_1 {
         long c2 = a2;
         a2 += x3 + y3;
         b2 += rotateRight(a2, 44);
-        wFirst = a2 + z3;
-        wSecond = b2 + c2;
+        long wSecond = b2 + c2;
+        long wFirst = a2 + z3;
 
         x = x * K1 + fetch64(access, in, off);
 
@@ -357,8 +355,8 @@ class CityHash_1_1 {
             long c1 = a1;
             a1 += x2 + y2;
             b1 += rotateRight(a1, 44);
-            vFirst = a1 + z2;
             vSecond = b1 + c1;
+            vFirst = a1 + z2;
 
             // WeakHashLen32WithSeeds
             long a = z + wSecond;
@@ -372,8 +370,8 @@ class CityHash_1_1 {
             long c = a;
             a += x1 + y1;
             b += rotateRight(a, 44);
-            wFirst = a + z1;
             wSecond = b + c;
+            wFirst = a + z1;
 
             long tmp = x;
             x = z;
@@ -387,9 +385,9 @@ class CityHash_1_1 {
     }
 
     /**
-     * Nested static class for BigEndian variant of CityHash_1_1.
+     * Nested static class for BigEndian variant of CityHash11.
      */
-    private static class BigEndian extends CityHash_1_1 {
+    private static class BigEndian extends CityHash11 {
         private static final BigEndian INSTANCE = new BigEndian();
 
         private BigEndian() {
@@ -477,7 +475,7 @@ class CityHash_1_1 {
         public <T> long hash(T input, ReadAccess<T> access, long off, long len) {
             long hash;
             if (access.byteOrder(input) == LITTLE_ENDIAN) {
-                hash = CityHash_1_1.INSTANCE.cityHash64(access, input, off, len);
+                hash = CityHash11.INSTANCE.cityHash64(access, input, off, len);
             } else {
                 hash = BigEndian.INSTANCE.cityHash64(access, input, off, len);
             }

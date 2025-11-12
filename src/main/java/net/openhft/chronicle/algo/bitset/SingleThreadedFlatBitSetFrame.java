@@ -54,7 +54,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     static long lowerBitsIncludingThis(long bitIndex) {
         return ALL_ONES >>> ~bitIndex;
     }
-// conversions
+    // conversions
 
     static long higherBitsExcludingThis(long bitIndex) {
         return ~(ALL_ONES >>> ~bitIndex);
@@ -84,7 +84,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException("Illegal number of bits: " + numberOfBits);
     }
-// checks
+    // checks
 
     static boolean checkNotFoundIndex(long fromIndex) {
         if (fromIndex < 0) {

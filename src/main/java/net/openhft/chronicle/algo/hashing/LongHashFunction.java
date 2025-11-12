@@ -75,7 +75,7 @@ public abstract class LongHashFunction implements Serializable {
      * @see #city_1_1(long, long)
      */
     public static LongHashFunction city_1_1() {
-        return CityHash_1_1.asLongHashFunctionWithoutSeed();
+        return CityHash11.asLongHashFunctionWithoutSeed();
     }
 
     /**
@@ -89,7 +89,7 @@ public abstract class LongHashFunction implements Serializable {
      * @see #city_1_1(long, long)
      */
     public static LongHashFunction city_1_1(long seed) {
-        return CityHash_1_1.asLongHashFunctionWithSeed(seed);
+        return CityHash11.asLongHashFunctionWithSeed(seed);
     }
 
     /**
@@ -103,7 +103,7 @@ public abstract class LongHashFunction implements Serializable {
      * @see #city_1_1(long)
      */
     public static LongHashFunction city_1_1(long seed0, long seed1) {
-        return CityHash_1_1.asLongHashFunctionWithTwoSeeds(seed0, seed1);
+        return CityHash11.asLongHashFunctionWithTwoSeeds(seed0, seed1);
     }
 
     /**
@@ -119,7 +119,7 @@ public abstract class LongHashFunction implements Serializable {
      * @see #xx_r39(long)
      */
     public static LongHashFunction xx_r39() {
-        return XxHash_r39.asLongHashFunctionWithoutSeed();
+        return XxHashR39.asLongHashFunctionWithoutSeed();
     }
 
     /**
@@ -135,7 +135,7 @@ public abstract class LongHashFunction implements Serializable {
      * @see #xx_r39()
      */
     public static LongHashFunction xx_r39(long seed) {
-        return XxHash_r39.asLongHashFunctionWithSeed(seed);
+        return XxHashR39.asLongHashFunctionWithSeed(seed);
     }
 
     /**
@@ -148,7 +148,7 @@ public abstract class LongHashFunction implements Serializable {
      * @see #murmur_3(long)
      */
     public static LongHashFunction murmur_3() {
-        return MurmurHash_3.asLongHashFunctionWithoutSeed();
+        return MurmurHash3.asLongHashFunctionWithoutSeed();
     }
 
     /**
@@ -161,7 +161,7 @@ public abstract class LongHashFunction implements Serializable {
      * @see #murmur_3()
      */
     public static LongHashFunction murmur_3(long seed) {
-        return MurmurHash_3.asLongHashFunctionWithSeed(seed);
+        return MurmurHash3.asLongHashFunctionWithSeed(seed);
     }
 
     private static void checkArrayOffs(int arrayLength, int off, int len) {
