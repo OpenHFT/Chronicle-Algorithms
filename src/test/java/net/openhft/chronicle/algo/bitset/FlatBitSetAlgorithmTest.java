@@ -3,10 +3,11 @@
  */
 package net.openhft.chronicle.algo.bitset;
 
-import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 
-public class FlatBitSetAlgorithmTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class FlatBitSetAlgorithmTest  {
     @Test
     public void testSizeInBytes() {
         long logicalSize = 64L;

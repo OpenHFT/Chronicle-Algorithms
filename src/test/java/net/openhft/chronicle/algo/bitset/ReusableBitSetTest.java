@@ -114,9 +114,11 @@ class ReusableBitSetTest {
             assertRangeClear(bs, clearedPrevStart, clearedPrevStart + 4);
 
             BitSet.Bits bits = bs.setBits().reset();
+            int visited = 0;
             while (bits.next() >= 0) {
-                // iterate to exercise iterator implementation
+                visited++;
             }
+            assertEquals(bs.cardinality(), visited);
 
             bs.setAll();
             assertEquals(LOGICAL_SIZE, bs.cardinality());
@@ -130,7 +132,6 @@ class ReusableBitSetTest {
         private final Access<?> access;
         private final Object handle;
         private final BytesStore<?, ?> bytesStore;
-        private final long offset;
 
         private BitSetFixture(ReusableBitSet bitSet, Access<?> access, Object handle, BytesStore<?, ?> bytesStore, long offset) {
             this.bitSet = bitSet;

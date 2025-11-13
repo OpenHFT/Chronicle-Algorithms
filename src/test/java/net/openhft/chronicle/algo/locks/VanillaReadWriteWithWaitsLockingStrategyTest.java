@@ -15,14 +15,12 @@ import static org.mockito.Mockito.*;
 class VanillaReadWriteWithWaitsLockingStrategyTest {
 
     private Access<Object> access;
-    private ReadAccess<Object> readAccess;
     private Object handle;
     private ReadWriteWithWaitsLockingStrategy strategy;
 
     @BeforeEach
     void setUp() {
         access = mock(Access.class);
-        readAccess = mock(ReadAccess.class);
         handle = new Object();
         strategy = VanillaReadWriteWithWaitsLockingStrategy.instance();
     }

@@ -114,12 +114,12 @@ class AccessUtilitiesTest {
         BytesStore<?, ?> store = BytesStore.nativeStoreWithFixedCapacity(32);
         try {
             @SuppressWarnings("rawtypes")
-            Full access = (Full) Full.INSTANCE;
-            assertTrue(access.compareAndSwapInt((BytesStore) store, 0, 0, 42));
+            Full access = Full.INSTANCE;
+            assertTrue(access.compareAndSwapInt(store, 0, 0, 42));
             assertEquals(42, store.readInt(0));
-            assertTrue(access.compareAndSwapLong((BytesStore) store, 8, 0L, 123L));
+            assertTrue(access.compareAndSwapLong(store, 8, 0L, 123L));
             assertEquals(123L, store.readLong(8));
-            assertEquals(store.byteOrder(), access.byteOrder((BytesStore) store));
+            assertEquals(store.byteOrder(), access.byteOrder(store));
         } finally {
             store.releaseLast();
         }
@@ -132,10 +132,9 @@ class AccessUtilitiesTest {
             store.writeLong(0, 0x0102030405060708L);
             store.writeInt(16, 0x11223344);
             RandomDataInputAccess<RandomDataInput> access = BytesAccesses.RandomDataInputReadAccessEnum.INSTANCE;
-            RandomDataInput handle = store;
-            assertEquals(0x11223344, access.readInt(handle, 16));
-            assertEquals(0x0102030405060708L, access.readLong(handle, 0));
-            assertEquals(handle.byteOrder(), access.byteOrder(handle));
+            assertEquals(0x11223344, access.readInt(store, 16));
+            assertEquals(0x0102030405060708L, access.readLong(store, 0));
+            assertEquals(store.byteOrder(), access.byteOrder(store));
         } finally {
             store.releaseLast();
         }
@@ -151,8 +150,8 @@ class AccessUtilitiesTest {
 
         byte[] bytes = new byte[8];
         assertEquals(
-                ArrayAccessors.Byte.INSTANCE.offset(bytes, 5) - ArrayAccessors.Byte.INSTANCE.offset(bytes, 0),
-                5
+                5,
+                ArrayAccessors.Byte.INSTANCE.offset(bytes, 5) - ArrayAccessors.Byte.INSTANCE.offset(bytes, 0)
         );
     }
 
@@ -161,11 +160,11 @@ class AccessUtilitiesTest {
         String sample = "Cafe";
         Object handle = CharSequenceAccessor.stringAccessor.handle(sample);
         if (Jvm.isJava9Plus()) {
-            assertTrue(handle instanceof byte[]);
+            assertInstanceOf(byte[].class, handle);
             byte[] asBytes = (byte[]) handle;
             assertTrue(asBytes.length >= sample.length());
         } else {
-            assertTrue(handle instanceof char[]);
+            assertInstanceOf(char[].class, handle);
             char[] asChars = (char[]) handle;
             assertEquals(sample.length(), asChars.length);
         }

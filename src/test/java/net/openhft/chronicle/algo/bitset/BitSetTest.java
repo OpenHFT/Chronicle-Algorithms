@@ -3,13 +3,14 @@
  */
 package net.openhft.chronicle.algo.bitset;
 
-import junit.framework.TestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-public class BitSetTest extends TestCase {
+public class BitSetTest {
     private BitSet bitSet;
 
     @BeforeEach

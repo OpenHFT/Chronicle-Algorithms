@@ -3,14 +3,15 @@
  */
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class ByteBufferAccessTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ByteBufferAccessTest {
     private ByteBufferAccess access;
     private ByteBuffer buffer;
 

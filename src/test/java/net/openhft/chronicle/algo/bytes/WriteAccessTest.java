@@ -5,6 +5,7 @@ package net.openhft.chronicle.algo.bytes;
 
 import net.openhft.chronicle.core.Jvm;
 import net.openhft.chronicle.core.Maths;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,7 +22,7 @@ class WriteAccessTest {
 
     @BeforeEach
     void setUp() {
-        assumeFalse(Jvm.isJava21Plus());
+        Assumptions.assumeFalse(Jvm.isJava21Plus());
         writeAccess = Mockito.spy(WriteAccess.class);
         handle = new byte[16];
 

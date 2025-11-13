@@ -3,16 +3,16 @@
  */
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
 import net.openhft.chronicle.bytes.RandomDataInput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteOrder;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class RandomDataInputAccessTest extends TestCase {
+public class RandomDataInputAccessTest {
     private RandomDataInput mockInput;
     private RandomDataInputAccess<RandomDataInput> access;
 

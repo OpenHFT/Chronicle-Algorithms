@@ -13,6 +13,7 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
  * Derived from https://github.com/google/guava/blob/fa95e381e665d8ee9639543b99ed38020c8de5ef
  * /guava/src/com/google/common/hash/Murmur3_128HashFunction.java
  */
+@SuppressWarnings("fallthrough")
 class MurmurHash3 {
     // Singleton instance of MurmurHash3
     private static final MurmurHash3 INSTANCE = new MurmurHash3();
