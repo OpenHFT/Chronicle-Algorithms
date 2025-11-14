@@ -132,6 +132,7 @@ class ReusableBitSetTest {
         private final Access<?> access;
         private final Object handle;
         private final BytesStore<?, ?> bytesStore;
+        private final long offset;
 
         private BitSetFixture(ReusableBitSet bitSet, Access<?> access, Object handle, BytesStore<?, ?> bytesStore, long offset) {
             this.bitSet = bitSet;
