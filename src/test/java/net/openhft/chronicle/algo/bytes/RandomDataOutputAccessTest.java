@@ -110,6 +110,6 @@ public class RandomDataOutputAccessTest {
     }
 
     // Mock class extending RandomDataOutput with self-referential generic type
-    static abstract class RandomDataOutputImpl implements RandomDataOutput<RandomDataOutputImpl> {
+    abstract static class RandomDataOutputImpl implements RandomDataOutput<RandomDataOutputImpl> {
     }
 }

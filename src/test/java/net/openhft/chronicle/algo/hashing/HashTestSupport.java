@@ -148,8 +148,8 @@ final class HashTestSupport {
         Arrays.fill(bytes, (byte) -1);
         long byteHash = function.hashBytes(bytes, 0, 1);
         long shortHash = function.hashBytes(bytes, 0, 2);
-        long intHash = function.hashBytes(bytes, 0, 4);
-        long longHash = function.hashBytes(bytes, 0, 8);
+        final long intHash = function.hashBytes(bytes, 0, 4);
+        final long longHash = function.hashBytes(bytes, 0, 8);
 
         assertEquals("hashByte(-1)", byteHash, function.hashByte((byte) -1));
         assertEquals("hashShort(-1)", shortHash, function.hashShort((short) -1));

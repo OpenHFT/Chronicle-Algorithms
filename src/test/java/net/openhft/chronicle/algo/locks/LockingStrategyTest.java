@@ -211,7 +211,7 @@ public class LockingStrategyTest {
             rwls().readUnlock();
             assertTrue(rwls().tryWriteLock());
         }
-// write lock is held
+        // write lock is held
         readUnlockForbidden();
         upgradeReadToWriteLockForbidden();
 

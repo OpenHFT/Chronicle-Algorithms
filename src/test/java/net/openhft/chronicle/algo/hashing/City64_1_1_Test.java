@@ -2088,26 +2088,26 @@ public class City64_1_1_Test {
     }
 
     // The following numbers is the result of compiling & running this program
-// with city-1.1.1, reference impl:
-//
-//    #include <stdlib.h>
-//    #include <stdio.h>
-//    #include <city.h>
-//
-//     main() {
-//        char* src = (char*) malloc(1024);
-//        for (int i = 0; i < 1024; i++) {
-//            src[i] = (char) i;
-//        }
-//        printf("without seeds\n");
-//        for (int i = 0; i <= 1024; i++) {
-//            printf("%lldL,\n", (long long)CityHash64(src, i));
-//        }
-//        printf("with seeds 0, 0\n");
-//        for (int i = 0; i <= 1024; i++) {
-//            printf("%lldL,\n", (long long)CityHash64WithSeeds(src, i, 0, 0));
-//        }
-//    }
+    // with city-1.1.1, reference impl:
+    //
+    //    #include <stdlib.h>
+    //    #include <stdio.h>
+    //    #include <city.h>
+    //
+    //     main() {
+    //        char* src = (char*) malloc(1024);
+    //        for (int i = 0; i < 1024; i++) {
+    //            src[i] = (char) i;
+    //        }
+    //        printf("without seeds\n");
+    //        for (int i = 0; i <= 1024; i++) {
+    //            printf("%lldL,\n", (long long)CityHash64(src, i));
+    //        }
+    //        printf("with seeds 0, 0\n");
+    //        for (int i = 0; i <= 1024; i++) {
+    //            printf("%lldL,\n", (long long)CityHash64WithSeeds(src, i, 0, 0));
+    //        }
+    //    }
     @Test
     public void testCityWithOneSeed() {
         test(LongHashFunction.city_1_1(0L, 0L), HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0);
