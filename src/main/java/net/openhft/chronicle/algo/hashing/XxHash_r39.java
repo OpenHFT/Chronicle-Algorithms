@@ -16,8 +16,6 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
  */
 class XxHash_r39 {
     private static final XxHash_r39 INSTANCE = new XxHash_r39();
-    private static final XxHash_r39 NATIVE_XX = NATIVE_LITTLE_ENDIAN ?
-            XxHash_r39.INSTANCE : BigEndian.INSTANCE;
 
     // Primes if treated as unsigned
     private static final long P1 = -7046029288634856825L;
@@ -28,6 +26,10 @@ class XxHash_r39 {
 
     // Private constructor to prevent instantiation
     private XxHash_r39() {
+    }
+
+    private static XxHash_r39 nativeXx() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }
 
     /**
@@ -307,7 +309,7 @@ class XxHash_r39 {
         @Override
         public long hashLong(long input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             input *= P2;
             input = Long.rotateLeft(input, 31);
             input *= P1;
@@ -320,7 +322,7 @@ class XxHash_r39 {
         @Override
         public long hashInt(int input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             long hash = seed() + P5 + 4;
             hash ^= Primitives.unsignedInt(input) * P1;
             hash = Long.rotateLeft(hash, 23) * P2 + P3;
@@ -330,7 +332,7 @@ class XxHash_r39 {
         @Override
         public long hashShort(short input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             long hash = seed() + P5 + 2;
             hash ^= Primitives.unsignedByte(input) * P5;
             hash = Long.rotateLeft(hash, 11) * P1;

@@ -18,16 +18,16 @@ class MurmurHash_3 {
     // Singleton instance of MurmurHash_3
     private static final MurmurHash_3 INSTANCE = new MurmurHash_3();
 
-    // Singleton instance of MurmurHash_3 for native byte order
-    private static final MurmurHash_3 NATIVE_MURMUR = NATIVE_LITTLE_ENDIAN ?
-            MurmurHash_3.INSTANCE : BigEndian.INSTANCE;
-
     // Constants used in the hash function
     private static final long C1 = 0x87c37b91114253d5L;
     private static final long C2 = 0x4cf5ad432745937fL;
 
     // Private constructor to prevent instantiation
     private MurmurHash_3() {
+    }
+
+    private static MurmurHash_3 nativeMurmur() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }
 
     /**
@@ -339,23 +339,23 @@ class MurmurHash_3 {
 
         @Override
         public long hashLong(long input) {
-            return hashNativeLong(NATIVE_MURMUR.toLittleEndian(input), 8L);
+            return hashNativeLong(nativeMurmur().toLittleEndian(input), 8L);
         }
 
         @Override
         public long hashInt(int input) {
-            return hashNativeLong(Primitives.unsignedInt(NATIVE_MURMUR.toLittleEndian(input)), 4L);
+            return hashNativeLong(Primitives.unsignedInt(nativeMurmur().toLittleEndian(input)), 4L);
         }
 
         @Override
         public long hashShort(short input) {
             return hashNativeLong(
-                    NATIVE_MURMUR.toLittleEndianShort(Primitives.unsignedShort(input)), 2L);
+                    nativeMurmur().toLittleEndianShort(Primitives.unsignedShort(input)), 2L);
         }
 
         @Override
         public long hashChar(char input) {
-            return hashNativeLong(NATIVE_MURMUR.toLittleEndianShort(input), 2L);
+            return hashNativeLong(nativeMurmur().toLittleEndianShort(input), 2L);
         }
 
         @Override
@@ -388,7 +388,7 @@ class MurmurHash_3 {
         // The seed value
         private final long seed;
         // The precomputed hash value for an empty input
-        private final transient long voidHash;
+        private final long voidHash;
 
         /**
          * Constructs an instance with the given seed.

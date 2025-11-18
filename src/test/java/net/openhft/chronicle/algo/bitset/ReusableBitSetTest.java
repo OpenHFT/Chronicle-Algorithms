@@ -132,14 +132,12 @@ class ReusableBitSetTest {
         private final Access<?> access;
         private final Object handle;
         private final BytesStore<?, ?> bytesStore;
-        private final long offset;
 
-        private BitSetFixture(ReusableBitSet bitSet, Access<?> access, Object handle, BytesStore<?, ?> bytesStore, long offset) {
+        private BitSetFixture(ReusableBitSet bitSet, Access<?> access, Object handle, BytesStore<?, ?> bytesStore) {
             this.bitSet = bitSet;
             this.access = access;
             this.handle = handle;
             this.bytesStore = bytesStore;
-            this.offset = offset;
         }
 
         static BitSetFixture singleThreaded(ByteBuffer buffer) {
@@ -148,7 +146,7 @@ class ReusableBitSetTest {
             SingleThreadedFlatBitSetFrame frame = new SingleThreadedFlatBitSetFrame(LOGICAL_SIZE);
             Access<ByteBuffer> bbAccess = Access.checkedByteBufferAccess();
             ReusableBitSet bitSet = new ReusableBitSet(frame, bbAccess, buffer, offset);
-            return new BitSetFixture(bitSet, bbAccess, buffer, null, offset);
+            return new BitSetFixture(bitSet, bbAccess, buffer, null);
         }
 
         @SuppressWarnings("unchecked")
@@ -159,7 +157,7 @@ class ReusableBitSetTest {
             Access<?> storeAccess = Access.checkedBytesStoreAccess();
             @SuppressWarnings("rawtypes")
             ReusableBitSet bitSet = new ReusableBitSet(frame, (Access) storeAccess, store, offset);
-            return new BitSetFixture(bitSet, storeAccess, store, store, offset);
+            return new BitSetFixture(bitSet, storeAccess, store, store);
         }
 
         ReusableBitSet bitSet() {

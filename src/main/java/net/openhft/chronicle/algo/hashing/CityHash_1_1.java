@@ -19,10 +19,6 @@ class CityHash_1_1 {
     // Singleton instance of CityHash_1_1
     private static final CityHash_1_1 INSTANCE = new CityHash_1_1();
 
-    // Singleton instance with native byte order
-    private static final CityHash_1_1 NATIVE_CITY = NATIVE_LITTLE_ENDIAN ?
-            CityHash_1_1.INSTANCE : BigEndian.INSTANCE;
-
     // Constants used in the hashing algorithm
     private static final long K0 = 0xc3a5c85c97cb3127L;
     private static final long K1 = 0xb492b66fbe98f273L;
@@ -31,6 +27,10 @@ class CityHash_1_1 {
 
     // Private constructor to prevent instantiation
     private CityHash_1_1() {
+    }
+
+    private static CityHash_1_1 nativeCity() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }
 
     /**
@@ -310,11 +310,9 @@ class CityHash_1_1 {
         long z4 = fetch64(access, in, off + len - 64L + 24L);
         a3 += w4;
         b3 = rotateRight(b3 + a3 + z4, 21);
-        long c3 = a3;
+        final long c3 = a3;
         a3 += x4 + y4;
         b3 += rotateRight(a3, 44);
-        long vSecond = b3 + c3;
-        long vFirst = a3 + z4;
 
         long x = fetch64(access, in, off + len - 40L);
         long y = fetch64(access, in, off + len - 16L) + fetch64(access, in, off + len - 56L);
@@ -332,6 +330,8 @@ class CityHash_1_1 {
         b2 += rotateRight(a2, 44);
         long wSecond = b2 + c2;
         long wFirst = a2 + z3;
+        long vSecond = b3 + c3;
+        long vFirst = a3 + z4;
 
         x = x * K1 + fetch64(access, in, off);
 
@@ -432,14 +432,14 @@ class CityHash_1_1 {
 
         @Override
         public long hashLong(long input) {
-            input = NATIVE_CITY.toLittleEndian(input);
+            input = nativeCity().toLittleEndian(input);
             long hash = hash8To16Bytes(8L, input, input);
             return finalizeHash(hash);
         }
 
         @Override
         public long hashInt(int input) {
-            input = NATIVE_CITY.toLittleEndian(input);
+            input = nativeCity().toLittleEndian(input);
             long unsignedInt = Primitives.unsignedInt(input);
             long hash = hash4To7Bytes(4L, unsignedInt, unsignedInt);
             return finalizeHash(hash);
@@ -494,7 +494,7 @@ class CityHash_1_1 {
         private static final long serialVersionUID = 0L;
 
         private final long seed0, seed1;
-        private final transient long voidHash;
+        private final long voidHash;
 
         private AsLongHashFunctionSeeded(long seed0, long seed1) {
             this.seed0 = seed0;

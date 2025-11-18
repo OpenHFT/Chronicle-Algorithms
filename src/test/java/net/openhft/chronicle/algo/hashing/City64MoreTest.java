@@ -8,7 +8,7 @@ import net.openhft.chronicle.bytes.NativeBytes;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.security.SecureRandom;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by peter on 28/06/15.
@@ -46,8 +46,8 @@ public class City64MoreTest {
             if (t % 50 == 0)
                 System.out.println(t + " - Score: " + score);
         }
-        System.out.println("Average score: " + scoreSum / 500);
-        System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
+        System.out.println("Average score: " + (scoreSum / 500.0));
+        System.out.printf("Average time %.3f us%n", (time / (double) timeCount) / 1e3);
     }
 
     @Ignore("Long running, avg score = 6852")
@@ -59,7 +59,7 @@ public class City64MoreTest {
             long[] hashs = new long[8192];
             NativeBytes<Void> b = NativeBytes.nativeBytes(hashs.length / 64);
             byte[] init = new byte[hashs.length / 64];
-            new SecureRandom().nextBytes(init);
+            ThreadLocalRandom.current().nextBytes(init);
             for (int i = 0; i < hashs.length; i++) {
                 b.clear();
                 b.write(init);
@@ -85,7 +85,7 @@ public class City64MoreTest {
             if (t % 50 == 0)
                 System.out.println(t + " - Score: " + score);
         }
-        System.out.println("Average score: " + scoreSum / 500);
-        System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
+        System.out.println("Average score: " + (scoreSum / 500.0));
+        System.out.printf("Average time %.3f us%n", (time / (double) timeCount) / 1e3);
     }
 }
