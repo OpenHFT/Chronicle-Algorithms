@@ -125,12 +125,12 @@ public class DirectBitSetTest {
             assertTrue("At index " + i, bs.isClear(i));
         }
         for (int i : INDICES) {
-            assertEquals("At index " + i, true, bs.setIfClear(i));
-            assertEquals("At index " + i, false, bs.setIfClear(i));
+            assertTrue("At index " + i, bs.setIfClear(i));
+            assertFalse("At index " + i, bs.setIfClear(i));
         }
         for (int i : INDICES) {
-            assertEquals("At index " + i, true, bs.clearIfSet(i));
-            assertEquals("At index " + i, false, bs.clearIfSet(i));
+            assertTrue("At index " + i, bs.clearIfSet(i));
+            assertFalse("At index " + i, bs.clearIfSet(i));
         }
     }
 
@@ -138,11 +138,11 @@ public class DirectBitSetTest {
     public void testFlip() {
         bs.clearAll();
         for (int i : INDICES) {
-            assertEquals("At index " + i, false, bs.get(i));
+            assertFalse("At index " + i, bs.get(i));
             bs.flip(i);
-            assertEquals("At index " + i, true, bs.get(i));
+            assertTrue("At index " + i, bs.get(i));
             bs.flip(i);
-            assertEquals("At index " + i, false, bs.get(i));
+            assertFalse("At index " + i, bs.get(i));
         }
     }
 
@@ -387,10 +387,10 @@ public class DirectBitSetTest {
             assertTrue(bs.isRangeSet(63, 63));
         }
         bs.flipRange(0, 0);
-        assertEquals(false, bs.get(0));
+        assertFalse(bs.get(0));
         assertEquals(0, bs.cardinality());
         bs.flipRange(0, 1);
-        assertEquals(true, bs.get(0));
+        assertTrue(bs.get(0));
         assertEquals(1, bs.cardinality());
         if (singleThreaded) {
             assertTrue(bs.isRangeSet(0, 1));
@@ -398,17 +398,17 @@ public class DirectBitSetTest {
             assertFalse(bs.isRangeClear(0, 1));
         }
         bs.clearRange(0, 0);
-        assertEquals(true, bs.get(0));
+        assertTrue(bs.get(0));
         assertEquals(1, bs.cardinality());
         bs.clearRange(0, 1);
-        assertEquals(false, bs.get(0));
+        assertFalse(bs.get(0));
         assertEquals(0, bs.cardinality());
 
         bs.setRange(0, 0);
-        assertEquals(false, bs.get(0));
+        assertFalse(bs.get(0));
         assertEquals(0, bs.cardinality());
         bs.setRange(0, 1);
-        assertEquals(true, bs.get(0));
+        assertTrue(bs.get(0));
         assertEquals(1, bs.cardinality());
     }
 
@@ -417,16 +417,16 @@ public class DirectBitSetTest {
         bs.clearAll();
 
         bs.flipRange(63, 64);
-        assertEquals(true, bs.get(63));
-        assertEquals(false, bs.get(64));
+        assertTrue(bs.get(63));
+        assertFalse(bs.get(64));
         assertEquals(1, bs.cardinality());
         if (singleThreaded) {
             assertFalse(bs.isRangeSet(63, 65));
             assertFalse(bs.isRangeClear(63, 65));
         }
         bs.flipRange(63, 65);
-        assertEquals(false, bs.get(63));
-        assertEquals(true, bs.get(64));
+        assertFalse(bs.get(63));
+        assertTrue(bs.get(64));
         assertEquals(1, bs.cardinality());
         if (singleThreaded) {
             assertFalse(bs.isRangeSet(63, 65));
@@ -434,28 +434,28 @@ public class DirectBitSetTest {
         }
         bs.clear(64);
         bs.setRange(63, 64);
-        assertEquals(true, bs.get(63));
-        assertEquals(false, bs.get(64));
+        assertTrue(bs.get(63));
+        assertFalse(bs.get(64));
         assertEquals(1, bs.cardinality());
 
         bs.set(64);
         bs.clearRange(63, 64);
-        assertEquals(false, bs.get(63));
-        assertEquals(true, bs.get(64));
+        assertFalse(bs.get(63));
+        assertTrue(bs.get(64));
         assertEquals(1, bs.cardinality());
 
         bs.clear(64);
         bs.setRange(63, 65);
-        assertEquals(true, bs.get(63));
-        assertEquals(true, bs.get(64));
+        assertTrue(bs.get(63));
+        assertTrue(bs.get(64));
         assertEquals(2, bs.cardinality());
         if (singleThreaded) {
             assertTrue(bs.isRangeSet(63, 65));
             assertFalse(bs.isRangeClear(63, 65));
         }
         bs.clearRange(63, 65);
-        assertEquals(false, bs.get(63));
-        assertEquals(false, bs.get(64));
+        assertFalse(bs.get(63));
+        assertFalse(bs.get(64));
         assertEquals(0, bs.cardinality());
         if (singleThreaded) {
             assertFalse(bs.isRangeSet(63, 65));

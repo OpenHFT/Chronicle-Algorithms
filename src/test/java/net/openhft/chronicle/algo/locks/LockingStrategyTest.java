@@ -179,7 +179,7 @@ public class LockingStrategyTest {
         assertTrue(e1.submit(() -> rwuls().tryUpgradeUpdateToWriteLock()).get());
 
         // Release the write lock in thread 1...
-        e1.submit(() -> rwuls().downgradeWriteToUpdateLock());
+        e1.submit(() -> rwuls().downgradeWriteToUpdateLock()).get();
 
         // Release the update lock in thread 1...
         e1.submit(updateUnlockTask).get();
@@ -211,7 +211,7 @@ public class LockingStrategyTest {
             rwls().readUnlock();
             assertTrue(rwls().tryWriteLock());
         }
-// write lock is held
+        // write lock is held
         readUnlockForbidden();
         upgradeReadToWriteLockForbidden();
 

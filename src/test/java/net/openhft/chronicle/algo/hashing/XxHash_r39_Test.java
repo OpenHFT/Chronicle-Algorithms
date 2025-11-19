@@ -9,6 +9,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @RunWith(Parameterized.class)
 public class XxHash_r39_Test {
@@ -18,8 +19,8 @@ public class XxHash_r39_Test {
      * from https://code.google.com/p/xxhash/
      * <p>
      * #include "xxhash.c"
-     * #include <stdlib.h>
-     * #include <stdio.h>
+     * #include &lt;stdlib.h&gt;
+     * #include &lt;stdio.h&gt;
      * int main()
      * {
      * char* src = (char*) malloc(1024);
@@ -2098,7 +2099,7 @@ public class XxHash_r39_Test {
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
-        ArrayList<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
         for (int len = 0; len < 1025; len++) {
             data.add(new Object[]{len});
         }

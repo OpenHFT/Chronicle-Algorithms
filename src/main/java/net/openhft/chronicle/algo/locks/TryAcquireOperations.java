@@ -13,109 +13,48 @@ public final class TryAcquireOperations {
 
     // TryAcquireOperation for LockingStrategy
     private static final TryAcquireOperation<LockingStrategy> LOCK =
-            new TryAcquireOperation<LockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(LockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryLock(access, obj, offset);
-                }
-            };
+            LockingStrategy::tryLock;
 
     // TryAcquireOperation for ReadWriteLockingStrategy - Read Lock
     private static final TryAcquireOperation<ReadWriteLockingStrategy> READ_LOCK =
-            new TryAcquireOperation<ReadWriteLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryReadLock(access, obj, offset);
-                }
-            };
+            ReadWriteLockingStrategy::tryReadLock;
 
     // TryAcquireOperation for ReadWriteLockingStrategy - Upgrade Read to Write Lock
     private static final TryAcquireOperation<ReadWriteLockingStrategy> UPGRADE_READ_TO_WRITE_LOCK =
-            new TryAcquireOperation<ReadWriteLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryUpgradeReadToWriteLock(access, obj, offset);
-                }
-            };
+            ReadWriteLockingStrategy::tryUpgradeReadToWriteLock;
 
     // TryAcquireOperation for ReadWriteLockingStrategy - Write Lock
     private static final TryAcquireOperation<ReadWriteLockingStrategy> WRITE_LOCK =
-            new TryAcquireOperation<ReadWriteLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryWriteLock(access, obj, offset);
-                }
-            };
+            ReadWriteLockingStrategy::tryWriteLock;
 
     // TryAcquireOperation for ReadWriteWithWaitsLockingStrategy - Upgrade Read to Write Lock and Deregister Wait
     private static final TryAcquireOperation<ReadWriteWithWaitsLockingStrategy>
             UPGRADE_READ_TO_WRITE_LOCK_AND_DEREGISTER_WAIT =
-            new TryAcquireOperation<ReadWriteWithWaitsLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteWithWaitsLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryUpgradeReadToWriteLockAndDeregisterWait(access, obj, offset);
-                }
-            };
+            ReadWriteWithWaitsLockingStrategy::tryUpgradeReadToWriteLockAndDeregisterWait;
 
     // TryAcquireOperation for ReadWriteWithWaitsLockingStrategy - Write Lock and Deregister Wait
     private static final TryAcquireOperation<ReadWriteWithWaitsLockingStrategy>
             WRITE_LOCK_AND_DEREGISTER_WAIT =
-            new TryAcquireOperation<ReadWriteWithWaitsLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteWithWaitsLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryWriteLockAndDeregisterWait(access, obj, offset);
-                }
-            };
+            ReadWriteWithWaitsLockingStrategy::tryWriteLockAndDeregisterWait;
 
     // TryAcquireOperation for ReadWriteUpdateLockingStrategy - Update Lock
     private static final TryAcquireOperation<ReadWriteUpdateLockingStrategy> UPDATE_LOCK =
-            new TryAcquireOperation<ReadWriteUpdateLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteUpdateLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryUpdateLock(access, obj, offset);
-                }
-            };
+            ReadWriteUpdateLockingStrategy::tryUpdateLock;
 
     // TryAcquireOperation for ReadWriteUpdateLockingStrategy - Upgrade Read to Update Lock
     private static final TryAcquireOperation<ReadWriteUpdateLockingStrategy>
             UPGRADE_READ_TO_UPDATE_LOCK =
-            new TryAcquireOperation<ReadWriteUpdateLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteUpdateLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryUpgradeReadToUpdateLock(access, obj, offset);
-                }
-            };
+            ReadWriteUpdateLockingStrategy::tryUpgradeReadToUpdateLock;
 
     // TryAcquireOperation for ReadWriteUpdateLockingStrategy - Upgrade Update to Write Lock
     private static final TryAcquireOperation<ReadWriteUpdateLockingStrategy>
             UPGRADE_UPDATE_TO_WRITE_LOCK =
-            new TryAcquireOperation<ReadWriteUpdateLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteUpdateLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryUpgradeUpdateToWriteLock(access, obj, offset);
-                }
-            };
+            ReadWriteUpdateLockingStrategy::tryUpgradeUpdateToWriteLock;
 
     // TryAcquireOperation for ReadWriteUpdateWithWaitsLockingStrategy - Upgrade Update to Write Lock and Deregister Wait
     private static final TryAcquireOperation<ReadWriteUpdateWithWaitsLockingStrategy>
             UPGRADE_UPDATE_TO_WRITE_LOCK_AND_DEREGISTER_WAIT =
-            new TryAcquireOperation<ReadWriteUpdateWithWaitsLockingStrategy>() {
-                @Override
-                public <T> boolean tryAcquire(ReadWriteUpdateWithWaitsLockingStrategy strategy,
-                                              Access<T> access, T obj, long offset) {
-                    return strategy.tryUpgradeUpdateToWriteLockAndDeregisterWait(
-                            access, obj, offset);
-                }
-            };
+            ReadWriteUpdateWithWaitsLockingStrategy::tryUpgradeUpdateToWriteLockAndDeregisterWait;
 
     // Private constructor to prevent instantiation
     private TryAcquireOperations() {

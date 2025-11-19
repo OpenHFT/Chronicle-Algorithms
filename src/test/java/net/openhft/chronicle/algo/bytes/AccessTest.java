@@ -3,34 +3,26 @@
  */
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class AccessTest extends TestCase {
+class AccessTest {
 
     private Access<Object> access;
     private Object handle;
-    private Access<Object> sourceAccess;
-    private Access<Object> targetAccess;
-    private Object source;
-    private Object target;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         access = mock(Access.class);
         handle = new Object();
-        sourceAccess = mock(Access.class);
-        targetAccess = mock(Access.class);
-        source = new Object();
-        target = new Object();
     }
 
     @Test
-    public void testCompareAndSwapInt() {
+    void testCompareAndSwapInt() {
         long offset = 0L;
         int expected = 10;
         int value = 20;
@@ -42,7 +34,7 @@ public class AccessTest extends TestCase {
     }
 
     @Test
-    public void testCompareAndSwapLong() {
+    void testCompareAndSwapLong() {
         long offset = 0L;
         long expected = 10L;
         long value = 20L;

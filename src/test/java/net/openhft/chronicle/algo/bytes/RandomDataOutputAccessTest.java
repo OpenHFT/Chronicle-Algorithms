@@ -3,16 +3,16 @@
  */
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
 import net.openhft.chronicle.bytes.RandomDataOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteOrder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class RandomDataOutputAccessTest extends TestCase {
+public class RandomDataOutputAccessTest {
     private RandomDataOutputImpl mockOutput;
     private RandomDataOutputAccess<RandomDataOutputImpl> access;
 
@@ -110,6 +110,6 @@ public class RandomDataOutputAccessTest extends TestCase {
     }
 
     // Mock class extending RandomDataOutput with self-referential generic type
-    abstract class RandomDataOutputImpl implements RandomDataOutput<RandomDataOutputImpl> {
+    abstract static class RandomDataOutputImpl implements RandomDataOutput<RandomDataOutputImpl> {
     }
 }

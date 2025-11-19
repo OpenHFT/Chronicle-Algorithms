@@ -57,7 +57,7 @@ final class HotSpotStringAccessor<T> implements Accessor.Read<String, T> {
     @SuppressWarnings("unchecked")
     @Override
     public T handle(String source) {
-        return (T) MEMORY.getObject(source, valueOffset);
+        return MEMORY.getObject(source, valueOffset);
     }
 
     /**

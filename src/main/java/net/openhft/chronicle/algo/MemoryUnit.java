@@ -805,7 +805,7 @@ public enum MemoryUnit {
     static long ise(MemoryUnit unitToAlign, MemoryUnit alignmentUnit) {
         throw new IllegalStateException("Couldn't align " + unitToAlign + " by " + alignmentUnit);
     }
-// To maintain full signature compatibility with 1.5, and to improve the
+    // To maintain full signature compatibility with 1.5, and to improve the
     // clarity of the generated javadoc (see 6287639: Abstract methods in
     // enum classes should not be listed as abstract), method convert
     // etc. are not declared abstract but otherwise act as abstract methods.

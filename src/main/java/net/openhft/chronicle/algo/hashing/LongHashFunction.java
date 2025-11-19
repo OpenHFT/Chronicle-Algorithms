@@ -262,7 +262,7 @@ public abstract class LongHashFunction implements Serializable {
     /**
      * Shortcut for {@link #hashBooleans(boolean[], int, int) hashBooleans(input, 0, input.length)}.
      */
-    public long hashBooleans(@NotNull boolean[] input) {
+    public long hashBooleans(boolean @NotNull [] input) {
         return hashBooleans(input, 0, input.length);
     }
 
@@ -276,7 +276,7 @@ public abstract class LongHashFunction implements Serializable {
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
      *                                   or {@code len < 0}
      */
-    public long hashBooleans(@NotNull boolean[] input, int off, int len) {
+    public long hashBooleans(boolean @NotNull [] input, int off, int len) {
         checkArrayOffs(input.length, off, len);
         return hash(booleanArrayAccessor(), input, off, len);
     }
@@ -284,7 +284,7 @@ public abstract class LongHashFunction implements Serializable {
     /**
      * Shortcut for {@link #hashBytes(byte[], int, int) hashBytes(input, 0, input.length)}.
      */
-    public long hashBytes(@NotNull byte[] input) {
+    public long hashBytes(byte @NotNull [] input) {
         return hashBytes(input, 0, input.length);
     }
 
@@ -298,7 +298,7 @@ public abstract class LongHashFunction implements Serializable {
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
      *                                   or {@code len < 0}
      */
-    public long hashBytes(@NotNull byte[] input, int off, int len) {
+    public long hashBytes(byte @NotNull [] input, int off, int len) {
         checkArrayOffs(input.length, off, len);
         return hash(byteArrayAccessor(), input, off, len);
     }
@@ -343,7 +343,7 @@ public abstract class LongHashFunction implements Serializable {
     /**
      * Shortcut for {@link #hashChars(char[], int, int) hashChars(input, 0, input.length)}.
      */
-    public long hashChars(@NotNull char[] input) {
+    public long hashChars(char @NotNull [] input) {
         return hashChars(input, 0, input.length);
     }
 
@@ -359,7 +359,7 @@ public abstract class LongHashFunction implements Serializable {
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
      *                                   or {@code len < 0}
      */
-    public long hashChars(@NotNull char[] input, int off, int len) {
+    public long hashChars(char @NotNull [] input, int off, int len) {
         checkArrayOffs(input.length, off, len);
         return hash(charArrayAccessor(), input, off, len);
     }
@@ -423,7 +423,7 @@ public abstract class LongHashFunction implements Serializable {
     /**
      * Shortcut for {@link #hashShorts(short[], int, int) hashShorts(input, 0, input.length)}.
      */
-    public long hashShorts(@NotNull short[] input) {
+    public long hashShorts(short @NotNull [] input) {
         return hashShorts(input, 0, input.length);
     }
 
@@ -439,7 +439,7 @@ public abstract class LongHashFunction implements Serializable {
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
      *                                   or {@code len < 0}
      */
-    public long hashShorts(@NotNull short[] input, int off, int len) {
+    public long hashShorts(short @NotNull [] input, int off, int len) {
         checkArrayOffs(input.length, off, len);
         return hash(shortArrayAccessor(), input, off, len);
     }
@@ -447,7 +447,7 @@ public abstract class LongHashFunction implements Serializable {
     /**
      * Shortcut for {@link #hashInts(int[], int, int) hashInts(input, 0, input.length)}.
      */
-    public long hashInts(@NotNull int[] input) {
+    public long hashInts(int @NotNull [] input) {
         return hashInts(input, 0, input.length);
     }
 
@@ -463,7 +463,7 @@ public abstract class LongHashFunction implements Serializable {
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
      *                                   or {@code len < 0}
      */
-    public long hashInts(@NotNull int[] input, int off, int len) {
+    public long hashInts(int @NotNull [] input, int off, int len) {
         checkArrayOffs(input.length, off, len);
         return hash(intArrayAccessor(), input, off, len);
     }
@@ -471,7 +471,7 @@ public abstract class LongHashFunction implements Serializable {
     /**
      * Shortcut for {@link #hashLongs(long[], int, int) hashLongs(input, 0, input.length)}.
      */
-    public long hashLongs(@NotNull long[] input) {
+    public long hashLongs(long @NotNull [] input) {
         return hashLongs(input, 0, input.length);
     }
 
@@ -487,7 +487,7 @@ public abstract class LongHashFunction implements Serializable {
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
      *                                   or {@code len < 0}
      */
-    public long hashLongs(@NotNull long[] input, int off, int len) {
+    public long hashLongs(long @NotNull [] input, int off, int len) {
         checkArrayOffs(input.length, off, len);
         return hash(longArrayAccessor(), input, off, len);
     }
