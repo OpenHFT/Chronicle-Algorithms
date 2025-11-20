@@ -1,0 +1,183 @@
+= Chronicle-Algorithms
+:license: Apache 2.0
+:toc: macro
+:toclevels: 3
+
+image:https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-algorithms/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-algorithms"]
+image:https://javadoc.io/badge2/net.openhft/chronicle-algorithms/javadoc.svg[link="https://javadoc.io/doc/net.openhft/chronicle-algorithms"]
+image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="https://opensource.org/licenses/Apache-2.0"]
+
+Chronicle-Algorithms is a Java library providing zero-allocation, high-performance algorithms for hashing, bit set operations, off-heap locking, and low-level memory access. It is designed for latency-sensitive systems where garbage collection pauses are critical concerns.
+
+toc::[]
+
+== Features
+
+* **Hashing**: Non-cryptographic 64-bit hash functions including CityHash, MurmurHash3, and xxHash
+* **Bit Sets**: High-performance, rigid-capacity bit sets with both single-threaded and concurrent implementations
+* **Bytes Access**: Unified abstractions for accessing raw bytes from diverse sources (arrays, ByteBuffers, Strings, off-heap memory) with zero allocation
+* **Locking**: Off-heap read-write-update locking strategies for concurrent access control
+
+== Hashing
+
+The library provides a unified API for several non-cryptographic 64-bit hash functions through the `LongHashFunction` class. These implementations are optimized for performance, produce consistent results across platforms (big-endian and little-endian), and generate zero garbage.
+
+=== Supported Algorithms
+* **CityHash 1.1**: Based on Google's CityHash algorithm
+* **MurmurHash3**: Based on the SMHasher suite implementation
+* **xxHash r39**: Based on Cyan4973's xxHash (r39 revision)
+
+=== Usage Examples
+
+[source,java,opts=novalidate]
+----
+import net.openhft.chronicle.algo.hashing.LongHashFunction;
+
+public class HashingExample {
+    public static void main(String[] args) {
+        String input = "Hello World";
+
+        // Get an instance of the hash function
+        LongHashFunction xxHash = LongHashFunction.xx_r39();
+
+        // Hash a String
+        long hash = xxHash.hashChars(input);
+
+        // Hash a primitive
+        long longHash = xxHash.hashLong(123456789L);
+
+        // Hash a byte array
+        byte[] data = new byte[] {1, 2, 3, 4, 5};
+        long bytesHash = LongHashFunction.city_1_1().hashBytes(data);
+
+        // Hash off-heap memory (unsafe access)
+        // long address = ...; // unsafe memory address
+        // long length = 64;
+        // long memoryHash = LongHashFunction.murmur_3().hashMemory(address, length);
+    }
+}
+----
+
+== Bit Sets
+
+The `net.openhft.chronicle.algo.bitset` package provides `BitSet` implementations that operate over raw memory or byte stores. Unlike `java.util.BitSet`, which has dynamic capacity, Chronicle bit sets have a rigid logical size and throw `IndexOutOfBoundsException` for out-of-bounds access.
+
+=== Implementations
+* **SingleThreadedFlatBitSetFrame**: Not thread-safe, optimized for single-threaded access.
+* **ConcurrentFlatBitSetFrame**: Thread-safe implementation using CAS (Compare-And-Swap) operations for concurrent access.
+
+=== Usage Examples
+
+[source,java,opts=novalidate]
+----
+import net.openhft.chronicle.algo.bitset.BitSetFrame;
+import net.openhft.chronicle.algo.bitset.SingleThreadedFlatBitSetFrame;
+import net.openhft.chronicle.algo.bitset.ReusableBitSet;
+import net.openhft.chronicle.algo.bytes.Access;
+import java.nio.ByteBuffer;
+
+// Create a frame definition for 64 bits
+BitSetFrame frame = new SingleThreadedFlatBitSetFrame(64);
+
+// Create a ByteBuffer to back the bit set
+ByteBuffer buffer = ByteBuffer.allocate(8); // 64 bits = 8 bytes
+
+// Create the ReusableBitSet wrapper
+ReusableBitSet bitSet = new ReusableBitSet(frame, Access.checkedByteBufferAccess(), buffer, 0);
+
+// Operations
+bitSet.set(1);
+bitSet.set(3);
+boolean isSet = bitSet.get(1); // true
+long nextSet = bitSet.nextSetBit(0); // 1
+----
+
+== Bytes Access
+
+The `net.openhft.chronicle.algo.bytes` package provides a unified `Access` and `Accessor` abstraction to read and write primitives from various underlying sources without creating objects. This enables zero-allocation operations across heterogeneous data types.
+
+=== Supported Sources
+* **Native Memory**: Direct access via `Unsafe`
+* **ByteBuffer**: Both heap and direct ByteBuffers
+* **Arrays**: All primitive array types (`byte[]`, `long[]`, `int[]`, etc.)
+* **CharSequence/String**: Efficient access to String internals (supports compact strings in Java 9+)
+* **BytesStore**: Chronicle Bytes abstractions
+
+[source,java]
+----
+import net.openhft.chronicle.algo.bytes.Access;
+import net.openhft.chronicle.algo.bytes.NativeAccess;
+
+// Native access singleton
+Access<Object> unsafeAccess = NativeAccess.instance();
+long value = unsafeAccess.readLong(object, offset);
+----
+
+== Locking
+
+The `net.openhft.chronicle.algo.locks` package provides logic for read-write-update locks that can be stored off-heap or in shared memory.
+
+* **Read Lock**: Multiple readers allowed.
+* **Update Lock**: Only one update lock allowed, but allows concurrent readers. Can upgrade to Write Lock.
+* **Write Lock**: Exclusive access.
+
+=== Locking Strategy
+The primary implementation is `VanillaReadWriteUpdateWithWaitsLockingStrategy`, which supports:
+* Lock upgrading (Read -> Update -> Write)
+* Lock downgrading
+* Waiting strategies
+
+== Maven Dependency
+
+To include Chronicle-Algorithms in your project, add the following dependency to your `pom.xml`:
+
+[source,xml]
+----
+<dependency>
+    <groupId>net.openhft</groupId>
+    <artifactId>chronicle-algorithms</artifactId>
+    <version>2.27ea1</version> <!-- Check Maven Central for latest version -->
+</dependency>
+----
+
+NOTE: Check link:https://search.maven.org/artifact/net.openhft/chronicle-algorithms[Maven Central] for the latest available version.
+
+== Building from Source
+
+To build the project locally:
+
+[source,bash]
+----
+# Clone the repository
+git clone https://github.com/OpenHFT/Chronicle-Algorithms.git
+cd Chronicle-Algorithms
+
+# Build and run tests
+mvn clean install
+
+# Run specific test
+mvn test -Dtest=BitSetTest
+----
+
+== Support
+
+For questions, issues, or feature requests:
+
+* GitHub Issues: https://github.com/OpenHFT/Chronicle-Algorithms/issues
+* Documentation: https://javadoc.io/doc/net.openhft/chronicle-algorithms
+* Chronicle Software: https://chronicle.software
+
+== Related Projects
+
+Part of the OpenHFT Chronicle suite:
+
+* link:https://github.com/OpenHFT/Chronicle-Core[Chronicle-Core] - Low-level utilities and memory management
+* link:https://github.com/OpenHFT/Chronicle-Bytes[Chronicle-Bytes] - Zero-copy bytes abstractions
+* link:https://github.com/OpenHFT/Chronicle-Queue[Chronicle-Queue] - Persisted low-latency messaging
+* link:https://github.com/OpenHFT/Chronicle-Map[Chronicle-Map] - Off-heap key-value store
+
+== License
+
+Copyright 2013-2025 chronicle.software
+
+Licensed under the Apache License, Version 2.0. See the link:LICENSE[LICENSE] file for details.
