@@ -1,0 +1,68 @@
+= Architectural Decision Log: Chronicle-Algorithms
+:toc: left
+:icons: font
+
+== ADR-001: Abstraction of Memory Access via `Access` Interface
+
+* **Status:** Accepted
+* **Context:** The library needs to perform operations (Hashing, Locking, BitSet manipulation) on data that may reside on the Java Heap (byte arrays), in Direct Memory (ByteBuffers), or at raw memory addresses (off-heap). Implementing algorithms separately for each data source leads to code duplication and maintenance issues.
+* **Decision:** Introduce a generic `Access<T>` interface (extending `ReadAccess` and `WriteAccess`).
+* **Details:**
+** The `Access` interface defines primitive read/write methods (e.g., `readLong`, `writeInt`) and atomic operations (`compareAndSwap`).
+** Implementations are created for specific sources: `NativeAccess` (Unsafe), `ByteBufferAccess`, `ArrayAccessors`.
+** Algorithms accept an `Access` instance and a handle `T`, allowing the same logic to run regardless of where the data lives.
+* **Consequences:**
+** (+) Algorithms are written once and reused for all memory types.
+** (+) Zero-overhead abstraction in JIT-compiled code (hot paths inline the accessors).
+** (-) Slightly higher complexity in method signatures (passing Accessors and Handles).
+
+== ADR-002: Stateless Hash Function Design
+
+* **Status:** Accepted
+* **Context:** Standard Java `MessageDigest` or object `hashCode` implementations often require object allocation or maintain internal state, which causes GC pressure in high-frequency trading environments.
+* **Decision:** Implement `LongHashFunction` as immutable, stateless singletons (or simple data holders for seeds).
+* **Details:**
+** Methods like `hashBytes` or `hashMemory` take the input data directly and return a `long`.
+** No objects are allocated during the hashing process.
+** Implementations (City, Murmur, xxHash) are exposed via static factory methods on `LongHashFunction`.
+* **Consequences:**
+** (+) Zero allocation hashing suitable for latency-critical paths.
+** (+) Thread-safe by design.
+
+== ADR-003: Three-Tier Locking Strategy (Read-Write-Update)
+
+* **Status:** Accepted
+* **Context:** Standard `ReentrantReadWriteLock` is insufficient for scenarios requiring an "Update" lock—a state where a thread intends to write but can still read, preventing other writers but allowing other readers until the actual write occurs. Furthermore, standard locks cannot easily be stored in off-heap shared memory for IPC.
+* **Decision:** Implement `ReadWriteUpdateLockingStrategy` interfaces that operate over the `Access` abstraction.
+* **Details:**
+** Locks are represented by state words (integers/longs) in memory.
+** Supports an `Update` lock state which is mutually exclusive with other Update/Write locks but allows concurrent Readers.
+** Supports atomic upgrades (Read -> Update -> Write) and downgrades.
+* **Consequences:**
+** (+) Enables complex concurrency patterns not possible with standard JDK locks.
+** (+) Locks can be placed in shared memory mapped files for inter-process synchronization.
+
+== ADR-004: Fixed-Size "Flat" BitSets
+
+* **Status:** Accepted
+* **Context:** `java.util.BitSet` is dynamic and heap-based. We require BitSets that map to fixed memory regions (e.g., hardware registers, shared memory buffers) with deterministic memory layout.
+* **Decision:** Implement `BitSetFrame` and `ReusableBitSet`.
+* **Details:**
+** "Flat" implies the bitset is a contiguous block of memory without dynamic expansion.
+** Provided implementations for Single-Threaded (non-atomic ops) and Concurrent (atomic CAS ops) usage.
+* **Consequences:**
+** (+) Deterministic memory usage.
+** (+) Can overlay a BitSet onto arbitrary memory (e.g., network packets, shared memory).
+** (-) Cannot resize dynamically; strictly bounded by the initialization size.
+
+== ADR-005: Native Byte Order Optimization
+
+* **Status:** Accepted
+* **Context:** Hashing algorithms often process data in 4 or 8-byte chunks. Converting bytes to integers/longs requires handling Endianness. Java is Big-Endian by convention, but x86 hardware is Little-Endian.
+* **Decision:** Detect `ByteOrder.nativeOrder()` and provide specialized implementations.
+* **Details:**
+** Classes like `CityHash_1_1` and `MurmurHash_3` have internal static subclasses for Big/Little endian.
+** The implementation delegates to the version matching the architecture at runtime.
+* **Consequences:**
+** (+) Maximal performance on the host architecture (avoiding byte swapping).
+** (-) Hash results may differ between Little-Endian and Big-Endian platforms for the same byte input (unless specifically handled to normalize, which varies per algorithm implementation).

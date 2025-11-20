@@ -1,0 +1,81 @@
+= Project Requirements: Chronicle-Algorithms
+:toc: left
+:icons: font
+
+== 1. Overview
+
+The **Chronicle-Algorithms** project aims to provide a library of high-performance, zero-allocation algorithms designed for low-latency Java applications. The primary focus is on efficiency, off-heap memory capabilities, and minimizing Garbage Collection (GC) pressure.
+
+The library encompasses four main functional areas:
+. Hashing
+. Bit Set Operations
+. Memory Access (Bytes)
+. Off-Heap Locking
+
+== 2. Functional Requirements
+
+=== 2.1. Hashing
+The system must provide efficient, non-cryptographic hash functions capable of processing various inputs producing 64-bit hash values.
+
+* **Algorithms:**
+** Must implement **CityHash 1.1**.
+** Must implement **MurmurHash3**.
+** Must implement **xxHash r39**.
+* **Input Support:**
+** Must support hashing of Java primitives (`long`, `int`, `short`, `char`, `byte`, `boolean`).
+** Must support hashing of byte arrays (`byte[]`), `ByteBuffer`, `String`, and `StringBuilder`.
+** Must support hashing of raw memory addresses (off-heap memory).
+* **Configuration:**
+** Must allow hashing with and without seed values.
+** Must handle Endianness (Little-Endian vs Big-Endian) correctly, optimizing for native byte order where possible.
+
+=== 2.2. Bit Set Operations
+The system must provide a `BitSet` implementation that operates efficiently on contiguous memory regions, including off-heap memory.
+
+* **Core Operations:**
+** Support standard bit manipulations: `set`, `clear`, `flip`, `get`.
+** Support range operations: `setRange`, `clearRange`, `flipRange`.
+** Support search operations: `nextSetBit`, `nextClearBit`, `previousSetBit`, `previousClearBit`.
+** Support continuous block operations: finding and setting/clearing `N` continuous bits.
+* **Concurrency:**
+** Must provide a single-threaded implementation (`SingleThreadedFlatBitSetFrame`) for maximum raw performance.
+** Must provide a thread-safe, concurrent implementation (`ConcurrentFlatBitSetFrame`) using atomic operations (CAS).
+* **Storage:**
+** Must abstract storage to allow BitSets to reside on Heap (arrays, ByteBuffers) or Off-Heap (Direct ByteBuffers, raw pointers).
+
+=== 2.3. Memory Access (Bytes)
+The system must provide a unified abstraction layer for accessing memory to decouple algorithms from the underlying storage mechanism.
+
+* **Access API:**
+** Define generic `ReadAccess` and `WriteAccess` interfaces.
+** Provide concrete implementations for:
+*** `NativeAccess` (using `Unsafe` for raw memory/arrays).
+*** `ByteBufferAccess` (for `java.nio.ByteBuffer`).
+*** `BytesStore` (integration with Chronicle-Bytes).
+*** `RandomDataInput`/`RandomDataOutput`.
+** Support reading/writing of all Java primitive types and unsigned variants at arbitrary offsets.
+** Support atomic Compare-And-Swap (CAS) operations for concurrency primitives.
+
+=== 2.4. Locking Strategies
+The system must provide locking mechanisms designed for shared memory and inter-process communication (IPC) scenarios.
+
+* **Lock Types:**
+** **Read-Write Locks:** Allow multiple readers or one writer.
+** **Read-Write-Update Locks:** Introduce an "Update" state allowing atomic upgrade from Read to Write.
+* **Features:**
+** Locks must be implementable over the generic `Access` interface (enabling off-heap locks).
+** Support for "Wait" strategies to handle contention.
+** Must provide `tryLock` capabilities for non-blocking attempts.
+** Support for lock state upgrades (Read -> Update -> Write) and downgrades.
+
+== 3. Non-Functional Requirements
+
+* **Performance:**
+** Algorithms must generate zero garbage (Zero Allocation) during steady-state operation.
+** Hash functions must be optimized for native byte order execution.
+* **Architecture:**
+** The library must be modular, with a clear separation between the Algorithm logic and the Memory Access logic.
+* **Compatibility:**
+** Must support Java 8 and newer (implied by usage of `java.util.function` and diamond operators).
+* **Safety:**
+** While prioritizing performance, interfaces should provide mechanisms to validate inputs (e.g., array bounds) where feasible, though "Unsafe" implementations are expected to assume valid inputs for speed.
