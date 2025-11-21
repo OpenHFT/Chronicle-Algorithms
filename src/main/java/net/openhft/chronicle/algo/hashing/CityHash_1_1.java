@@ -452,9 +452,8 @@ class CityHash_1_1 {
 
         @Override
         public long hashChar(char input) {
-            int unsignedInput = input;
-            int firstByte = (unsignedInput >> FIRST_SHORT_BYTE_SHIFT) & FIRST_SHORT_BYTE_MASK;
-            int secondByte = (unsignedInput >> SECOND_SHORT_BYTE_SHIFT) & SECOND_SHORT_BYTE_MASK;
+            int firstByte = ((int) input >> FIRST_SHORT_BYTE_SHIFT) & FIRST_SHORT_BYTE_MASK;
+            int secondByte = ((int) input >> SECOND_SHORT_BYTE_SHIFT) & SECOND_SHORT_BYTE_MASK;
             long hash = hash1To3Bytes(2, firstByte, secondByte, secondByte);
             return finalizeHash(hash);
         }

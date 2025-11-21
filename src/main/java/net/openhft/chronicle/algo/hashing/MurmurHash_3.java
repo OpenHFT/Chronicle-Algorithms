@@ -409,8 +409,7 @@ class MurmurHash_3 {
         long hashNativeLong(long nativeLong, long len) {
             long seed = this.seed;
             long h1 = seed ^ mixK1(nativeLong);
-            long h2 = seed;
-            return MurmurHash_3.finalize(len, h1, h2);
+            return MurmurHash_3.finalize(len, h1, seed);
         }
 
         @Override

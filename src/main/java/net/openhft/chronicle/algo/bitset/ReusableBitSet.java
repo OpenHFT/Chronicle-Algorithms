@@ -206,7 +206,7 @@ public class ReusableBitSet implements BitSet {
      * for iterating over set bits in the bit set.
      */
     protected class Bits implements BitSet.Bits {
-        protected BitSetFrame.Bits frameBits;
+        protected final BitSetFrame.Bits frameBits;
 
         /**
          * Constructs a new Bits instance with the specified frame bits.

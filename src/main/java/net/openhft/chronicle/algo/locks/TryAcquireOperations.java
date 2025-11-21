@@ -3,8 +3,6 @@
  */
 package net.openhft.chronicle.algo.locks;
 
-import net.openhft.chronicle.algo.bytes.Access;
-
 /**
  * Utility class providing various {@link TryAcquireOperation} implementations
  * for different locking strategies.

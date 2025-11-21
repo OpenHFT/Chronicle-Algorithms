@@ -95,8 +95,7 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         int waitWord = MAX_WAIT - 1;
         assertDoesNotThrow(() -> checkWaitWordForIncrement(waitWord));
 
-        int maxWaitWord = MAX_WAIT;
-        assertThrows(IllegalMonitorStateException.class, () -> checkWaitWordForIncrement(maxWaitWord));
+        assertThrows(IllegalMonitorStateException.class, () -> checkWaitWordForIncrement(MAX_WAIT));
     }
 
     @Test
@@ -122,8 +121,7 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
 
     @Test
     void testCheckExclusiveUpdateLocked() {
-        int countWord = UPDATE_PARTY;
-        assertTrue(checkExclusiveUpdateLocked(countWord));
+        assertTrue(checkExclusiveUpdateLocked(UPDATE_PARTY));
 
         int nonExclusiveUpdateCountWord = UPDATE_PARTY + 1;
         assertFalse(checkExclusiveUpdateLocked(nonExclusiveUpdateCountWord));

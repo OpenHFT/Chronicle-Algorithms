@@ -46,8 +46,7 @@ class MemoryUnitTest {
     @DisplayName("align throws for invalid granularity combinations")
     void alignRejectsFinerOrEqualUnits() {
         for (MemoryUnit unit : MemoryUnit.values()) {
-            MemoryUnit finalUnit = unit;
-            assertThrows(IllegalStateException.class, () -> finalUnit.align(1, finalUnit));
+            assertThrows(IllegalStateException.class, () -> unit.align(1, unit));
             for (int coarser = unit.ordinal() + 1; coarser < MemoryUnit.values().length; coarser++) {
                 MemoryUnit coarserUnit = MemoryUnit.values()[coarser];
                 assertThrows(IllegalStateException.class, () -> unit.align(1, coarserUnit));
