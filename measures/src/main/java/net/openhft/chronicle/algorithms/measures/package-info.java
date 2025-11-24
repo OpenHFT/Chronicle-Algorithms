@@ -13,4 +13,3 @@
  * {@code net.openhft.chronicle.algo.bytes} instead.
  */
 package net.openhft.chronicle.algorithms.measures;
-

@@ -12,4 +12,3 @@
  * and are suitable for use in hot paths across Chronicle libraries.
  */
 package net.openhft.chronicle.algo.bytes;
-

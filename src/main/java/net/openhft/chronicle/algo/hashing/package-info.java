@@ -11,4 +11,3 @@
  * methods are considered implementation details.
  */
 package net.openhft.chronicle.algo.hashing;
-

@@ -12,4 +12,3 @@
  * releases.
  */
 package net.openhft.chronicle.algo.bitset;
-

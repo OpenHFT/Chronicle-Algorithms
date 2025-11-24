@@ -13,4 +13,3 @@
  * representation of lock states.
  */
 package net.openhft.chronicle.algo.locks;
-

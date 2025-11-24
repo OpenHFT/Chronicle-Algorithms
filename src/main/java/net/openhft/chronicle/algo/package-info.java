@@ -11,4 +11,3 @@
  * individual algorithms and internal implementations to evolve over time.
  */
 package net.openhft.chronicle.algo;
-
