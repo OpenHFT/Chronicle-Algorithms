@@ -6,11 +6,10 @@ package net.openhft.chronicle.algo.locks;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
- * Interface defining the logic of read-write-update lock state transitions.
+ * Strategy covering the additional "update" state layered on a read/write lock.
  * <p>
- * A read lock allows multiple concurrent reads.
- * An update lock allows concurrent reads but not multiple update locks.
- * A write lock is exclusive.
+ * Update locks block other updaters but still allow readers, providing a staging point before
+ * upgrading to an exclusive write lock.
  */
 public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy {
 

@@ -4,9 +4,10 @@
 package net.openhft.chronicle.algo.locks;
 
 /**
- * Interface representing the state of a read-write lock.
- * Provides methods for acquiring and releasing read and write locks,
- * as well as upgrading and downgrading lock states.
+ * Abstraction over the mutable state of a read-write lock.
+ * <p>
+ * Exposes operations to acquire/release read and write ownership, perform upgrades/downgrades and
+ * exposes the associated {@link ReadWriteLockingStrategy}.
  */
 public interface ReadWriteLockState extends LockState {
 

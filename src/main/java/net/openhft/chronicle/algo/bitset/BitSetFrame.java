@@ -6,9 +6,12 @@ package net.openhft.chronicle.algo.bitset;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
- * The {@code BitSetFrame} interface defines a set of operations for manipulating bits within a bit set.
- * It provides methods to set, clear, flip, and check the state of bits at specified indices.
- * The operations are parameterized with an {@code Access} object, a handle, and an offset for flexibility.
+ * Low-level API for working with a bit set stored in an arbitrary memory container.
+ * <p>
+ * Implementations encapsulate the bit layout and arithmetic, while callers supply an
+ * {@link Access} strategy, an opaque handle to the underlying storage and an offset into it. This
+ * separation allows the same bitset logic to be reused across on-heap arrays, {@link
+ * net.openhft.chronicle.bytes.BytesStore BytesStore} or raw native memory.
  */
 public interface BitSetFrame {
     /**

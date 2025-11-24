@@ -4,10 +4,10 @@
 package net.openhft.chronicle.algo.bitset;
 
 /**
- * The {@code BitSetAlgorithm} interface defines the contract for algorithms
- * that handle operations related to bit sets. Implementations of this interface
- * provide methods to calculate the size in bytes required for a given logical size in bits
- * and to determine the maximum logical size that fits within the same size in bytes.
+ * Strategy interface describing how logical bitset sizes map to physical storage requirements.
+ * <p>
+ * Algorithms can account for padding or metadata and can also report the largest logical size that
+ * still fits into a previously allocated storage block.
  */
 public interface BitSetAlgorithm {
 

@@ -6,7 +6,7 @@ package net.openhft.chronicle.algo.bytes;
 import java.nio.ByteOrder;
 
 /**
- * A functional interface that defines a common access method for determining the byte order of a given handle.
+ * Common contract for determining the byte order of a readable/writable handle.
  *
  * @param <T> the type of the handle
  */

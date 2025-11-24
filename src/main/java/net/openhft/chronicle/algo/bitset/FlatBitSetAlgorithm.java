@@ -6,9 +6,9 @@ package net.openhft.chronicle.algo.bitset;
 import static net.openhft.chronicle.algo.MemoryUnit.BITS;
 
 /**
- * The {@code FlatBitSetAlgorithm} enum implements the {@link BitSetAlgorithm} interface
- * providing concrete implementations for the methods defined in the interface.
- * This enum represents a singleton instance of the algorithm used for BitSet operations.
+ * Basic {@link BitSetAlgorithm} backed by a flat array of 64-bit words. Byte sizing is a straight
+ * bits-to-bytes conversion, and the maximum logical size that fits the same byte length is the
+ * logical size itself because no headers or metadata are stored.
  */
 enum FlatBitSetAlgorithm implements BitSetAlgorithm {
     INSTANCE;

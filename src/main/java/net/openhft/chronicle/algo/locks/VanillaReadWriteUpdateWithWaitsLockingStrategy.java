@@ -10,8 +10,10 @@ import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.ByteOrder.nativeOrder;
 
 /**
- * Vanilla implementation of a read-write-update lock with waits.
- * This class provides the locking mechanism to handle read, write, and update operations with wait strategies.
+ * Vanilla implementation of a read/write/update lock that also tracks waiters.
+ * <p>
+ * Encodes counts, update and write ownership, and wait flags into two words and exposes CAS helpers
+ * so callers can embed the lock state in arbitrary addressable memory.
  */
 public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
         extends AbstractReadWriteLockingStrategy
@@ -48,13 +50,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     /**
-     * Retrieves the lock word from the given ReadAccess.
-     *
-     * @param access The ReadAccess instance
-     * @param t      The input handle
-     * @param offset The offset within the input
-     * @param <T>    The type of the input handle
-     * @return The lock word read from the input
+     * Retrieves the volatile lock word (count + wait packed).
      */
     private static <T> long getLockWord(ReadAccess<T> access, T t, long offset) {
         // Reads the lock word from the specified offset
@@ -62,15 +58,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     /**
-     * Performs a compare-and-swap operation on the lock word.
-     *
-     * @param access   The Access instance
-     * @param t        The input handle
-     * @param offset   The offset within the input
-     * @param expected The expected value
-     * @param x        The new value
-     * @param <T>      The type of the input handle
-     * @return True if the operation was successful, false otherwise
+     * Compare-and-swap the combined lock word.
      */
     public static <T> boolean casLockWord(
             Access<T> access, T t, long offset, long expected, long x) {
@@ -79,10 +67,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     /**
-     * Extracts the count word from the given lock word.
-     *
-     * @param lockWord The lock word
-     * @return The count word
+     * Extracts the count word (reads/update/write) from the packed lock word.
      */
     private static int countWord(long lockWord) {
         // Extracts the count word from the lock word
@@ -90,10 +75,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     /**
-     * Extracts the wait word from the given lock word.
-     *
-     * @param lockWord The lock word
-     * @return The wait word
+     * Extracts the wait word from the packed lock word.
      */
     private static int waitWord(long lockWord) {
         // Extracts the wait word from the lock word
@@ -101,11 +83,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     /**
-     * Constructs a lock word from the given count and wait words.
-     *
-     * @param countWord The count word
-     * @param waitWord  The wait word
-     * @return The constructed lock word
+     * Pack count and wait words into a single long.
      */
     public static long lockWord(int countWord, int waitWord) {
         // Combines the count and wait words into a single lock word
@@ -114,13 +92,7 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
     }
 
     /**
-     * Retrieves the count word from the given Access instance.
-     *
-     * @param access The Access instance
-     * @param t      The input handle
-     * @param offset The offset within the input
-     * @param <T>    The type of the input handle
-     * @return The count word read from the input
+     * Read the volatile count word component.
      */
     private static <T> int getCountWord(Access<T> access, T t, long offset) {
         // Reads the count word from the specified offset

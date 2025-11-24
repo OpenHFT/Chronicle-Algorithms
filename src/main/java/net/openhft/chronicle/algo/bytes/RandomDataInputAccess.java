@@ -8,8 +8,8 @@ import net.openhft.chronicle.bytes.RandomDataInput;
 import java.nio.ByteOrder;
 
 /**
- * Provides a default implementation for reading various primitive types and
- * volatile values from a {@link RandomDataInput} handle at a specified offset.
+ * {@link ReadAccess} adapter for {@link RandomDataInput} so Chronicle algorithms can treat data
+ * sources uniformly.
  *
  * @param <S> the type of the object being accessed, extending {@link RandomDataInput}
  */

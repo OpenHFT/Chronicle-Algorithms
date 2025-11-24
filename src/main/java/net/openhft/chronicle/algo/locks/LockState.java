@@ -4,8 +4,10 @@
 package net.openhft.chronicle.algo.locks;
 
 /**
- * Interface representing the state of a lock.
- * Provides methods for attempting to acquire the lock, releasing the lock, and resetting the lock state.
+ * Abstraction over a lock's backing state that can be stored and manipulated via {@link LockingStrategy}.
+ * <p>
+ * Implementations hide whether the state lives in memory, on-heap structures or elsewhere; the
+ * strategy knows how to interpret {@link #getState()}.
  */
 public interface LockState {
 

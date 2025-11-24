@@ -4,8 +4,8 @@
 package net.openhft.chronicle.algo.locks;
 
 /**
- * Abstract base class for managing read-write lock state.
- * Implements common behavior for acquiring and releasing write locks.
+ * Base implementation for {@link ReadWriteLockState} that routes generic lock/unlock to write
+ * semantics. Concrete subclasses supply the read/write state handling.
  */
 public abstract class AbstractReadWriteLockState implements ReadWriteLockState {
 

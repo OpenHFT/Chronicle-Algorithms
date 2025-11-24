@@ -8,8 +8,10 @@ import net.openhft.chronicle.bytes.RandomDataOutput;
 import java.nio.ByteOrder;
 
 /**
- * Provides a default implementation for writing various primitive types
- * and volatile values to a {@link RandomDataOutput} handle at a specified offset.
+ * Default {@link WriteAccess} adapter for {@link RandomDataOutput} implementations.
+ * <p>
+ * Bridges Chronicle Bytes write operations to the {@link WriteAccess} contract so the same bitset
+ * and hashing utilities can operate over {@link RandomDataOutput} without bespoke code.
  *
  * @param <R> the type of the object being accessed, extending {@link RandomDataOutput}
  */

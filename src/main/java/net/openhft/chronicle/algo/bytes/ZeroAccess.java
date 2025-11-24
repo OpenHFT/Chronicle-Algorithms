@@ -6,8 +6,10 @@ package net.openhft.chronicle.algo.bytes;
 import java.nio.ByteOrder;
 
 /**
- * A {@link ReadAccess} implementation that always returns zero or false for read operations.
- * This is a singleton implementation, accessed via the {@code INSTANCE} enum constant.
+ * A {@link ReadAccess} implementation that always returns zero-equivalent values.
+ * <p>
+ * Useful in tests or as a safe default when a handle is absent but callers still expect a fully
+ * defined {@link ReadAccess} contract.
  */
 enum ZeroAccess implements ReadAccess<Void> {
     INSTANCE;

@@ -13,20 +13,11 @@ package net.openhft.chronicle.algo;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A {@code MemoryUnit} represents memory amounts at a given unit of
- * granularity and provides utility methods to convert across units.  A
- * {@code MemoryUnit} does not maintain memory information, but only
- * helps organize and use memory amounts representations that may be maintained
- * separately across various contexts.
- *
- * <p>Note than in this class kilo-, mega- and giga- prefixes means 2^10 = 1024 multiplexing,
- * that is more common in low-level programming, CPU and operation system contexts,
- * not 1000 as defined by International System of Units (SI).
- *
- * <p>A {@code MemoryUnit} is mainly used to inform memory amount-based methods
- * how a given memory amount parameter should be interpreted.
- *
- * <p>API of {@code MemoryUnit} is copied from {@link TimeUnit} enum.
+ * Memory unit conversion enum modelled after {@link TimeUnit}.
+ * <p>
+ * Encapsulates the conversions between bits, bytes, longs, cache lines and larger units using
+ * binary prefixes (Ki/Mi/Gi). Alignment helpers round values up to the nearest boundary for the
+ * target unit.
  */
 public enum MemoryUnit {
 

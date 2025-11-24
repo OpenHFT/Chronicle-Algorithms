@@ -4,10 +4,9 @@
 package net.openhft.chronicle.algo.locks;
 
 /**
- * Interface representing a read-write-update lock state with wait registration capabilities.
+ * Read/write/update lock state that also tracks registered waiters.
  * <p>
- * This interface extends both {@link ReadWriteUpdateLockState} and {@link ReadWriteWithWaitsLockState},
- * adding the capability to upgrade an update lock to a write lock while deregistering the wait state.
+ * Adds an operation to upgrade from update to write while removing the wait registration.
  */
 public interface ReadWriteUpdateWithWaitsLockState
         extends ReadWriteUpdateLockState, ReadWriteWithWaitsLockState {

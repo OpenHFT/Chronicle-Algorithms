@@ -9,10 +9,10 @@ import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_ENDIAN;
 
 /**
- * Adapted version of xxHash implementation from
- * https://github.com/Cyan4973/xxHash/releases/tag/r39, which is fully compatible with r40 though.
- * This implementation provides endian-independant hash values,
- * but it's slower on big-endian platforms.
+ * Endian-independent xxHash64 implementation based on r39 (compatible with r40).
+ * <p>
+ * Converts inputs via {@link ReadAccess} so hashing can be applied to any addressable source.
+ * Uses little-endian mixing internally; big-endian platforms pay a small penalty.
  */
 class XxHash_r39 {
     private static final XxHash_r39 INSTANCE = new XxHash_r39();
@@ -33,10 +33,7 @@ class XxHash_r39 {
     }
 
     /**
-     * Finalizes the hash value with additional mixing of bits.
-     *
-     * @param hash The initial hash value to finalize
-     * @return The finalized hash value
+     * Final mixing step used by xxHash64.
      */
     private static long finalize(long hash) {
         hash ^= hash >>> 33;
@@ -48,19 +45,14 @@ class XxHash_r39 {
     }
 
     /**
-     * Returns a LongHashFunction instance implementing xxHash without a seed.
-     *
-     * @return A LongHashFunction instance
+     * Returns a seedless xxHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithoutSeed() {
         return AsLongHashFunction.SEEDLESS_INSTANCE;
     }
 
     /**
-     * Returns a LongHashFunction instance implementing xxHash with the given seed.
-     *
-     * @param seed The seed value for the hash function
-     * @return A LongHashFunction instance
+     * Returns a seeded xxHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
         return new AsLongHashFunctionSeeded(seed);

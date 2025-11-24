@@ -11,9 +11,10 @@ import static net.openhft.chronicle.algo.MemoryUnit.BITS;
 import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
 
 /**
- * This is the SingleThreadedFlatBitSetFrame class implementing BitSetFrame.
- * It provides methods for bit manipulation with input validations.
- * This class is not thread-safe.
+ * Flat bit set frame that performs unchecked memory access via {@link Access} for a single thread.
+ * <p>
+ * All bounds validation is performed up front, but operations themselves assume exclusive access to
+ * the underlying storage and therefore avoid CAS or volatile reads for speed.
  */
 public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 

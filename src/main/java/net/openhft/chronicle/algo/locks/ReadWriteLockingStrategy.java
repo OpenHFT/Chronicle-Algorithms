@@ -6,9 +6,10 @@ package net.openhft.chronicle.algo.locks;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
- * Interface representing a read-write locking strategy.
- * Provides methods for acquiring and releasing read and write locks,
- * as well as upgrading and downgrading lock states.
+ * Strategy for manipulating read/write lock state stored in an addressable resource.
+ * <p>
+ * Supplies primitives for read/write acquisition, upgrades, downgrades, and introspection of the
+ * current state; higher-level code composes these to implement lock protocols.
  */
 public interface ReadWriteLockingStrategy extends LockingStrategy {
 

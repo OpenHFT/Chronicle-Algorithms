@@ -11,8 +11,11 @@ import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_ENDIAN;
 
 /**
- * Adapted from the C++ CityHash implementation from Google at
- * http://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
+ * Endian-independent CityHash64 v1.1 implementation adapted from Google's reference.
+ * <p>
+ * Exposes hash functions via {@link LongHashFunction} and consumes data through {@link ReadAccess}
+ * so any addressable source can be hashed without copying. On big-endian platforms values are
+ * byte-swapped to maintain consistent output.
  */
 class CityHash_1_1 {
 
@@ -34,21 +37,14 @@ class CityHash_1_1 {
     }
 
     /**
-     * Applies a bitwise shift and mix operation to the given value.
-     *
-     * @param val the value to be shifted and mixed
-     * @return the result of the shift and mix operation
+     * Applies the CityHash shift/mix primitive.
      */
     private static long shiftMix(long val) {
         return val ^ (val >>> 47);
     }
 
     /**
-     * Hashes two long values using a default multiplier.
-     *
-     * @param u the first value
-     * @param v the second value
-     * @return the hashed result
+     * Hashes two long values using the default multiplier.
      */
     private static long hashLen16(long u, long v) {
         return hashLen16(u, v, K_MUL);
@@ -56,11 +52,6 @@ class CityHash_1_1 {
 
     /**
      * Hashes two long values using the specified multiplier.
-     *
-     * @param u   the first value
-     * @param v   the second value
-     * @param mul the multiplier
-     * @return the hashed result
      */
     private static long hashLen16(long u, long v, long mul) {
         long a = shiftMix((u ^ v) * mul);
@@ -68,23 +59,14 @@ class CityHash_1_1 {
     }
 
     /**
-     * Computes the multiplier based on the length.
-     *
-     * @param len the length
-     * @return the multiplier
+     * Compute the mixing multiplier based on input length.
      */
     private static long mul(long len) {
         return K2 + (len << 1);
     }
 
     /**
-     * Hashes a length of 1 to 3 bytes.
-     *
-     * @param len           the length
-     * @param firstByte     the first byte
-     * @param midOrLastByte the middle or last byte
-     * @param lastByte      the last byte
-     * @return the hashed result
+     * Hash for inputs of 1-3 bytes.
      */
     private static long hash1To3Bytes(int len, int firstByte, int midOrLastByte, int lastByte) {
         int y = firstByte + (midOrLastByte << 8);
@@ -93,12 +75,7 @@ class CityHash_1_1 {
     }
 
     /**
-     * Hashes a length of 4 to 7 bytes.
-     *
-     * @param len         the length
-     * @param first4Bytes the first 4 bytes
-     * @param last4Bytes  the last 4 bytes
-     * @return the hashed result
+     * Hash for inputs of 4-7 bytes.
      */
     private static long hash4To7Bytes(long len, long first4Bytes, long last4Bytes) {
         long mul = mul(len);
@@ -106,12 +83,7 @@ class CityHash_1_1 {
     }
 
     /**
-     * Hashes a length of 8 to 16 bytes.
-     *
-     * @param len         the length
-     * @param first8Bytes the first 8 bytes
-     * @param last8Bytes  the last 8 bytes
-     * @return the hashed result
+     * Hash for inputs of 8-16 bytes.
      */
     private static long hash8To16Bytes(long len, long first8Bytes, long last8Bytes) {
         long mul = mul(len);
@@ -122,30 +94,21 @@ class CityHash_1_1 {
     }
 
     /**
-     * Provides an instance of LongHashFunction without a seed.
-     *
-     * @return an instance of LongHashFunction without a seed
+     * Seedless CityHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithoutSeed() {
         return AsLongHashFunction.INSTANCE;
     }
 
     /**
-     * Provides an instance of LongHashFunction with a seed.
-     *
-     * @param seed the seed
-     * @return an instance of LongHashFunction with the seed
+     * Seeded CityHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
         return new AsLongHashFunctionSeeded(K2, seed);
     }
 
     /**
-     * Provides an instance of LongHashFunction with two seeds.
-     *
-     * @param seed0 the first seed
-     * @param seed1 the second seed
-     * @return an instance of LongHashFunction with the seeds
+     * CityHash64 {@link LongHashFunction} seeded with two values.
      */
     public static LongHashFunction asLongHashFunctionWithTwoSeeds(long seed0, long seed1) {
         return new AsLongHashFunctionSeeded(seed0, seed1);
