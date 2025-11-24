@@ -1,0 +1,26 @@
+= Chronicle-Algorithms Architecture Overview
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Purpose
+Chronicle-Algorithms provides zero-allocation, low-latency primitives for hashing, bit set operations, byte access abstractions, and lightweight lock strategies used across Chronicle libraries.
+
+== Module Scope
+- Public packages: `net.openhft.chronicle.algo`, `.bitset`, `.bytes`, `.hashing`, `.locks`
+- Internal packages: `net.openhft.chronicle.algo.internal` (do not use directly)
+- Test/analysis utilities: `net.openhft.chronicle.algorithms.measures` (hash quality evaluations)
+
+== Design Points
+- Off-heap friendly APIs: operate on Chronicle Bytes and direct buffers without allocation.
+- Stable surface area: keep public interfaces stable within a major version; allow internal evolution.
+- Performance focus: cache-friendly flat data structures and branch-light hashing paths.
+
+== Interactions
+- Depends on Chronicle Core/Bytes for low-level buffer access.
+- Consumed by higher-level Chronicle components that require hashing, bit set, and lock primitives.
+
+== Usage Notes
+- Treat `internal` packages as implementation details.
+- Prefer Chronicle Bytes-backed accessors where off-heap or zero-copy is required.
