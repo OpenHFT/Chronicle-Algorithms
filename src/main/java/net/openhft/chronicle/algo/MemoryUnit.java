@@ -1,7 +1,6 @@
 /*
  * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
-
 /*
  * Based on java.util.concurrent.TimeUnit, which is
  * Written by Doug Lea with assistance from members of JCP JSR-166

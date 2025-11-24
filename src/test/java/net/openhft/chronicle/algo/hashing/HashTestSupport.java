@@ -227,5 +227,4 @@ final class HashTestSupport {
         buffer.duplicate().order(nativeOrder()).asLongBuffer().get(longs);
         return longs;
     }
-
 }
