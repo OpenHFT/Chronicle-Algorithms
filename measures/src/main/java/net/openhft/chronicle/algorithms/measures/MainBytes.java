@@ -19,6 +19,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * JMH microbenchmark that compares different hashing strategies over {@link Bytes} payloads.
+ *
+ * <p>The benchmark fills a direct {@link Bytes} instance with pseudo random 64 bit values and
+ * measures the throughput and latency of several hashing functions, including
+ * {@link OptimisedBytesStoreHash}, {@link LongHashFunction#city_1_1()}, {@link LongHashFunction#murmur_3()},
+ * and {@link LongHashFunction#xx_r39()}. Payload size is controlled by the {@link #size} parameter.
+ *
+ * <p>When run under a debugger ({@link Jvm#isDebug()} is true) the benchmark methods are invoked
+ * directly. In normal operation the {@link Runner} entry point is used to execute the configured
+ * JMH benchmarks.
+ */
 @State(Scope.Thread)
 public class MainBytes {
     static final LongHashFunction city_1_1 = LongHashFunction.city_1_1();
