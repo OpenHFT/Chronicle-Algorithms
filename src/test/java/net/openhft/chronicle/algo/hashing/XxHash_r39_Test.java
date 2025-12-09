@@ -2121,6 +2121,6 @@ public class XxHash_r39_Test {
         for (int j = 0; j < data.length; j++) {
             data[j] = (byte) j;
         }
-        LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
+        LongHashFunctionTestUtils.test(city, data, hashesOfLoopingBytes[len]);
     }
 }

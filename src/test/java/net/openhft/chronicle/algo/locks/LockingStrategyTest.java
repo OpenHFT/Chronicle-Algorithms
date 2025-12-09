@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-@RunWith(value = Parameterized.class)
+@RunWith(Parameterized.class)
 public class LockingStrategyTest {
 
     private final LockingStrategy lockingStrategy;
@@ -375,7 +375,7 @@ public class LockingStrategyTest {
 
     enum AccessMethod {ADDRESS, BYTES_WITH_OFFSET}
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "PMD.TestClassWithoutTestCases"})
     private class TestReadWriteLockState extends AbstractReadWriteLockState {
 
         private ReadWriteLockingStrategy rwls() {
@@ -428,7 +428,7 @@ public class LockingStrategyTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "PMD.TestClassWithoutTestCases"})
     private class TestReadWriteUpdateLockState extends TestReadWriteLockState
             implements ReadWriteUpdateLockState {
 

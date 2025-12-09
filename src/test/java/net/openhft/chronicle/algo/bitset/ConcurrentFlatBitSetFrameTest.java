@@ -11,14 +11,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class ConcurrentFlatBitSetFrameTest {
+class ConcurrentFlatBitSetFrameTest {
     private ConcurrentFlatBitSetFrame bitSetFrame;
     private Access<Object> access;
     private Object handle;
     private long offset;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bitSetFrame = new ConcurrentFlatBitSetFrame(64);
         access = mock(Access.class);
         handle = new Object();
@@ -26,7 +26,7 @@ public class ConcurrentFlatBitSetFrameTest {
     }
 
     @Test
-    public void testFlip() {
+    void testFlip() {
         long bitIndex = 5L;
         long byteIndex = bitIndex / 64;
         long mask = 1L << bitIndex;
@@ -45,7 +45,7 @@ public class ConcurrentFlatBitSetFrameTest {
     }
 
     @Test
-    public void testSet() {
+    void testSet() {
         long bitIndex = 5L;
         long byteIndex = bitIndex / 64;
         long mask = 1L << bitIndex;
@@ -58,7 +58,7 @@ public class ConcurrentFlatBitSetFrameTest {
     }
 
     @Test
-    public void testSetNextNContinuousClearBits() {
+    void testSetNextNContinuousClearBits() {
         long fromIndex = 5L;
         int numberOfBits = 3;
         long byteIndex = fromIndex / 64;
@@ -72,7 +72,7 @@ public class ConcurrentFlatBitSetFrameTest {
     }
 
     @Test
-    public void testClearNextNContinuousSetBits() {
+    void testClearNextNContinuousSetBits() {
         long fromIndex = 5L;
         int numberOfBits = 3;
         long byteIndex = fromIndex / 64;

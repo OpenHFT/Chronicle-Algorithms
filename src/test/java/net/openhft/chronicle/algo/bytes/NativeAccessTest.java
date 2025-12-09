@@ -11,13 +11,13 @@ import java.nio.ByteOrder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NativeAccessTest {
+class NativeAccessTest {
 
     private final Accessor.Full<byte[], byte[]> byteAccessor = Accessor.byteArrayAccessor();
     private final Access<byte[]> byteAccess = byteAccessor.access();
 
     @Test
-    public void arrayAccessReturnsSameHandleInstances() {
+    void arrayAccessReturnsSameHandleInstances() {
         NativeAccess<Object> unsafe = NativeAccess.instance();
         NativeAccess<Object> second = NativeAccess.instance();
         assertNotNull(unsafe);
@@ -25,7 +25,7 @@ public class NativeAccessTest {
     }
 
     @Test
-    public void byteArrayReadsRespectNativeOrder() {
+    void byteArrayReadsRespectNativeOrder() {
         byte[] sample = {
                 (byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78,
                 (byte) 0x9A, (byte) 0xBC, (byte) 0xDE, (byte) 0xF0
@@ -45,7 +45,7 @@ public class NativeAccessTest {
     }
 
     @Test
-    public void unalignedReadsMatchNativeByteBuffer() {
+    void unalignedReadsMatchNativeByteBuffer() {
         byte[] padded = new byte[9];
         System.arraycopy(new byte[]{
                 (byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78,
@@ -60,7 +60,7 @@ public class NativeAccessTest {
     }
 
     @Test
-    public void primitiveArrayAccessReadsValues() {
+    void primitiveArrayAccessReadsValues() {
         long[] longs = {0xFEDCBA9876543210L, 0x123456789ABCDEFL};
         Accessor.Full<long[], long[]> longAccessor = Accessor.longArrayAccessor();
         Access<long[]> longAccess = longAccessor.access();
@@ -87,7 +87,7 @@ public class NativeAccessTest {
     }
 
     @Test
-    public void compareAndSwapLongSupportsArrayBases() {
+    void compareAndSwapLongSupportsArrayBases() {
         long[] longs = {0L};
         Accessor.Full<long[], long[]> longAccessor = Accessor.longArrayAccessor();
         Access<long[]> longAccess = longAccessor.access();
@@ -102,7 +102,7 @@ public class NativeAccessTest {
     }
 
     @Test
-    public void readViaAccessInterfaceMatchesNativeOffset() {
+    void readViaAccessInterfaceMatchesNativeOffset() {
         byte[] data = loopingBytes(16);
         long baseOffset = Jvm.arrayByteBaseOffset();
         assertEquals(byteAccess.readInt(data, baseOffset + 4),

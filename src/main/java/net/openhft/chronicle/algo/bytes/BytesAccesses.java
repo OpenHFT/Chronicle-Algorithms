@@ -13,6 +13,8 @@ import java.nio.ByteOrder;
  */
 final class BytesAccesses {
 
+    static final RandomDataInputAccess<RandomDataInput> RANDOM_DATA_INPUT = RandomDataInputReadAccessEnum.INSTANCE;
+
     // Private constructor to prevent instantiation
     private BytesAccesses() {
     }

@@ -10,6 +10,8 @@ import net.openhft.chronicle.bytes.BytesStore;
  */
 final class BytesAccessors {
 
+    static final Generic<?> GENERIC_ACCESSOR = Generic.INSTANCE;
+
     // Private constructor to prevent instantiation
     private BytesAccessors() {
     }

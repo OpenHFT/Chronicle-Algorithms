@@ -27,7 +27,7 @@ public class MurmurHash3Test {
         ThreadLocalRandom.current().nextBytes(testData);
         for (int i = 0; i < testData.length; i++) {
             byte[] data = Arrays.copyOf(testData, i);
-            LongHashFunctionTest.test(tested, data, referenceFromGuava.hashBytes(data).asLong());
+            LongHashFunctionTestUtils.test(tested, data, referenceFromGuava.hashBytes(data).asLong());
         }
     }
 }

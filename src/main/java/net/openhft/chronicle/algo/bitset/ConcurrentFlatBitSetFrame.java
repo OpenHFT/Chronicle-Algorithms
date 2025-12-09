@@ -1072,9 +1072,17 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                 if (l != 0) {
                     int trailingZeros = numberOfTrailingZeros(l);
                     long index = bitIndex + trailingZeros;
-                    if (((this.bitIndex = index + 1) & 63) == 0) {
-                        if ((byteIndex = i + 8) == byteLength)
+                    long nextBitIndex = index + 1;
+                    if ((nextBitIndex & 63) == 0) {
+                        long nextByteIndex = i + 8;
+                        if (nextByteIndex == byteLength) {
                             this.bitIndex = -1;
+                        } else {
+                            this.bitIndex = nextBitIndex;
+                            byteIndex = nextByteIndex;
+                        }
+                    } else {
+                        this.bitIndex = nextBitIndex;
                     }
                     return index;
                 }
@@ -1082,11 +1090,18 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     if ((l = access.readLong(handle, i)) != 0) {
                         int trailingZeros = numberOfTrailingZeros(l);
                         long index = (i << 3) + trailingZeros;
-                        if (((this.bitIndex = index + 1) & 63) != 0) {
+                        long nextBitIndex = index + 1;
+                        if ((nextBitIndex & 63) != 0) {
+                            this.bitIndex = nextBitIndex;
                             byteIndex = i;
                         } else {
-                            if ((byteIndex = i + 8) == lim)
+                            long nextByteIndex = i + 8;
+                            if (nextByteIndex == lim) {
                                 this.bitIndex = -1;
+                            } else {
+                                this.bitIndex = nextBitIndex;
+                                byteIndex = nextByteIndex;
+                            }
                         }
                         return index;
                     }

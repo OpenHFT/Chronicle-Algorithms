@@ -12,7 +12,7 @@ import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-class LongHashFunctionTest {
+class LongHashFunctionTestUtils {
 
     private static ByteOrder nonNativeOrder() {
         return nativeOrder() == LITTLE_ENDIAN ? BIG_ENDIAN : LITTLE_ENDIAN;

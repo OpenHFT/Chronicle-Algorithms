@@ -11,96 +11,96 @@ import java.nio.ByteOrder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ByteBufferAccessTest {
+class ByteBufferAccessTest {
     private ByteBufferAccess access;
     private ByteBuffer buffer;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         access = ByteBufferAccess.INSTANCE;
         buffer = ByteBuffer.allocate(64).order(ByteOrder.LITTLE_ENDIAN);
     }
 
     @Test
-    public void testReadByte() {
+    void testReadByte() {
         buffer.put(0, (byte) 123);
         assertEquals(123, access.readByte(buffer, 0));
     }
 
     @Test
-    public void testReadShort() {
+    void testReadShort() {
         buffer.putShort(0, (short) 12345);
         assertEquals(12345, access.readShort(buffer, 0));
     }
 
     @Test
-    public void testReadChar() {
+    void testReadChar() {
         buffer.putChar(0, 'a');
         assertEquals('a', access.readChar(buffer, 0));
     }
 
     @Test
-    public void testReadInt() {
+    void testReadInt() {
         buffer.putInt(0, 123456789);
         assertEquals(123456789, access.readInt(buffer, 0));
     }
 
     @Test
-    public void testReadLong() {
+    void testReadLong() {
         buffer.putLong(0, 1234567890123456789L);
         assertEquals(1234567890123456789L, access.readLong(buffer, 0));
     }
 
     @Test
-    public void testReadFloat() {
+    void testReadFloat() {
         buffer.putFloat(0, 12345.6789f);
         assertEquals(12345.6789f, access.readFloat(buffer, 0), 0.0);
     }
 
     @Test
-    public void testReadDouble() {
+    void testReadDouble() {
         buffer.putDouble(0, 1234567890.123456789);
         assertEquals(1234567890.123456789, access.readDouble(buffer, 0), 0.0);
     }
 
     @Test
-    public void testWriteByte() {
+    void testWriteByte() {
         access.writeByte(buffer, 0, (byte) 123);
         assertEquals(123, buffer.get(0));
     }
 
     @Test
-    public void testWriteShort() {
+    void testWriteShort() {
         access.writeShort(buffer, 0, (short) 12345);
         assertEquals(12345, buffer.getShort(0));
     }
 
     @Test
-    public void testWriteChar() {
+    void testWriteChar() {
         access.writeChar(buffer, 0, 'a');
         assertEquals('a', buffer.getChar(0));
     }
 
     @Test
-    public void testWriteInt() {
+    void testWriteInt() {
         access.writeInt(buffer, 0, 123456789);
         assertEquals(123456789, buffer.getInt(0));
     }
 
     @Test
-    public void testWriteLong() {
+    void testWriteLong() {
         access.writeLong(buffer, 0, 1234567890123456789L);
         assertEquals(1234567890123456789L, buffer.getLong(0));
     }
 
     @Test
-    public void testWriteFloat() {
+    void testWriteFloat() {
         access.writeFloat(buffer, 0, 12345.6789f);
         assertEquals(12345.6789f, buffer.getFloat(0), 0.0);
     }
 
     @Test
-    public void testWriteDouble() {
+    void testWriteDouble() {
         access.writeDouble(buffer, 0, 1234567890.123456789);
         assertEquals(1234567890.123456789, buffer.getDouble(0), 0.0);
     }

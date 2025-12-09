@@ -17,10 +17,10 @@ import java.util.Collection;
 import static net.openhft.chronicle.algo.bytes.Access.checkedByteBufferAccess;
 import static org.junit.Assert.*;
 
-@RunWith(value = Parameterized.class)
+@RunWith(Parameterized.class)
 public class DirectBitSetTest {
 
-    private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
+    private static final int[] INDICES = {0, 50, 100, 127, 128, 255};
     private final ReusableBitSet bs;
     private final boolean singleThreaded;
 
@@ -493,10 +493,10 @@ public class DirectBitSetTest {
         for (int n = 1; n <= 64; n *= 2) {
             bs.clearAll();
             for (int i = 0; i < size / n; i++) {
-                assertRangeIsClear(i * n, i * n + n);
+                assertRangeIsClear((long) i * n, (long) i * n + n);
                 assertEquals(m(n), i * n, bs.setNextNContinuousClearBits(0L, n));
-                assertRangeIsSet(i * n, i * n + n);
-                assertEquals(i * n + n, bs.cardinality());
+                assertRangeIsSet((long) i * n, (long) i * n + n);
+                assertEquals((long) i * n + n, bs.cardinality());
             }
         }
         for (int n = 2; n <= 64; n *= 2) {
@@ -530,10 +530,10 @@ public class DirectBitSetTest {
         for (int n : new int[]{3, 7, 13, 31, 33, 63, 65, 100, 127, 128, 129, 254, 255}) {
             bs.clearAll();
             for (int i = 0; i < size / n; i++) {
-                assertRangeIsClear(i * n, i * n + n);
+                assertRangeIsClear((long) i * n, (long) i * n + n);
                 assertEquals(m(n), i * n, bs.setNextNContinuousClearBits(0L, n));
-                assertRangeIsSet(i * n, i * n + n);
-                assertEquals(i * n + n, bs.cardinality());
+                assertRangeIsSet((long) i * n, (long) i * n + n);
+                assertEquals((long) i * n + n, bs.cardinality());
             }
         }
         long lastBound = size - (size % 64 == 0 ? 64 : size % 64);
@@ -565,10 +565,10 @@ public class DirectBitSetTest {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (int i = 0; i < size / n; i++) {
-                assertRangeIsSet(i * n, i * n + n);
+                assertRangeIsSet((long) i * n, (long) i * n + n);
                 assertEquals(m(n), i * n, bs.clearNextNContinuousSetBits(0L, n));
-                assertRangeIsClear(i * n, i * n + n);
-                assertEquals(cardinality - (i * n + n), bs.cardinality());
+                assertRangeIsClear((long) i * n, (long) i * n + n);
+                assertEquals(cardinality - ((long) i * n + n), bs.cardinality());
             }
         }
         for (int n = 2; n <= 64; n *= 2) {
@@ -603,9 +603,9 @@ public class DirectBitSetTest {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (int i = 0; i < size / n; i++) {
-                assertRangeIsSet(i * n, i * n + n);
+                assertRangeIsSet((long) i * n, (long) i * n + n);
                 assertEquals(m(n), i * n, bs.clearNextNContinuousSetBits(0L, n));
-                assertRangeIsClear(i * n, i * n + n);
+                assertRangeIsClear((long) i * n, (long) i * n + n);
                 assertEquals(cardinality -= n, bs.cardinality());
             }
         }

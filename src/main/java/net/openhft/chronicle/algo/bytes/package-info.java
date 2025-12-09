@@ -1,3 +1,6 @@
+/*
+ * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ */
 /**
  * Abstractions for zero copy access to bytes like data structures.
  *
