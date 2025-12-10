@@ -28,6 +28,9 @@ class XxHash_r39 {
     private XxHash_r39() {
     }
 
+    /**
+     * Chooses the xxHash implementation that matches the platform byte order.
+     */
     private static XxHash_r39 nativeXx() {
         return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }

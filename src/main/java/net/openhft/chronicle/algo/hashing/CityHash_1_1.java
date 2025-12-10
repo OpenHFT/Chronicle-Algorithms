@@ -32,6 +32,9 @@ class CityHash_1_1 {
     private CityHash_1_1() {
     }
 
+    /**
+     * Returns the appropriate implementation for the platform's native byte order.
+     */
     private static CityHash_1_1 nativeCity() {
         return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }

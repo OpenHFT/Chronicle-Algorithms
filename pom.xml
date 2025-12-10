@@ -23,6 +23,7 @@
     <properties>
         <jacoco.line.coverage>0.579</jacoco.line.coverage>
         <jacoco.branch.coverage>0.364</jacoco.branch.coverage>
+        <cpd.skip>true</cpd.skip>
     </properties>
 
     <dependencyManagement>

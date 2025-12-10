@@ -26,6 +26,9 @@ class MurmurHash_3 {
     private MurmurHash_3() {
     }
 
+    /**
+     * Returns the MurmurHash implementation matching the platform's native byte order.
+     */
     private static MurmurHash_3 nativeMurmur() {
         return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }
@@ -212,6 +215,9 @@ class MurmurHash_3 {
         return finalize(length, h1, h2);
     }
 
+    /**
+     * Reads up to the final eight bytes of the tail and packs them into {@code k1}.
+     */
     private <T> long tailK1(ReadAccess<T> access, T input, long offset, int remaining) {
         if (remaining >= 8) {
             return fetch64(access, input, offset);
@@ -239,6 +245,9 @@ class MurmurHash_3 {
         return k1;
     }
 
+    /**
+     * Reads the remaining tail bytes beyond the first eight and packs them into {@code k2}.
+     */
     private <T> long tailK2(ReadAccess<T> access, T input, long offset, int remaining) {
         if (remaining <= 8) {
             return 0L;
