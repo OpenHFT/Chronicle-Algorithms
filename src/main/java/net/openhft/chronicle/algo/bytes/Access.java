@@ -62,6 +62,16 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     /**
      * Copy bytes between two addressable regions using their respective access strategies.
      * Performs minimal work by moving data in 8/4/2/1 byte chunks.
+     *
+     * @param <S>          source handle type
+     * @param <T>          target handle type
+     * @param sourceAccess accessor for the source handle
+     * @param source       source handle
+     * @param sourceOffset offset within the source
+     * @param targetAccess accessor for the target handle
+     * @param target       target handle
+     * @param targetOffset offset within the target
+     * @param len          number of bytes to copy
      */
     static <S, T> void copy(final ReadAccess<S> sourceAccess,
                             final S source,
@@ -94,6 +104,15 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     /**
      * Compare bytes between two regions, using the provided {@link ReadAccess} strategies.
      *
+     * @param <T>     first handle type
+     * @param <U>     second handle type
+     * @param access1 accessor for first handle
+     * @param handle1 first handle
+     * @param offset1 start offset in first handle
+     * @param access2 accessor for second handle
+     * @param handle2 second handle
+     * @param offset2 start offset in second handle
+     * @param len     number of bytes to compare
      * @return true if all bytes in the range match
      */
     static <T, U> boolean equivalent(final ReadAccess<T> access1,

@@ -10,6 +10,12 @@ package net.openhft.chronicle.algo.locks;
 public abstract class AbstractReadWriteLockState implements ReadWriteLockState {
 
     /**
+     * Creates a state holder; concrete subclasses define state representation.
+     */
+    protected AbstractReadWriteLockState() {
+    }
+
+    /**
      * Attempts to acquire a write lock.
      * This method delegates to {@link #tryWriteLock()}.
      *

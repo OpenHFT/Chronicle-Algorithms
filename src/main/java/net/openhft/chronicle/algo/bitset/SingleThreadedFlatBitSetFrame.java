@@ -18,6 +18,9 @@ import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
  */
 public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
+    /**
+     * Bit mask with all bits set, reused by masking helpers.
+     */
     public static final long ALL_ONES = ~0L;
 
     private final long longLength;

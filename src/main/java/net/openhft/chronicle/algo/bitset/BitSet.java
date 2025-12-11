@@ -4,18 +4,15 @@
 package net.openhft.chronicle.algo.bitset;
 
 /**
- * Most notable logical difference of this interface with {@code java.util.BitSet}
- * is that {@code DirectBitSet} has a rigid {@link #logicalSize},
- * attempts to {@link #get}, {@link #set} or {@link #clear} bits at indices
- * exceeding the size cause {@code IndexOutOfBoundsException}. There is also
- * a {@link #setAll()} method to set all bits within the size.
- * {@code java.util.BitSet} doesn't have such rigid capacity.
- *
- * @see java.util.BitSet
+ * Bitset abstraction with fixed logical size and direct memory implementations.
+ * Unlike {@link java.util.BitSet}, operations beyond {@link #logicalSize()} throw
+ * {@link IndexOutOfBoundsException}, and a {@link #setAll()} helper is provided.
  */
 public interface BitSet {
 
-    // Constant representing a not found entry
+    /**
+     * Sentinel returned by navigation methods when no matching bit exists.
+     */
     long NOT_FOUND = -1L;
 
     /**

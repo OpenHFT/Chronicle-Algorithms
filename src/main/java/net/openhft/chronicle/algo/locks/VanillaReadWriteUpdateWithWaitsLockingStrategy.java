@@ -59,6 +59,14 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     /**
      * Compare-and-swap the combined lock word.
+     *
+     * @param <T>      handle type containing the lock word
+     * @param access   accessor used to perform the CAS
+     * @param t        handle holding the lock word
+     * @param offset   offset of the lock word
+     * @param expected expected packed value
+     * @param x        replacement packed value
+     * @return {@code true} if the CAS succeeded
      */
     public static <T> boolean casLockWord(
             Access<T> access, T t, long offset, long expected, long x) {
@@ -84,6 +92,10 @@ public final class VanillaReadWriteUpdateWithWaitsLockingStrategy
 
     /**
      * Pack count and wait words into a single long.
+     *
+     * @param countWord count portion of the lock state
+     * @param waitWord  wait portion of the lock state
+     * @return packed lock word combining count and wait
      */
     public static long lockWord(int countWord, int waitWord) {
         // Combines the count and wait words into a single lock word

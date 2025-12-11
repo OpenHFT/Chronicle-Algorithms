@@ -12,6 +12,12 @@ import net.openhft.chronicle.algo.bytes.Access;
 public abstract class AbstractReadWriteLockingStrategy implements ReadWriteLockingStrategy {
 
     /**
+     * Creates the strategy; subclasses supply the concrete locking semantics.
+     */
+    protected AbstractReadWriteLockingStrategy() {
+    }
+
+    /**
      * Attempts to acquire a write lock.
      * This method delegates to {@link #tryWriteLock(Access, Object, long)}.
      *

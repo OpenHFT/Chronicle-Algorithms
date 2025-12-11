@@ -10,9 +10,15 @@ import net.openhft.chronicle.algo.bytes.Access;
  * It allows for efficient bit manipulations using an underlying {@link BitSetFrame}.
  */
 public class ReusableBitSet implements BitSet {
+    /**
+     * Frame describing how bits are stored and manipulated.
+     */
     protected BitSetFrame frame;
+    /** Accessor used to read/write the underlying storage. */
     protected Access<Object> access;
+    /** Backing storage handle (buffer, bytes, etc.). */
     protected Object handle;
+    /** Offset into the backing storage where the bitset starts. */
     protected long offset;
 
     /**
@@ -206,6 +212,7 @@ public class ReusableBitSet implements BitSet {
      * for iterating over set bits in the bit set.
      */
     protected class Bits implements BitSet.Bits {
+        /** View of set bits for the current frame. */
         protected final BitSetFrame.Bits frameBits;
 
         /**

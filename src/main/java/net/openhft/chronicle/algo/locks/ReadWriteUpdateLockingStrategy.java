@@ -16,6 +16,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
     /**
      * Attempts to acquire an update lock.
      *
+     * @param <T>    handle type that holds the lock word
      * @param access the access object
      * @param t      the instance to lock
      * @param offset the offset for the lock state
@@ -26,6 +27,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
     /**
      * Attempts to upgrade a read lock to an update lock.
      *
+     * @param <T>    handle type that holds the lock word
      * @param access the access object
      * @param t      the instance to upgrade
      * @param offset the offset for the lock state
@@ -36,6 +38,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
     /**
      * Attempts to upgrade an update lock to a write lock.
      *
+     * @param <T>    handle type that holds the lock word
      * @param access the access object
      * @param t      the instance to upgrade
      * @param offset the offset for the lock state
@@ -46,6 +49,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
     /**
      * Releases an update lock.
      *
+     * @param <T>    handle type that holds the lock word
      * @param access the access object
      * @param t      the instance to unlock
      * @param offset the offset for the lock state
@@ -55,6 +59,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
     /**
      * Downgrades an update lock to a read lock.
      *
+     * @param <T>    handle type that holds the lock word
      * @param access the access object
      * @param t      the instance to downgrade
      * @param offset the offset for the lock state
@@ -64,6 +69,7 @@ public interface ReadWriteUpdateLockingStrategy extends ReadWriteLockingStrategy
     /**
      * Downgrades a write lock to an update lock.
      *
+     * @param <T>    handle type that holds the lock word
      * @param access the access object
      * @param t      the instance to downgrade
      * @param offset the offset for the lock state
