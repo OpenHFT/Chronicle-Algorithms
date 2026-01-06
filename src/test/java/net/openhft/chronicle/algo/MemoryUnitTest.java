@@ -21,7 +21,7 @@ class MemoryUnitTest {
         long aligned = target.align(amount, source);
         long alignedBits = MemoryUnit.BITS.convert(aligned, source);
         long unitBits = target.toBits(1);
-        assertEquals(0, alignedBits % unitBits);
+        assertEquals(0, alignedBits % unitBits, "aligned bits divisible by unit bits");
         if (amount >= 0) {
             assertTrue(aligned >= amount, "positive amounts align upwards");
         } else {
@@ -46,10 +46,10 @@ class MemoryUnitTest {
     @DisplayName("align throws for invalid granularity combinations")
     void alignRejectsFinerOrEqualUnits() {
         for (MemoryUnit unit : MemoryUnit.values()) {
-            assertThrows(IllegalStateException.class, () -> unit.align(1, unit));
+            assertThrows(IllegalStateException.class, () -> unit.align(1, unit), "align rejects equal units");
             for (int coarser = unit.ordinal() + 1; coarser < MemoryUnit.values().length; coarser++) {
                 MemoryUnit coarserUnit = MemoryUnit.values()[coarser];
-                assertThrows(IllegalStateException.class, () -> unit.align(1, coarserUnit));
+                assertThrows(IllegalStateException.class, () -> unit.align(1, coarserUnit), "align rejects coarser units");
             }
         }
     }
@@ -57,10 +57,10 @@ class MemoryUnitTest {
     @Test
     @DisplayName("conversions saturate on overflow")
     void conversionsSaturateAtBounds() {
-        assertEquals(Long.MAX_VALUE, MemoryUnit.GIGABYTES.toBits(Long.MAX_VALUE));
-        assertEquals(Long.MIN_VALUE, MemoryUnit.GIGABYTES.toBits(Long.MIN_VALUE));
-        assertEquals(Long.MAX_VALUE, MemoryUnit.MEGABYTES.toBytes(Long.MAX_VALUE));
-        assertEquals(Long.MIN_VALUE, MemoryUnit.MEGABYTES.toBytes(Long.MIN_VALUE));
+        assertEquals(Long.MAX_VALUE, MemoryUnit.GIGABYTES.toBits(Long.MAX_VALUE), "toBits saturates positive overflow");
+        assertEquals(Long.MIN_VALUE, MemoryUnit.GIGABYTES.toBits(Long.MIN_VALUE), "toBits saturates negative overflow");
+        assertEquals(Long.MAX_VALUE, MemoryUnit.MEGABYTES.toBytes(Long.MAX_VALUE), "toBytes saturates positive overflow");
+        assertEquals(Long.MIN_VALUE, MemoryUnit.MEGABYTES.toBytes(Long.MIN_VALUE), "toBytes saturates negative overflow");
     }
 
     @Test
@@ -68,10 +68,10 @@ class MemoryUnitTest {
     void alignAndConvertMatchesSeparateCalls() {
         long amount = 1536; // bytes
         long aligned = MemoryUnit.KILOBYTES.align(amount, MemoryUnit.BYTES);
-        assertEquals(2048, aligned);
+        assertEquals(2048, aligned, "align rounds bytes to KiB multiple");
         long converted = MemoryUnit.KILOBYTES.convert(aligned, MemoryUnit.BYTES);
-        assertEquals(2, converted);
-        assertEquals(converted, MemoryUnit.KILOBYTES.alignAndConvert(amount, MemoryUnit.BYTES));
+        assertEquals(2, converted, "convert aligned bytes to KiB");
+        assertEquals(converted, MemoryUnit.KILOBYTES.alignAndConvert(amount, MemoryUnit.BYTES), "alignAndConvert matches align then convert");
     }
 
     static Stream<Arguments> conversionCases() {
@@ -87,7 +87,7 @@ class MemoryUnitTest {
     @ParameterizedTest(name = "{0}.convert({2} {3}) = {1}")
     @MethodSource("conversionCases")
     void convertBetweenUnits(MemoryUnit target, long expected, long amount, MemoryUnit source) {
-        assertEquals(expected, target.convert(amount, source));
+        assertEquals(expected, target.convert(amount, source), "convert returns expected value");
     }
 
     @Test
@@ -98,8 +98,8 @@ class MemoryUnitTest {
                 if (source.ordinal() < target.ordinal()) {
                     long aligned = target.align(-73, source);
                     long alignedBits = MemoryUnit.BITS.convert(aligned, source);
-                    assertEquals(0, alignedBits % target.toBits(1));
-                    assertTrue(aligned <= -73);
+                    assertEquals(0, alignedBits % target.toBits(1), "aligned bits divisible by unit bits");
+                    assertTrue(aligned <= -73, "negative amounts align downwards");
                 }
             }
         }

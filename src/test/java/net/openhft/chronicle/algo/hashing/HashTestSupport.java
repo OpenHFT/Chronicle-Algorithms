@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import static java.nio.ByteOrder.nativeOrder;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 final class HashTestSupport {
 
@@ -31,10 +31,10 @@ final class HashTestSupport {
 
     static void assertHashMatchesVectors(LongHashFunction function, byte[] data, long expected) {
         int len = data.length;
-        assertEquals("hashBytes", expected, function.hashBytes(data));
-        assertEquals("hashBytes(ByteBuffer)",
-                expected,
-                function.hashBytes(ByteBuffer.wrap(Arrays.copyOf(data, len)).order(nativeOrder())));
+        assertEquals(expected, function.hashBytes(data), "hashBytes");
+        assertEquals(expected,
+                function.hashBytes(ByteBuffer.wrap(Arrays.copyOf(data, len)).order(nativeOrder())),
+                "hashBytes(ByteBuffer)");
 
         ByteBuffer wrapped = ByteBuffer.allocate(len + 8).order(nativeOrder());
         wrapped.put((byte) 0x7F);
@@ -42,10 +42,10 @@ final class HashTestSupport {
         wrapped.flip();
         wrapped.position(1);
         wrapped.limit(1 + len);
-        assertEquals("hashBytes(ByteBuffer slice)", expected, function.hashBytes(wrapped));
+        assertEquals(expected, function.hashBytes(wrapped), "hashBytes(ByteBuffer slice)");
 
         if (len == 0) {
-            assertEquals("hashVoid", expected, function.hashVoid());
+            assertEquals(expected, function.hashVoid(), "hashVoid");
         }
 
         ByteBuffer bb = ByteBuffer.wrap(Arrays.copyOf(data, Math.max(len, 8))).order(nativeOrder());
@@ -62,7 +62,7 @@ final class HashTestSupport {
         if (len >= 1) {
             long byteHash = function.hashByte(buffer.get(0));
             if (len == 1) {
-                assertEquals("hashByte", expected, byteHash);
+                assertEquals(expected, byteHash, "hashByte");
             }
         }
 
@@ -70,8 +70,8 @@ final class HashTestSupport {
             short value = buffer.getShort(0);
             long shortHash = function.hashShort(value);
             if (len == 2) {
-                assertEquals("hashShort", expected, shortHash);
-                assertEquals("hashChar", expected, function.hashChar((char) value));
+                assertEquals(expected, shortHash, "hashShort");
+                assertEquals(expected, function.hashChar((char) value), "hashChar");
             }
         }
 
@@ -79,7 +79,7 @@ final class HashTestSupport {
             int value = buffer.getInt(0);
             long intHash = function.hashInt(value);
             if (len == 4) {
-                assertEquals("hashInt", expected, intHash);
+                assertEquals(expected, intHash, "hashInt");
             }
         }
 
@@ -87,7 +87,7 @@ final class HashTestSupport {
             long value = buffer.getLong(0);
             long longHash = function.hashLong(value);
             if (len == 8) {
-                assertEquals("hashLong", expected, longHash);
+                assertEquals(expected, longHash, "hashLong");
             }
         }
     }
@@ -96,51 +96,51 @@ final class HashTestSupport {
                                             ByteBuffer buffer,
                                             int len,
                                             long expected) {
-        assertEquals("hashBytes(byte[],off,len)",
-                expected,
-                function.hashBytes(padArray(dataWithPadding(buffer, len), 1), 1, len));
+        assertEquals(expected,
+                function.hashBytes(padArray(dataWithPadding(buffer, len), 1), 1, len),
+                "hashBytes(byte[],off,len)");
 
         if ((len & 1) == 0) {
             short[] shorts = toShortArray(buffer, len);
-            assertEquals("hashShorts", expected, function.hashShorts(shorts));
-            assertEquals("hashShorts(off,len)",
-                    expected,
-                    function.hashShorts(padArray(shorts, (short) 1), 1, shorts.length));
+            assertEquals(expected, function.hashShorts(shorts), "hashShorts");
+            assertEquals(expected,
+                    function.hashShorts(padArray(shorts, (short) 1), 1, shorts.length),
+                    "hashShorts(off,len)");
 
             char[] chars = toCharArray(buffer, len);
-            assertEquals("hashChars", expected, function.hashChars(chars));
-            assertEquals("hashChars(off,len)",
-                    expected,
-                    function.hashChars(padArray(chars, (char) 1), 1, chars.length));
+            assertEquals(expected, function.hashChars(chars), "hashChars");
+            assertEquals(expected,
+                    function.hashChars(padArray(chars, (char) 1), 1, chars.length),
+                    "hashChars(off,len)");
         }
 
         if ((len & 3) == 0) {
             int[] ints = toIntArray(buffer, len);
-            assertEquals("hashInts", expected, function.hashInts(ints));
-            assertEquals("hashInts(off,len)",
-                    expected,
-                    function.hashInts(padArray(ints, 1), 1, ints.length));
+            assertEquals(expected, function.hashInts(ints), "hashInts");
+            assertEquals(expected,
+                    function.hashInts(padArray(ints, 1), 1, ints.length),
+                    "hashInts(off,len)");
         }
 
         if ((len & 7) == 0) {
             long[] longs = toLongArray(buffer, len);
-            assertEquals("hashLongs", expected, function.hashLongs(longs));
-            assertEquals("hashLongs(off,len)",
-                    expected,
-                    function.hashLongs(padArray(longs, 1L), 1, longs.length));
+            assertEquals(expected, function.hashLongs(longs), "hashLongs");
+            assertEquals(expected,
+                    function.hashLongs(padArray(longs, 1L), 1, longs.length),
+                    "hashLongs(off,len)");
         }
     }
 
     private static void exerciseReadAccess(LongHashFunction function, byte[] data, long expected) {
         long baseOffset = Jvm.arrayByteBaseOffset();
-        assertEquals("hash(ReadAccess)",
-                expected,
-                function.hash(data, BYTE_ARRAY_ACCESS, baseOffset, data.length));
+        assertEquals(expected,
+                function.hash(data, BYTE_ARRAY_ACCESS, baseOffset, data.length),
+                "hash(ReadAccess)");
 
         ByteBuffer buffer = ByteBuffer.wrap(data).order(nativeOrder());
-        assertEquals("hash(ReadAccess ByteBuffer)",
-                expected,
-                function.hash(buffer, BYTE_BUFFER_ACCESS, buffer.position(), buffer.remaining()));
+        assertEquals(expected,
+                function.hash(buffer, BYTE_BUFFER_ACCESS, buffer.position(), buffer.remaining()),
+                "hash(ReadAccess ByteBuffer)");
     }
 
     private static void exerciseNegativePrimitiveHashes(LongHashFunction function) {
@@ -151,11 +151,11 @@ final class HashTestSupport {
         final long intHash = function.hashBytes(bytes, 0, 4);
         final long longHash = function.hashBytes(bytes, 0, 8);
 
-        assertEquals("hashByte(-1)", byteHash, function.hashByte((byte) -1));
-        assertEquals("hashShort(-1)", shortHash, function.hashShort((short) -1));
-        assertEquals("hashChar(-1)", shortHash, function.hashChar((char) -1));
-        assertEquals("hashInt(-1)", intHash, function.hashInt(-1));
-        assertEquals("hashLong(-1)", longHash, function.hashLong(-1L));
+        assertEquals(byteHash, function.hashByte((byte) -1), "hashByte(-1)");
+        assertEquals(shortHash, function.hashShort((short) -1), "hashShort(-1)");
+        assertEquals(shortHash, function.hashChar((char) -1), "hashChar(-1)");
+        assertEquals(intHash, function.hashInt(-1), "hashInt(-1)");
+        assertEquals(longHash, function.hashLong(-1L), "hashLong(-1)");
     }
 
     private static byte[] dataWithPadding(ByteBuffer source, int len) {

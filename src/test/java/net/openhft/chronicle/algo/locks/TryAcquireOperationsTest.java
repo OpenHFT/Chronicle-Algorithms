@@ -38,7 +38,7 @@ class TryAcquireOperationsTest {
         when(lockingStrategy.tryLock(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(lockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "lock operation succeeds");
         verify(lockingStrategy).tryLock(access, handle, 0L);
     }
 
@@ -48,7 +48,7 @@ class TryAcquireOperationsTest {
         when(readWriteLockingStrategy.tryReadLock(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(readWriteLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "readLock operation succeeds");
         verify(readWriteLockingStrategy).tryReadLock(access, handle, 0L);
     }
 
@@ -58,7 +58,7 @@ class TryAcquireOperationsTest {
         when(readWriteLockingStrategy.tryUpgradeReadToWriteLock(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(readWriteLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "upgradeReadToWriteLock operation succeeds");
         verify(readWriteLockingStrategy).tryUpgradeReadToWriteLock(access, handle, 0L);
     }
 
@@ -68,7 +68,7 @@ class TryAcquireOperationsTest {
         when(readWriteLockingStrategy.tryWriteLock(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(readWriteLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "writeLock operation succeeds");
         verify(readWriteLockingStrategy).tryWriteLock(access, handle, 0L);
     }
 
@@ -78,7 +78,7 @@ class TryAcquireOperationsTest {
         when(rwWithWaitsLockingStrategy.tryUpgradeReadToWriteLockAndDeregisterWait(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(rwWithWaitsLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "upgradeReadToWriteLockAndDeregisterWait operation succeeds");
         verify(rwWithWaitsLockingStrategy).tryUpgradeReadToWriteLockAndDeregisterWait(access, handle, 0L);
     }
 
@@ -88,7 +88,7 @@ class TryAcquireOperationsTest {
         when(rwWithWaitsLockingStrategy.tryWriteLockAndDeregisterWait(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(rwWithWaitsLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "writeLockAndDeregisterWait operation succeeds");
         verify(rwWithWaitsLockingStrategy).tryWriteLockAndDeregisterWait(access, handle, 0L);
     }
 
@@ -98,7 +98,7 @@ class TryAcquireOperationsTest {
         when(readWriteUpdateLockingStrategy.tryUpdateLock(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(readWriteUpdateLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "updateLock operation succeeds");
         verify(readWriteUpdateLockingStrategy).tryUpdateLock(access, handle, 0L);
     }
 
@@ -108,7 +108,7 @@ class TryAcquireOperationsTest {
         when(readWriteUpdateLockingStrategy.tryUpgradeReadToUpdateLock(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(readWriteUpdateLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "upgradeReadToUpdateLock operation succeeds");
         verify(readWriteUpdateLockingStrategy).tryUpgradeReadToUpdateLock(access, handle, 0L);
     }
 
@@ -118,7 +118,7 @@ class TryAcquireOperationsTest {
         when(readWriteUpdateLockingStrategy.tryUpgradeUpdateToWriteLock(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(readWriteUpdateLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "upgradeUpdateToWriteLock operation succeeds");
         verify(readWriteUpdateLockingStrategy).tryUpgradeUpdateToWriteLock(access, handle, 0L);
     }
 
@@ -128,7 +128,7 @@ class TryAcquireOperationsTest {
         when(rwUpdateWithWaitsLockingStrategy.tryUpgradeUpdateToWriteLockAndDeregisterWait(access, handle, 0L)).thenReturn(true);
 
         boolean result = operation.tryAcquire(rwUpdateWithWaitsLockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "upgradeUpdateToWriteLockAndDeregisterWait operation succeeds");
         verify(rwUpdateWithWaitsLockingStrategy).tryUpgradeUpdateToWriteLockAndDeregisterWait(access, handle, 0L);
     }
 }

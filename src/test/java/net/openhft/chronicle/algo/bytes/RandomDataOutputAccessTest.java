@@ -105,7 +105,7 @@ class RandomDataOutputAccessTest {
     @Test
     void testByteOrder() {
         when(mockOutput.byteOrder()).thenReturn(ByteOrder.BIG_ENDIAN);
-        assertEquals(ByteOrder.BIG_ENDIAN, access.byteOrder(mockOutput));
+        assertEquals(ByteOrder.BIG_ENDIAN, access.byteOrder(mockOutput), "byteOrder delegates to output");
         verify(mockOutput).byteOrder();
     }
 

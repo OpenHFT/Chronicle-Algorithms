@@ -5,21 +5,35 @@ package net.openhft.chronicle.algo.hashing;
 
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MurmurHash3Test {
 
     @Test
     public void testMurmurWithoutSeed() {
-        testMurmur(LongHashFunction.murmur_3(), Hashing.murmur3_128());
+        LongHashFunction tested = LongHashFunction.murmur_3();
+        HashFunction referenceFromGuava = Hashing.murmur3_128();
+        byte[] sample = new byte[0];
+        assertEquals(referenceFromGuava.hashBytes(sample).asLong(),
+                tested.hashBytes(sample),
+                "hashBytes matches Guava seed=0 len=0");
+        testMurmur(tested, referenceFromGuava);
     }
 
     @Test
     public void testMurmurWithSeed() {
-        testMurmur(LongHashFunction.murmur_3(42L), Hashing.murmur3_128(42));
+        LongHashFunction tested = LongHashFunction.murmur_3(42L);
+        HashFunction referenceFromGuava = Hashing.murmur3_128(42);
+        byte[] sample = new byte[0];
+        assertEquals(referenceFromGuava.hashBytes(sample).asLong(),
+                tested.hashBytes(sample),
+                "hashBytes matches Guava seed=42 len=0");
+        testMurmur(tested, referenceFromGuava);
     }
 
     private void testMurmur(LongHashFunction tested, HashFunction referenceFromGuava) {

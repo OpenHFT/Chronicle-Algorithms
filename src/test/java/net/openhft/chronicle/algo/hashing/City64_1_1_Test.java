@@ -3,18 +3,13 @@
  */
 package net.openhft.chronicle.algo.hashing;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.stream.IntStream;
 
-import static org.junit.runners.Parameterized.Parameter;
-import static org.junit.runners.Parameterized.Parameters;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(Parameterized.class)
 public class City64_1_1_Test {
     private static final long[] HASHES_OF_LOOPING_BYTES_WITHOUT_SEEDS = {
             -7286425919675154353L,
@@ -2070,21 +2065,19 @@ public class City64_1_1_Test {
             -6312701748516438716L,
             -8712455751362790038L,
     };
-    @Parameter
-    public int len;
 
-    @Parameters
-    public static Collection<Object[]> data() {
-        List<Object[]> data = new ArrayList<>();
-        for (int len = 0; len < 1025; len++) {
-            data.add(new Object[]{len});
-        }
-        return data;
+    static IntStream lengths() {
+        return IntStream.rangeClosed(0, 1024);
     }
 
-    @Test
-    public void testCityWithoutSeeds() {
-        test(LongHashFunction.city_1_1(), HASHES_OF_LOOPING_BYTES_WITHOUT_SEEDS);
+    @ParameterizedTest(name = "len={0} without seeds")
+    @MethodSource("lengths")
+    public void testCityWithoutSeeds(int len) {
+        LongHashFunction city = LongHashFunction.city_1_1();
+        byte[] data = loopingBytes(len);
+        long expected = HASHES_OF_LOOPING_BYTES_WITHOUT_SEEDS[len];
+        assertEquals(expected, city.hashBytes(data), "hashBytes without seeds len=" + len);
+        LongHashFunctionTestUtils.test(city, data, expected);
     }
 
     // The following numbers is the result of compiling & running this program
@@ -2108,16 +2101,21 @@ public class City64_1_1_Test {
     //            printf("%lldL,\n", (long long)CityHash64WithSeeds(src, i, 0, 0));
     //        }
     //    }
-    @Test
-    public void testCityWithOneSeed() {
-        test(LongHashFunction.city_1_1(0L, 0L), HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0);
+    @ParameterizedTest(name = "len={0} with seeds 0,0")
+    @MethodSource("lengths")
+    public void testCityWithOneSeed(int len) {
+        LongHashFunction city = LongHashFunction.city_1_1(0L, 0L);
+        byte[] data = loopingBytes(len);
+        long expected = HASHES_OF_LOOPING_BYTES_WITH_SEEDS_0_0[len];
+        assertEquals(expected, city.hashBytes(data), "hashBytes with seeds 0,0 len=" + len);
+        LongHashFunctionTestUtils.test(city, data, expected);
     }
 
-    private void test(LongHashFunction city, long[] hashesOfLoopingBytes) {
+    private static byte[] loopingBytes(int len) {
         byte[] data = new byte[len];
         for (int j = 0; j < data.length; j++) {
             data[j] = (byte) j;
         }
-        LongHashFunctionTestUtils.test(city, data, hashesOfLoopingBytes[len]);
+        return data;
     }
 }

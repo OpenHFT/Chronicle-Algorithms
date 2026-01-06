@@ -23,7 +23,7 @@ class AbstractReadWriteLockStateTest {
     void testTryLock() {
         when(lockState.tryWriteLock()).thenReturn(true);
         boolean result = lockState.tryLock();
-        assertTrue(result);
+        assertTrue(result, "tryLock delegates to tryWriteLock");
         verify(lockState).tryWriteLock();
     }
 

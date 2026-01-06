@@ -44,7 +44,7 @@ class BitSetTest {
     void testSetIfClear() {
         long bitIndex = 5L;
         when(bitSet.setIfClear(bitIndex)).thenReturn(true);
-        assertTrue(bitSet.setIfClear(bitIndex));
+        assertTrue(bitSet.setIfClear(bitIndex), "setIfClear returns true");
         verify(bitSet).setIfClear(bitIndex);
     }
 
@@ -52,7 +52,7 @@ class BitSetTest {
     void testClearIfSet() {
         long bitIndex = 5L;
         when(bitSet.clearIfSet(bitIndex)).thenReturn(true);
-        assertTrue(bitSet.clearIfSet(bitIndex));
+        assertTrue(bitSet.clearIfSet(bitIndex), "clearIfSet returns true");
         verify(bitSet).clearIfSet(bitIndex);
     }
 
@@ -77,7 +77,7 @@ class BitSetTest {
         long fromIndex = 5L;
         long toIndex = 10L;
         when(bitSet.isRangeSet(fromIndex, toIndex)).thenReturn(true);
-        assertTrue(bitSet.isRangeSet(fromIndex, toIndex));
+        assertTrue(bitSet.isRangeSet(fromIndex, toIndex), "isRangeSet returns true");
         verify(bitSet).isRangeSet(fromIndex, toIndex);
     }
 
@@ -121,7 +121,7 @@ class BitSetTest {
     void testGet() {
         long bitIndex = 5L;
         when(bitSet.get(bitIndex)).thenReturn(true);
-        assertTrue(bitSet.get(bitIndex));
+        assertTrue(bitSet.get(bitIndex), "get returns true");
         verify(bitSet).get(bitIndex);
     }
 
@@ -129,7 +129,7 @@ class BitSetTest {
     void testIsSet() {
         long bitIndex = 5L;
         when(bitSet.isSet(bitIndex)).thenReturn(true);
-        assertTrue(bitSet.isSet(bitIndex));
+        assertTrue(bitSet.isSet(bitIndex), "isSet returns true");
         verify(bitSet).isSet(bitIndex);
     }
 
@@ -137,7 +137,7 @@ class BitSetTest {
     void testIsClear() {
         long bitIndex = 5L;
         when(bitSet.isClear(bitIndex)).thenReturn(true);
-        assertTrue(bitSet.isClear(bitIndex));
+        assertTrue(bitSet.isClear(bitIndex), "isClear returns true");
         verify(bitSet).isClear(bitIndex);
     }
 
@@ -146,7 +146,7 @@ class BitSetTest {
         long fromIndex = 5L;
         long toIndex = 10L;
         when(bitSet.isRangeClear(fromIndex, toIndex)).thenReturn(true);
-        assertTrue(bitSet.isRangeClear(fromIndex, toIndex));
+        assertTrue(bitSet.isRangeClear(fromIndex, toIndex), "isRangeClear returns true");
         verify(bitSet).isRangeClear(fromIndex, toIndex);
     }
 
@@ -154,7 +154,7 @@ class BitSetTest {
     void testNextSetBit() {
         long fromIndex = 5L;
         when(bitSet.nextSetBit(fromIndex)).thenReturn(6L);
-        assertEquals(6L, bitSet.nextSetBit(fromIndex));
+        assertEquals(6L, bitSet.nextSetBit(fromIndex), "nextSetBit returns expected index");
         verify(bitSet).nextSetBit(fromIndex);
     }
 
@@ -162,7 +162,7 @@ class BitSetTest {
     void testNextClearBit() {
         long fromIndex = 5L;
         when(bitSet.nextClearBit(fromIndex)).thenReturn(6L);
-        assertEquals(6L, bitSet.nextClearBit(fromIndex));
+        assertEquals(6L, bitSet.nextClearBit(fromIndex), "nextClearBit returns expected index");
         verify(bitSet).nextClearBit(fromIndex);
     }
 
@@ -170,7 +170,7 @@ class BitSetTest {
     void testPreviousSetBit() {
         long fromIndex = 5L;
         when(bitSet.previousSetBit(fromIndex)).thenReturn(4L);
-        assertEquals(4L, bitSet.previousSetBit(fromIndex));
+        assertEquals(4L, bitSet.previousSetBit(fromIndex), "previousSetBit returns expected index");
         verify(bitSet).previousSetBit(fromIndex);
     }
 
@@ -178,21 +178,21 @@ class BitSetTest {
     void testPreviousClearBit() {
         long fromIndex = 5L;
         when(bitSet.previousClearBit(fromIndex)).thenReturn(4L);
-        assertEquals(4L, bitSet.previousClearBit(fromIndex));
+        assertEquals(4L, bitSet.previousClearBit(fromIndex), "previousClearBit returns expected index");
         verify(bitSet).previousClearBit(fromIndex);
     }
 
     @Test
     void testLogicalSize() {
         when(bitSet.logicalSize()).thenReturn(64L);
-        assertEquals(64L, bitSet.logicalSize());
+        assertEquals(64L, bitSet.logicalSize(), "logicalSize returns expected value");
         verify(bitSet).logicalSize();
     }
 
     @Test
     void testCardinality() {
         when(bitSet.cardinality()).thenReturn(5L);
-        assertEquals(5L, bitSet.cardinality());
+        assertEquals(5L, bitSet.cardinality(), "cardinality returns expected value");
         verify(bitSet).cardinality();
     }
 
@@ -200,7 +200,7 @@ class BitSetTest {
     void testSetNextClearBit() {
         long fromIndex = 5L;
         when(bitSet.setNextClearBit(fromIndex)).thenReturn(6L);
-        assertEquals(6L, bitSet.setNextClearBit(fromIndex));
+        assertEquals(6L, bitSet.setNextClearBit(fromIndex), "setNextClearBit returns expected index");
         verify(bitSet).setNextClearBit(fromIndex);
     }
 
@@ -208,7 +208,7 @@ class BitSetTest {
     void testClearNextSetBit() {
         long fromIndex = 5L;
         when(bitSet.clearNextSetBit(fromIndex)).thenReturn(6L);
-        assertEquals(6L, bitSet.clearNextSetBit(fromIndex));
+        assertEquals(6L, bitSet.clearNextSetBit(fromIndex), "clearNextSetBit returns expected index");
         verify(bitSet).clearNextSetBit(fromIndex);
     }
 
@@ -216,7 +216,7 @@ class BitSetTest {
     void testSetPreviousClearBit() {
         long fromIndex = 5L;
         when(bitSet.setPreviousClearBit(fromIndex)).thenReturn(4L);
-        assertEquals(4L, bitSet.setPreviousClearBit(fromIndex));
+        assertEquals(4L, bitSet.setPreviousClearBit(fromIndex), "setPreviousClearBit returns expected index");
         verify(bitSet).setPreviousClearBit(fromIndex);
     }
 
@@ -224,7 +224,7 @@ class BitSetTest {
     void testClearPreviousSetBit() {
         long fromIndex = 5L;
         when(bitSet.clearPreviousSetBit(fromIndex)).thenReturn(4L);
-        assertEquals(4L, bitSet.clearPreviousSetBit(fromIndex));
+        assertEquals(4L, bitSet.clearPreviousSetBit(fromIndex), "clearPreviousSetBit returns expected index");
         verify(bitSet).clearPreviousSetBit(fromIndex);
     }
 
@@ -233,7 +233,9 @@ class BitSetTest {
         long fromIndex = 5L;
         int numberOfBits = 3;
         when(bitSet.setNextNContinuousClearBits(fromIndex, numberOfBits)).thenReturn(5L);
-        assertEquals(5L, bitSet.setNextNContinuousClearBits(fromIndex, numberOfBits));
+        assertEquals(5L,
+                bitSet.setNextNContinuousClearBits(fromIndex, numberOfBits),
+                "setNextNContinuousClearBits returns expected index");
         verify(bitSet).setNextNContinuousClearBits(fromIndex, numberOfBits);
     }
 
@@ -242,7 +244,9 @@ class BitSetTest {
         long fromIndex = 5L;
         int numberOfBits = 3;
         when(bitSet.clearNextNContinuousSetBits(fromIndex, numberOfBits)).thenReturn(5L);
-        assertEquals(5L, bitSet.clearNextNContinuousSetBits(fromIndex, numberOfBits));
+        assertEquals(5L,
+                bitSet.clearNextNContinuousSetBits(fromIndex, numberOfBits),
+                "clearNextNContinuousSetBits returns expected index");
         verify(bitSet).clearNextNContinuousSetBits(fromIndex, numberOfBits);
     }
 
@@ -251,7 +255,9 @@ class BitSetTest {
         long fromIndex = 5L;
         int numberOfBits = 3;
         when(bitSet.setPreviousNContinuousClearBits(fromIndex, numberOfBits)).thenReturn(2L);
-        assertEquals(2L, bitSet.setPreviousNContinuousClearBits(fromIndex, numberOfBits));
+        assertEquals(2L,
+                bitSet.setPreviousNContinuousClearBits(fromIndex, numberOfBits),
+                "setPreviousNContinuousClearBits returns expected index");
         verify(bitSet).setPreviousNContinuousClearBits(fromIndex, numberOfBits);
     }
 
@@ -260,7 +266,9 @@ class BitSetTest {
         long fromIndex = 5L;
         int numberOfBits = 3;
         when(bitSet.clearPreviousNContinuousSetBits(fromIndex, numberOfBits)).thenReturn(2L);
-        assertEquals(2L, bitSet.clearPreviousNContinuousSetBits(fromIndex, numberOfBits));
+        assertEquals(2L,
+                bitSet.clearPreviousNContinuousSetBits(fromIndex, numberOfBits),
+                "clearPreviousNContinuousSetBits returns expected index");
         verify(bitSet).clearPreviousNContinuousSetBits(fromIndex, numberOfBits);
     }
 }

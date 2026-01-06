@@ -42,7 +42,7 @@ class AcquisitionStrategiesTest {
         };
 
         boolean result = strategy.acquire(operation::tryAcquire, lockingStrategy, access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "spinLoop acquires when operation succeeds");
     }
 
     @Test

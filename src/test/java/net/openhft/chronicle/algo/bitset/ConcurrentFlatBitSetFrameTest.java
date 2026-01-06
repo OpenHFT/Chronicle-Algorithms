@@ -67,7 +67,7 @@ class ConcurrentFlatBitSetFrameTest {
         when(access.readVolatileLong(handle, byteIndex)).thenReturn(0L);
         when(access.compareAndSwapLong(handle, byteIndex, 0L, mask)).thenReturn(true);
 
-        assertEquals(5L, bitSetFrame.setNextNContinuousClearBits(access, handle, offset, fromIndex, numberOfBits));
+        assertEquals(5L, bitSetFrame.setNextNContinuousClearBits(access, handle, offset, fromIndex, numberOfBits), "setNextNContinuousClearBits returns fromIndex");
         verify(access, times(1)).compareAndSwapLong(handle, byteIndex, 0L, mask);
     }
 
@@ -81,7 +81,7 @@ class ConcurrentFlatBitSetFrameTest {
         when(access.readVolatileLong(handle, byteIndex)).thenReturn(~0L);
         when(access.compareAndSwapLong(handle, byteIndex, ~0L, mask)).thenReturn(true);
 
-        assertEquals(5L, bitSetFrame.clearNextNContinuousSetBits(access, handle, offset, fromIndex, numberOfBits));
+        assertEquals(5L, bitSetFrame.clearNextNContinuousSetBits(access, handle, offset, fromIndex, numberOfBits), "clearNextNContinuousSetBits returns fromIndex");
         verify(access, times(1)).compareAndSwapLong(handle, byteIndex, ~0L, mask);
     }
 }

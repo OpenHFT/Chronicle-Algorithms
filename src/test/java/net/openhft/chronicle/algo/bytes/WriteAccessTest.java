@@ -106,7 +106,7 @@ class WriteAccessTest {
     @Test
     void testWriteByte() {
         writeAccess.writeByte(handle, 0, (byte) 0x7F);
-        assertArrayEquals(new byte[]{0x7F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle);
+        assertArrayEquals(new byte[]{0x7F, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle, "writeByte stores value at offset");
     }
 
     @Test
@@ -116,25 +116,25 @@ class WriteAccessTest {
 
         writeAccess.writeUnsignedByte(handle, 0, 0xFF);
         verify(writeAccess).writeByte(handle, 0, (byte) Maths.toUInt8(0xFF));
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeUnsignedByte stores expected value");
     }
 
     @Test
     void testWriteBoolean() {
         writeAccess.writeBoolean(handle, 0, true);
         verify(writeAccess).writeByte(handle, 0, (byte) 'Y');
-        assertArrayEquals(new byte[]{'Y', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle);
+        assertArrayEquals(new byte[]{'Y', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle, "writeBoolean(true) stores 'Y'");
 
         writeAccess.writeBoolean(handle, 0, false);
         verify(writeAccess).writeByte(handle, 0, (byte) 0);
-        assertArrayEquals(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle);
+        assertArrayEquals(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle, "writeBoolean(false) stores 0");
     }
 
     @Test
     void testWriteUnsignedShort() {
         writeAccess.writeUnsignedShort(handle, 0, 0xFFFF);
         verify(writeAccess).writeShort(handle, 0, (short) Maths.toUInt16(0xFFFF));
-        assertArrayEquals(new byte[]{(byte) 0xFF, (byte) 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle);
+        assertArrayEquals(new byte[]{(byte) 0xFF, (byte) 0xFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, handle, "writeUnsignedShort stores expected bytes");
     }
 
     @Test
@@ -145,7 +145,7 @@ class WriteAccessTest {
 
         writeAccess.writeChar(handle, 0, 'A');
         verify(writeAccess).writeShort(handle, 0, (short) 'A');
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeChar stores expected bytes");
     }
 
     @Test
@@ -158,7 +158,7 @@ class WriteAccessTest {
 
         writeAccess.writeUnsignedInt(handle, 0, 0xFFFFFFFFL);
         verify(writeAccess).writeInt(handle, 0, (int) Maths.toUInt32(0xFFFFFFFFL));
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeUnsignedInt stores expected bytes");
     }
 
     @Test
@@ -171,7 +171,7 @@ class WriteAccessTest {
 
         writeAccess.writeInt(handle, 0, 0x12345678);
         verify(writeAccess).writeInt(handle, 0, 0x12345678);
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeInt stores expected bytes");
     }
 
     @Test
@@ -188,7 +188,7 @@ class WriteAccessTest {
 
         writeAccess.writeLong(handle, 0, 0x123456789ABCDEF0L);
         verify(writeAccess).writeLong(handle, 0, 0x123456789ABCDEF0L);
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeLong stores expected bytes");
     }
 
     @Test
@@ -202,7 +202,7 @@ class WriteAccessTest {
 
         writeAccess.writeFloat(handle, 0, 1.0f);
         verify(writeAccess).writeFloat(handle, 0, 1.0f);
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeFloat stores expected bytes");
     }
 
     @Test
@@ -220,7 +220,7 @@ class WriteAccessTest {
 
         writeAccess.writeDouble(handle, 0, 1.0);
         verify(writeAccess).writeDouble(handle, 0, 1.0);
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeDouble stores expected bytes");
     }
 
     @Test
@@ -234,7 +234,7 @@ class WriteAccessTest {
         for (int i = 0; i < 16; i += 8) {
             verify(writeAccess).writeLong(handle, i, 0xAAAAAAAAAAAAAAAAL);
         }
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "writeBytes fills range with value");
     }
 
     @Test
@@ -245,6 +245,6 @@ class WriteAccessTest {
         for (int i = 0; i < 16; i += 8) {
             verify(writeAccess).writeLong(handle, i, 0L);
         }
-        assertArrayEquals(expected, handle);
+        assertArrayEquals(expected, handle, "zeroOut clears range");
     }
 }

@@ -5,17 +5,19 @@ package net.openhft.chronicle.algo.hashing;
 
 import net.openhft.chronicle.algo.bytes.NativeAccess;
 import net.openhft.chronicle.bytes.NativeBytes;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ThreadLocalRandom;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by peter on 28/06/15.
  */
 public class MurmurHash3MoreTest {
     @Test
-    @Ignore("Long running, avg score = 6994")
+    @Disabled("Long running, avg score = 6994")
     public void testSmallRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
@@ -48,10 +50,11 @@ public class MurmurHash3MoreTest {
         }
         System.out.println("Average score: " + (scoreSum / 500.0));
         System.out.printf("Average time %.3f us%n", (time / (double) timeCount) / 1e3);
+        assertTrue(timeCount > 0, "hashes computed");
     }
 
-    @Ignore("Long running, avg score = 6836")
     @Test
+    @Disabled("Long running, avg score = 6836")
     public void testRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
@@ -87,5 +90,6 @@ public class MurmurHash3MoreTest {
         }
         System.out.println("Average score: " + (scoreSum / 500.0));
         System.out.printf("Average time %.3f us%n", (time / (double) timeCount) / 1e3);
+        assertTrue(timeCount > 0, "hashes computed");
     }
 }

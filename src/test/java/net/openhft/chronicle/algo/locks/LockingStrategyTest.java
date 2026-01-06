@@ -6,32 +6,26 @@ package net.openhft.chronicle.algo.locks;
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.algo.bytes.Accessor;
 import net.openhft.chronicle.bytes.BytesStore;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.ByteBuffer;
-import java.util.Collection;
 import java.util.concurrent.*;
+import java.util.stream.Stream;
 
-import static java.util.Arrays.asList;
 import static net.openhft.chronicle.algo.bytes.Accessor.uncheckedByteBufferAccessor;
-import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.ADDRESS;
-import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.BYTES_WITH_OFFSET;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-@RunWith(Parameterized.class)
 public class LockingStrategyTest {
 
-    private final LockingStrategy lockingStrategy;
-    private final AccessMethod accessMethod;
-    private final TestReadWriteLockState rwLockState = new TestReadWriteLockState();
+    private LockingStrategy lockingStrategy;
+    private AccessMethod accessMethod;
+    private final ReadWriteLockStateAdapter rwLockState = new ReadWriteLockStateAdapter();
     private final Callable<Boolean> tryReadLockTask = () -> rwls().tryReadLock();
-    private final TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
+    private final ReadWriteUpdateLockStateAdapter rwuLockState = new ReadWriteUpdateLockStateAdapter();
     private final Runnable readUnlockTask = () -> rwls().readUnlock();
     private final Callable<Boolean> tryUpdateLockTask = () -> rwuls().tryUpdateLock();
     private final Runnable updateUnlockTask = () -> rwuls().updateUnlock();
@@ -46,31 +40,26 @@ public class LockingStrategyTest {
     private Access access;
     private Object handle;
 
-    public LockingStrategyTest(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
-        this.lockingStrategy = lockingStrategy;
-        this.accessMethod = accessMethod;
-    }
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        return asList(new Object[][]{
-                {VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), ADDRESS},
-                {VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), BYTES_WITH_OFFSET},
-                {VanillaReadWriteWithWaitsLockingStrategy.instance(), ADDRESS},
-                {VanillaReadWriteWithWaitsLockingStrategy.instance(), BYTES_WITH_OFFSET},
-        });
+    static Stream<Arguments> scenarios() {
+        return Stream.of(
+                Arguments.of("RWU/address", VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), AccessMethod.ADDRESS),
+                Arguments.of("RWU/bytes+offset", VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), AccessMethod.BYTES_WITH_OFFSET),
+                Arguments.of("RW/address", VanillaReadWriteWithWaitsLockingStrategy.instance(), AccessMethod.ADDRESS),
+                Arguments.of("RW/bytes+offset", VanillaReadWriteWithWaitsLockingStrategy.instance(), AccessMethod.BYTES_WITH_OFFSET)
+        );
     }
 
     @SuppressWarnings("unchecked")
-    @Before
-    public void setUp() {
+    private void setUp(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
+        this.lockingStrategy = lockingStrategy;
+        this.accessMethod = accessMethod;
         e1 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>());
         e2 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>());
 
         buffer = ByteBuffer.allocateDirect(8);
-        if (accessMethod == ADDRESS) {
+        if (accessMethod == AccessMethod.ADDRESS) {
             Accessor.Full<ByteBuffer, ?> accessor = uncheckedByteBufferAccessor(buffer);
             access = accessor.access();
             handle = accessor.handle(buffer);
@@ -85,108 +74,146 @@ public class LockingStrategyTest {
         rwls().reset();
     }
 
-    @After
-    public void tearDown() {
+    private void tearDown() {
         e1.shutdown();
         e2.shutdown();
     }
 
-    @Test
-    public void testUpdateLockIsExclusive() throws ExecutionException, InterruptedException {
+    @ParameterizedTest(name = "{0} update lock exclusive")
+    @MethodSource("scenarios")
+    public void testUpdateLockIsExclusive(String scenario, LockingStrategy lockingStrategy, AccessMethod accessMethod)
+            throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
+        try {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
-        assertTrue(e1.submit(tryUpdateLockTask).get());
+            assertTrue(e1.submit(tryUpdateLockTask).get(), scenario + ": update lock acquired by thread1");
 
         // Try to acquire update lock in thread 2, should fail...
-        assertFalse(e2.submit(tryUpdateLockTask).get());
+            assertFalse(e2.submit(tryUpdateLockTask).get(), scenario + ": update lock blocked in thread2");
 
         // Release the update lock in thread 1...
         e1.submit(updateUnlockTask).get();
 
         // Try to acquire update lock in thread 2 again, should succeed...
-        assertTrue(e2.submit(tryUpdateLockTask).get());
+            assertTrue(e2.submit(tryUpdateLockTask).get(), scenario + ": update lock acquired by thread2 after release");
 
         // Release the update lock in thread 2...
         e2.submit(updateUnlockTask).get();
+        } finally {
+            tearDown();
+        }
     }
 
-    @Test
-    public void testUpdateLockAllowsOtherReaders() throws ExecutionException, InterruptedException {
+    @ParameterizedTest(name = "{0} update lock allows readers")
+    @MethodSource("scenarios")
+    public void testUpdateLockAllowsOtherReaders(String scenario, LockingStrategy lockingStrategy, AccessMethod accessMethod)
+            throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
+        try {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
-        assertTrue(e1.submit(tryUpdateLockTask).get());
+            assertTrue(e1.submit(tryUpdateLockTask).get(), scenario + ": update lock acquired by thread1");
 
         // Try to acquire read lock in thread 2, should succeed...
-        assertTrue(e2.submit(tryReadLockTask).get());
+            assertTrue(e2.submit(tryReadLockTask).get(), scenario + ": read lock acquired by thread2 while update held");
 
         // Release the update lock in thread 1...
         e1.submit(updateUnlockTask).get();
 
         // Release the read lock in thread 2...
         e2.submit(readUnlockTask).get();
+        } finally {
+            tearDown();
+        }
     }
 
-    @Test
-    public void testUpdateLockBlocksOtherWriters() throws ExecutionException, InterruptedException {
+    @ParameterizedTest(name = "{0} update lock blocks writers")
+    @MethodSource("scenarios")
+    public void testUpdateLockBlocksOtherWriters(String scenario, LockingStrategy lockingStrategy, AccessMethod accessMethod)
+            throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
+        try {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
-        assertTrue(e1.submit(tryUpdateLockTask).get());
+            assertTrue(e1.submit(tryUpdateLockTask).get(), scenario + ": update lock acquired by thread1");
 
         // Try to acquire write lock in thread 2, should fail...
-        assertFalse(e2.submit(tryWriteLockTask).get());
+            assertFalse(e2.submit(tryWriteLockTask).get(), scenario + ": write lock blocked by update lock");
 
         // Release the update lock in thread 1...
         e1.submit(updateUnlockTask).get();
 
         // Try to acquire write lock in thread 2 again, should succeed...
-        assertTrue(e2.submit(tryWriteLockTask).get());
+            assertTrue(e2.submit(tryWriteLockTask).get(), scenario + ": write lock acquired after update release");
 
         // Release the write lock in thread 2...
         e2.submit(writeUnlockTask).get();
+        } finally {
+            tearDown();
+        }
     }
 
-    @Test
-    public void testWriteLockBlocksOtherReaders() throws ExecutionException, InterruptedException {
+    @ParameterizedTest(name = "{0} write lock blocks readers")
+    @MethodSource("scenarios")
+    public void testWriteLockBlocksOtherReaders(String scenario, LockingStrategy lockingStrategy, AccessMethod accessMethod)
+            throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
+        try {
         assumeReadWriteLock();
 
         // Acquire the write lock in thread 1...
-        assertTrue(e1.submit(tryWriteLockTask).get());
+            assertTrue(e1.submit(tryWriteLockTask).get(), scenario + ": write lock acquired by thread1");
 
         // Try to acquire read lock in thread 2, should fail...
-        assertFalse(e2.submit(tryReadLockTask).get());
+            assertFalse(e2.submit(tryReadLockTask).get(), scenario + ": read lock blocked by write lock");
 
         // Release the write lock in thread 1...
         e1.submit(writeUnlockTask).get();
 
         // Try to acquire read lock in thread 2 again, should succeed...
-        assertTrue(e2.submit(tryReadLockTask).get());
+            assertTrue(e2.submit(tryReadLockTask).get(), scenario + ": read lock acquired after write release");
 
         // Release the read lock in thread 2...
         e2.submit(readUnlockTask).get();
+        } finally {
+            tearDown();
+        }
     }
 
-    @Test
-    public void testUpdateLockUpgradeToWriteLock() throws ExecutionException, InterruptedException {
+    @ParameterizedTest(name = "{0} update-to-write upgrade")
+    @MethodSource("scenarios")
+    public void testUpdateLockUpgradeToWriteLock(String scenario, LockingStrategy lockingStrategy, AccessMethod accessMethod)
+            throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
+        try {
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
-        assertTrue(e1.submit(tryUpdateLockTask).get());
+            assertTrue(e1.submit(tryUpdateLockTask).get(), scenario + ": update lock acquired by thread1");
 
         // Try to acquire write lock in thread 1, should succeed...
-        assertTrue(e1.submit(() -> rwuls().tryUpgradeUpdateToWriteLock()).get());
+            assertTrue(e1.submit(() -> rwuls().tryUpgradeUpdateToWriteLock()).get(),
+                    scenario + ": upgrade update->write succeeded");
 
         // Release the write lock in thread 1...
         e1.submit(() -> rwuls().downgradeWriteToUpdateLock()).get();
 
         // Release the update lock in thread 1...
         e1.submit(updateUnlockTask).get();
+        } finally {
+            tearDown();
+        }
     }
 
-    @Test
-    public void testReadWriteLockTransitions() {
+    @ParameterizedTest(name = "{0} read/write transitions")
+    @MethodSource("scenarios")
+    public void testReadWriteLockTransitions(String scenario, LockingStrategy lockingStrategy, AccessMethod accessMethod) {
+        setUp(lockingStrategy, accessMethod);
+        try {
         assumeReadWriteLock();
 
         // forbid upgrades/downgrades/unlocks when lock is not held
@@ -196,20 +223,20 @@ public class LockingStrategyTest {
         downgradeWriteToReadLockForbidden();
 
         // Read lock is held
-        assertTrue(rwls().tryReadLock());
+            assertTrue(rwls().tryReadLock(), scenario + ": tryReadLock succeeds");
         writeUnlockForbidden();
         downgradeWriteToReadLockForbidden();
 
         // allow unlock
         rwls().readUnlock();
-        assertTrue(rwls().tryReadLock());
+            assertTrue(rwls().tryReadLock(), scenario + ": tryReadLock succeeds after readUnlock");
 
         // allow upgrade to write lock
         try {
-            assertTrue(rwls().tryUpgradeReadToWriteLock());
+            assertTrue(rwls().tryUpgradeReadToWriteLock(), scenario + ": tryUpgradeReadToWriteLock succeeds");
         } catch (UnsupportedOperationException tolerated) {
             rwls().readUnlock();
-            assertTrue(rwls().tryWriteLock());
+            assertTrue(rwls().tryWriteLock(), scenario + ": tryWriteLock succeeds (no upgrade support)");
         }
         // write lock is held
         readUnlockForbidden();
@@ -217,7 +244,7 @@ public class LockingStrategyTest {
 
         // allow unlock
         rwls().writeUnlock();
-        assertTrue(rwls().tryWriteLock());
+            assertTrue(rwls().tryWriteLock(), scenario + ": tryWriteLock succeeds after writeUnlock");
 
         // allow downgrade to read lock
         try {
@@ -226,10 +253,16 @@ public class LockingStrategyTest {
             // ignore
         }
         rwls().reset();
+        } finally {
+            tearDown();
+        }
     }
 
-    @Test
-    public void testReadWriteUpgradeLockTransitions() {
+    @ParameterizedTest(name = "{0} read/write/update transitions")
+    @MethodSource("scenarios")
+    public void testReadWriteUpgradeLockTransitions(String scenario, LockingStrategy lockingStrategy, AccessMethod accessMethod) {
+        setUp(lockingStrategy, accessMethod);
+        try {
         assumeReadWriteUpdateLock();
 
         // forbid upgrades/downgrades/unlocks when lock is not held
@@ -240,14 +273,14 @@ public class LockingStrategyTest {
         downgradeWriteToUpdateLockForbidden();
 
         // Read lock is held
-        assertTrue(rwuls().tryReadLock());
+            assertTrue(rwuls().tryReadLock(), scenario + ": tryReadLock succeeds");
         updateUnlockForbidden();
         upgradeUpdateToWriteLockForbidden();
         downgradeUpdateToReadLockForbidden();
         downgradeWriteToUpdateLockForbidden();
 
         // allow upgrade to update lock
-        assertTrue(rwuls().tryUpgradeReadToUpdateLock());
+            assertTrue(rwuls().tryUpgradeReadToUpdateLock(), scenario + ": tryUpgradeReadToUpdateLock succeeds");
 
         // update lock is held
         readUnlockForbidden();
@@ -259,10 +292,10 @@ public class LockingStrategyTest {
 
         // allow unlock
         rwuls().updateUnlock();
-        assertTrue(rwuls().tryUpdateLock());
+            assertTrue(rwuls().tryUpdateLock(), scenario + ": tryUpdateLock succeeds after updateUnlock");
 
         // allow upgrade to write lock
-        assertTrue(rwuls().tryUpgradeUpdateToWriteLock());
+            assertTrue(rwuls().tryUpgradeUpdateToWriteLock(), scenario + ": tryUpgradeUpdateToWriteLock succeeds");
 
         // write lock is held
         updateUnlockForbidden();
@@ -274,6 +307,9 @@ public class LockingStrategyTest {
         rwuls().downgradeWriteToUpdateLock();
 
         rwuls().updateUnlock();
+        } finally {
+            tearDown();
+        }
     }
 
     private void downgradeWriteToReadLockForbidden() {
@@ -358,11 +394,13 @@ public class LockingStrategyTest {
     }
 
     private void assumeReadWriteUpdateLock() {
-        assumeTrue(lockingStrategy instanceof ReadWriteUpdateLockingStrategy);
+        assumeTrue(lockingStrategy instanceof ReadWriteUpdateLockingStrategy,
+                () -> "requires ReadWriteUpdateLockingStrategy but was " + lockingStrategy.getClass().getSimpleName());
     }
 
     private void assumeReadWriteLock() {
-        assumeTrue(lockingStrategy instanceof ReadWriteLockingStrategy);
+        assumeTrue(lockingStrategy instanceof ReadWriteLockingStrategy,
+                () -> "requires ReadWriteLockingStrategy but was " + lockingStrategy.getClass().getSimpleName());
     }
 
     private ReadWriteLockState rwls() {
@@ -375,8 +413,8 @@ public class LockingStrategyTest {
 
     enum AccessMethod {ADDRESS, BYTES_WITH_OFFSET}
 
-    @SuppressWarnings({"unchecked", "PMD.TestClassWithoutTestCases"})
-    private class TestReadWriteLockState extends AbstractReadWriteLockState {
+    @SuppressWarnings("unchecked")
+    private class ReadWriteLockStateAdapter extends AbstractReadWriteLockState {
 
         private ReadWriteLockingStrategy rwls() {
             return (ReadWriteLockingStrategy) lockingStrategy;
@@ -428,8 +466,8 @@ public class LockingStrategyTest {
         }
     }
 
-    @SuppressWarnings({"unchecked", "PMD.TestClassWithoutTestCases"})
-    private class TestReadWriteUpdateLockState extends TestReadWriteLockState
+    @SuppressWarnings("unchecked")
+    private class ReadWriteUpdateLockStateAdapter extends ReadWriteLockStateAdapter
             implements ReadWriteUpdateLockState {
 
         ReadWriteUpdateLockingStrategy rwuls() {

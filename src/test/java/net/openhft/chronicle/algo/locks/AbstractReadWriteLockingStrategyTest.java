@@ -30,7 +30,7 @@ class AbstractReadWriteLockingStrategyTest {
     void testTryLock() {
         when(strategy.tryWriteLock(access, handle, 0L)).thenReturn(true);
         boolean result = strategy.tryLock(access, handle, 0L);
-        assertTrue(result);
+        assertTrue(result, "tryLock delegates to tryWriteLock");
         verify(strategy).tryWriteLock(access, handle, 0L);
     }
 
@@ -44,9 +44,9 @@ class AbstractReadWriteLockingStrategyTest {
     @Test
     void testIsReadLocked() {
         when(strategy.readLockCount(1L)).thenReturn(1);
-        assertTrue(strategy.isReadLocked(1L));
+        assertTrue(strategy.isReadLocked(1L), "isReadLocked returns true when count > 0");
 
         when(strategy.readLockCount(0L)).thenReturn(0);
-        assertFalse(strategy.isReadLocked(0L));
+        assertFalse(strategy.isReadLocked(0L), "isReadLocked returns false when count is zero");
     }
 }

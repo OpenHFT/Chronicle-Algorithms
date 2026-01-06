@@ -29,16 +29,16 @@ class VanillaReadWriteWithWaitsLockingStrategyTest {
         long lock = 5L;
         int expectedReadLocks = 5;
         int readLocks = VanillaReadWriteWithWaitsLockingStrategy.rwReadLocked(lock);
-        assertEquals(expectedReadLocks, readLocks);
+        assertEquals(expectedReadLocks, readLocks, "rwReadLocked extracts read lock count");
     }
 
     @Test
     void testIsWriteLocked() {
         long state = VanillaReadWriteWithWaitsLockingStrategy.RW_WRITE_LOCKED;
-        assertTrue(strategy.isWriteLocked(state));
+        assertTrue(strategy.isWriteLocked(state), "RW_WRITE_LOCKED is write locked");
 
         long nonWriteLockedState = 0;
-        assertFalse(strategy.isWriteLocked(nonWriteLockedState));
+        assertFalse(strategy.isWriteLocked(nonWriteLockedState), "zero state is not write locked");
     }
 
     @Test
@@ -46,7 +46,7 @@ class VanillaReadWriteWithWaitsLockingStrategyTest {
         long state = 7L; // 7 read locks
         int expectedReadLockCount = 7;
         int readLockCount = strategy.readLockCount(state);
-        assertEquals(expectedReadLockCount, readLockCount);
+        assertEquals(expectedReadLockCount, readLockCount, "readLockCount extracts read lock count");
     }
 
     @Test
@@ -65,16 +65,16 @@ class VanillaReadWriteWithWaitsLockingStrategyTest {
         long state = VanillaReadWriteWithWaitsLockingStrategy.RW_WRITE_WAITING * 3; // 3 waits
         int expectedWaitCount = 3;
         int waitCount = strategy.waitCount(state);
-        assertEquals(expectedWaitCount, waitCount);
+        assertEquals(expectedWaitCount, waitCount, "waitCount extracts wait count");
     }
 
     @Test
     void testIsLocked() {
         long lockedState = VanillaReadWriteWithWaitsLockingStrategy.RW_WRITE_LOCKED;
-        assertTrue(strategy.isLocked(lockedState));
+        assertTrue(strategy.isLocked(lockedState), "RW_WRITE_LOCKED is locked");
 
         long nonLockedState = 0;
-        assertFalse(strategy.isLocked(nonLockedState));
+        assertFalse(strategy.isLocked(nonLockedState), "zero state is not locked");
     }
 
     @Test
@@ -83,7 +83,7 @@ class VanillaReadWriteWithWaitsLockingStrategyTest {
         int expectedLockCount = 4;
 
         int lockCount = strategy.lockCount(state);
-        assertEquals(expectedLockCount, lockCount);
+        assertEquals(expectedLockCount, lockCount, "lockCount includes read locks and write lock");
     }
 
     @Test
@@ -92,12 +92,12 @@ class VanillaReadWriteWithWaitsLockingStrategyTest {
         String expectedString = "[read locks = 3, write locked = false, waits = 1]";
 
         String lockStateString = strategy.toString(state);
-        assertEquals(expectedString, lockStateString);
+        assertEquals(expectedString, lockStateString, "toString formats state");
     }
 
     @Test
     void testSizeInBytes() {
         int expectedSize = 8;
-        assertEquals(expectedSize, strategy.sizeInBytes());
+        assertEquals(expectedSize, strategy.sizeInBytes(), "sizeInBytes returns 8");
     }
 }

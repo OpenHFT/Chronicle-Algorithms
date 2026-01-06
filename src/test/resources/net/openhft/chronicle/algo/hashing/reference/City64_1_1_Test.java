@@ -43,7 +43,7 @@ public class City64_1_1_Test {
         for (int j = 0; j < data.length; j++) {
             data[j] = (byte) j;
         }
-        LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
+        LongHashFunctionChecks.test(city, data, hashesOfLoopingBytes[len]);
     }
 
 // The following numbers is the result of compiling & running this program

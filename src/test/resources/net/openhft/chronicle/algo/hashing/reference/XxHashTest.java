@@ -40,7 +40,7 @@ public class XxHashTest {
         for (int j = 0; j < data.length; j++) {
             data[j] = (byte) j;
         }
-        LongHashFunctionTest.test(city, data, hashesOfLoopingBytes[len]);
+        LongHashFunctionChecks.test(city, data, hashesOfLoopingBytes[len]);
     }
 
 /**

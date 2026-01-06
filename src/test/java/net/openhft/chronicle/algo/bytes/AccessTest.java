@@ -29,7 +29,7 @@ class AccessTest {
 
         when(access.compareAndSwapInt(handle, offset, expected, value)).thenReturn(true);
 
-        assertTrue(access.compareAndSwapInt(handle, offset, expected, value));
+        assertTrue(access.compareAndSwapInt(handle, offset, expected, value), "compareAndSwapInt succeeds");
         verify(access).compareAndSwapInt(handle, offset, expected, value);
     }
 
@@ -41,7 +41,7 @@ class AccessTest {
 
         when(access.compareAndSwapLong(handle, offset, expected, value)).thenReturn(true);
 
-        assertTrue(access.compareAndSwapLong(handle, offset, expected, value));
+        assertTrue(access.compareAndSwapLong(handle, offset, expected, value), "compareAndSwapLong succeeds");
         verify(access).compareAndSwapLong(handle, offset, expected, value);
     }
 }

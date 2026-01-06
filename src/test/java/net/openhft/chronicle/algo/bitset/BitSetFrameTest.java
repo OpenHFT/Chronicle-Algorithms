@@ -52,7 +52,7 @@ class BitSetFrameTest {
     void testSetIfClear() {
         long bitIndex = 5L;
         when(bitSetFrame.setIfClear(access, handle, offset, bitIndex)).thenReturn(true);
-        assertTrue(bitSetFrame.setIfClear(access, handle, offset, bitIndex));
+        assertTrue(bitSetFrame.setIfClear(access, handle, offset, bitIndex), "setIfClear succeeds");
         verify(bitSetFrame).setIfClear(access, handle, offset, bitIndex);
     }
 
@@ -60,7 +60,7 @@ class BitSetFrameTest {
     void testClearIfSet() {
         long bitIndex = 5L;
         when(bitSetFrame.clearIfSet(access, handle, offset, bitIndex)).thenReturn(true);
-        assertTrue(bitSetFrame.clearIfSet(access, handle, offset, bitIndex));
+        assertTrue(bitSetFrame.clearIfSet(access, handle, offset, bitIndex), "clearIfSet succeeds");
         verify(bitSetFrame).clearIfSet(access, handle, offset, bitIndex);
     }
 
@@ -85,7 +85,7 @@ class BitSetFrameTest {
     void testIsSet() {
         long bitIndex = 5L;
         when(bitSetFrame.isSet(access, handle, offset, bitIndex)).thenReturn(true);
-        assertTrue(bitSetFrame.isSet(access, handle, offset, bitIndex));
+        assertTrue(bitSetFrame.isSet(access, handle, offset, bitIndex), "isSet returns true");
         verify(bitSetFrame).isSet(access, handle, offset, bitIndex);
     }
 
@@ -93,7 +93,7 @@ class BitSetFrameTest {
     void testIsClear() {
         long bitIndex = 5L;
         when(bitSetFrame.isClear(access, handle, offset, bitIndex)).thenReturn(true);
-        assertTrue(bitSetFrame.isClear(access, handle, offset, bitIndex));
+        assertTrue(bitSetFrame.isClear(access, handle, offset, bitIndex), "isClear returns true");
         verify(bitSetFrame).isClear(access, handle, offset, bitIndex);
     }
 }

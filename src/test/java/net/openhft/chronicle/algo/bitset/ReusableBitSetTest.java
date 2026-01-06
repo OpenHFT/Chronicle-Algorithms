@@ -48,69 +48,71 @@ class ReusableBitSetTest {
         try (BitSetFixture fixture = factory.get()) {
             ReusableBitSet bs = fixture.bitSet();
             bs.clearAll();
-            assertEquals(0, bs.cardinality());
+            assertEquals(0, bs.cardinality(), name + ": cardinality after clearAll");
             assertRangeClear(bs, 0, LOGICAL_SIZE);
 
             bs.set(5);
-            assertTrue(bs.get(5));
-            assertTrue(bs.isSet(5));
-            assertFalse(bs.isClear(5));
-            assertEquals(1, bs.cardinality());
+            assertTrue(bs.get(5), name + ": get(5) after set");
+            assertTrue(bs.isSet(5), name + ": isSet(5) after set");
+            assertFalse(bs.isClear(5), name + ": isClear(5) after set");
+            assertEquals(1, bs.cardinality(), name + ": cardinality after set(5)");
 
-            assertFalse(bs.setIfClear(5));
-            assertTrue(bs.clearIfSet(5));
-            assertEquals(0, bs.cardinality());
+            assertFalse(bs.setIfClear(5), name + ": setIfClear(5) false when already set");
+            assertTrue(bs.clearIfSet(5), name + ": clearIfSet(5) true when set");
+            assertEquals(0, bs.cardinality(), name + ": cardinality after clearIfSet(5)");
             bs.set(5, true);
-            assertTrue(bs.get(5));
+            assertTrue(bs.get(5), name + ": get(5) after set(5,true)");
             bs.set(5, false);
-            assertFalse(bs.get(5));
+            assertFalse(bs.get(5), name + ": get(5) after set(5,false)");
 
             bs.setRange(10, 20);
             assertRangeSet(bs, 10, 20);
-            assertEquals(10, bs.cardinality());
+            assertEquals(10, bs.cardinality(), name + ": cardinality after setRange(10,20)");
 
             bs.clearRange(12, 18);
-            assertEquals(4, bs.cardinality());
+            assertEquals(4, bs.cardinality(), name + ": cardinality after clearRange(12,18)");
             bs.setRange(12, 18, true);
-            assertEquals(10, bs.cardinality());
+            assertEquals(10, bs.cardinality(), name + ": cardinality after setRange(12,18,true)");
 
             bs.flip(12);
-            assertFalse(bs.get(12));
+            assertFalse(bs.get(12), name + ": bit 12 cleared after flip(12)");
             bs.flipRange(12, 16);
-            assertFalse(bs.get(13));
-            assertFalse(bs.get(14));
-            assertFalse(bs.get(15));
+            assertFalse(bs.get(13), name + ": bit 13 cleared after flipRange(12,16)");
+            assertFalse(bs.get(14), name + ": bit 14 cleared after flipRange(12,16)");
+            assertFalse(bs.get(15), name + ": bit 15 cleared after flipRange(12,16)");
 
-            assertEquals(10, bs.nextSetBit(0));
-            assertEquals(0, bs.nextClearBit(0));
-            assertEquals(19, bs.previousSetBit(LOGICAL_SIZE - 1));
-            assertEquals(15, bs.previousClearBit(18));
+            assertEquals(10, bs.nextSetBit(0), name + ": nextSetBit(0)");
+            assertEquals(0, bs.nextClearBit(0), name + ": nextClearBit(0)");
+            assertEquals(19, bs.previousSetBit(LOGICAL_SIZE - 1), name + ": previousSetBit(end)");
+            assertEquals(15, bs.previousClearBit(18), name + ": previousClearBit(18)");
 
-            assertEquals(0, bs.setNextClearBit(0));
-            assertTrue(bs.get(0));
-            assertEquals(0, bs.clearNextSetBit(0));
-            assertFalse(bs.get(0));
-            assertEquals(10, bs.clearNextSetBit(1));
-            assertFalse(bs.get(10));
+            assertEquals(0, bs.setNextClearBit(0), name + ": setNextClearBit(0)");
+            assertTrue(bs.get(0), name + ": bit 0 set after setNextClearBit(0)");
+            assertEquals(0, bs.clearNextSetBit(0), name + ": clearNextSetBit(0)");
+            assertFalse(bs.get(0), name + ": bit 0 cleared after clearNextSetBit(0)");
+            assertEquals(10, bs.clearNextSetBit(1), name + ": clearNextSetBit(1)");
+            assertFalse(bs.get(10), name + ": bit 10 cleared after clearNextSetBit(1)");
 
             bs.setRange(32, 48);
             assertRangeSet(bs, 32, 48);
-            assertEquals(31, bs.setPreviousClearBit(47));
-            assertTrue(bs.get(31));
-            assertEquals(47, bs.clearPreviousSetBit(LOGICAL_SIZE - 1));
-            assertFalse(bs.get(47));
+            assertEquals(31, bs.setPreviousClearBit(47), name + ": setPreviousClearBit(47)");
+            assertTrue(bs.get(31), name + ": bit 31 set after setPreviousClearBit(47)");
+            assertEquals(47, bs.clearPreviousSetBit(LOGICAL_SIZE - 1), name + ": clearPreviousSetBit(end)");
+            assertFalse(bs.get(47), name + ": bit 47 cleared after clearPreviousSetBit(end)");
 
             bs.clearAll();
             bs.setRange(10, 20);
             long blockStart = bs.setNextNContinuousClearBits(0, 6);
-            assertEquals(0, blockStart);
-            assertEquals(blockStart, bs.clearNextNContinuousSetBits(blockStart, 6));
+            assertEquals(0, blockStart, name + ": setNextNContinuousClearBits(0,6)");
+            assertEquals(blockStart,
+                    bs.clearNextNContinuousSetBits(blockStart, 6),
+                    name + ": clearNextNContinuousSetBits(blockStart,6)");
             assertRangeClear(bs, blockStart, blockStart + 6);
             long prevBlockStart = bs.setPreviousNContinuousClearBits(9, 4);
-            assertEquals(6, prevBlockStart);
+            assertEquals(6, prevBlockStart, name + ": setPreviousNContinuousClearBits(9,4)");
             assertRangeSet(bs, prevBlockStart, prevBlockStart + 4);
             long clearedPrevStart = bs.clearPreviousNContinuousSetBits(18, 4);
-            assertEquals(15, clearedPrevStart);
+            assertEquals(15, clearedPrevStart, name + ": clearPreviousNContinuousSetBits(18,4)");
             assertRangeClear(bs, clearedPrevStart, clearedPrevStart + 4);
 
             BitSet.Bits bits = bs.setBits().reset();
@@ -118,12 +120,12 @@ class ReusableBitSetTest {
             while (bits.next() >= 0) {
                 visited++;
             }
-            assertEquals(bs.cardinality(), visited);
+            assertEquals(bs.cardinality(), visited, name + ": visited set bits");
 
             bs.setAll();
-            assertEquals(LOGICAL_SIZE, bs.cardinality());
+            assertEquals(LOGICAL_SIZE, bs.cardinality(), name + ": cardinality after setAll");
             bs.clearAll();
-            assertEquals(0, bs.cardinality());
+            assertEquals(0, bs.cardinality(), name + ": cardinality after clearAll");
         }
     }
 

@@ -74,7 +74,7 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         when(access.readVolatileInt(handle, offset + WAIT_WORD_OFFSET)).thenReturn(expectedWaitWord);
 
         int waitWord = getWaitWord(access, handle, offset);
-        assertEquals(expectedWaitWord, waitWord);
+        assertEquals(expectedWaitWord, waitWord, "getWaitWord returns expected value");
         verify(access).readVolatileInt(handle, offset + WAIT_WORD_OFFSET);
     }
 
@@ -86,25 +86,29 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         when(access.compareAndSwapInt(handle, offset + WAIT_WORD_OFFSET, expected, x)).thenReturn(true);
 
         boolean result = casWaitWord(access, handle, offset, expected, x);
-        assertTrue(result);
+        assertTrue(result, "casWaitWord returns true");
         verify(access).compareAndSwapInt(handle, offset + WAIT_WORD_OFFSET, expected, x);
     }
 
     @Test
     void testCheckWaitWordForIncrement() {
         int waitWord = MAX_WAIT - 1;
-        assertDoesNotThrow(() -> checkWaitWordForIncrement(waitWord));
+        assertDoesNotThrow(() -> checkWaitWordForIncrement(waitWord), "increment below MAX_WAIT succeeds");
 
-        assertThrows(IllegalMonitorStateException.class, () -> checkWaitWordForIncrement(MAX_WAIT));
+        assertThrows(IllegalMonitorStateException.class,
+                () -> checkWaitWordForIncrement(MAX_WAIT),
+                "increment at MAX_WAIT fails");
     }
 
     @Test
     void testCheckWaitWordForDecrement() {
         int waitWord = 1;
-        assertDoesNotThrow(() -> checkWaitWordForDecrement(waitWord));
+        assertDoesNotThrow(() -> checkWaitWordForDecrement(waitWord), "decrement above zero succeeds");
 
         int zeroWaitWord = 0;
-        assertThrows(IllegalMonitorStateException.class, () -> checkWaitWordForDecrement(zeroWaitWord));
+        assertThrows(IllegalMonitorStateException.class,
+                () -> checkWaitWordForDecrement(zeroWaitWord),
+                "decrement at zero fails");
     }
 
     @Test
@@ -115,22 +119,22 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         when(access.compareAndSwapLong(handle, offset, lockWord, VanillaReadWriteUpdateWithWaitsLockingStrategy.lockWord(WRITE_LOCKED_COUNT_WORD, waitWord - WAIT_PARTY))).thenReturn(true);
 
         boolean result = tryWriteLockAndDeregisterWait0(access, handle, offset, lockWord);
-        assertTrue(result);
+        assertTrue(result, "tryWriteLockAndDeregisterWait0 returns true");
         verify(access).compareAndSwapLong(handle, offset, lockWord, VanillaReadWriteUpdateWithWaitsLockingStrategy.lockWord(WRITE_LOCKED_COUNT_WORD, waitWord - WAIT_PARTY));
     }
 
     @Test
     void testCheckExclusiveUpdateLocked() {
-        assertTrue(checkExclusiveUpdateLocked(UPDATE_PARTY));
+        assertTrue(checkExclusiveUpdateLocked(UPDATE_PARTY), "exclusive update lock recognized");
 
         int nonExclusiveUpdateCountWord = UPDATE_PARTY + 1;
-        assertFalse(checkExclusiveUpdateLocked(nonExclusiveUpdateCountWord));
+        assertFalse(checkExclusiveUpdateLocked(nonExclusiveUpdateCountWord), "non-exclusive update lock rejected");
     }
 
     @Test
     void testResetState() {
         long state = strategy.resetState();
-        assertEquals(0L, state);
+        assertEquals(0L, state, "resetState clears lock word");
     }
 
     @Test
@@ -167,10 +171,10 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
     @Test
     void testIsUpdateLocked() {
         long state = VanillaReadWriteUpdateWithWaitsLockingStrategy.lockWord(UPDATE_PARTY, 0);
-        assertTrue(strategy.isUpdateLocked(state));
+        assertTrue(strategy.isUpdateLocked(state), "isUpdateLocked true for UPDATE_PARTY");
 
         long nonUpdateLockedState = 0;
-        assertFalse(strategy.isUpdateLocked(nonUpdateLockedState));
+        assertFalse(strategy.isUpdateLocked(nonUpdateLockedState), "isUpdateLocked false for 0");
     }
 
     @Test
@@ -179,16 +183,16 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         int expectedReadLockCount = 1;
 
         int readLockCount = strategy.readLockCount(state);
-        assertEquals(expectedReadLockCount, readLockCount);
+        assertEquals(expectedReadLockCount, readLockCount, "readLockCount returns expected value");
     }
 
     @Test
     void testIsWriteLocked() {
         long state = VanillaReadWriteUpdateWithWaitsLockingStrategy.lockWord(WRITE_LOCKED_COUNT_WORD, 0);
-        assertTrue(strategy.isWriteLocked(state));
+        assertTrue(strategy.isWriteLocked(state), "isWriteLocked true for WRITE_LOCKED_COUNT_WORD");
 
         long nonWriteLockedState = 0;
-        assertFalse(strategy.isWriteLocked(nonWriteLockedState));
+        assertFalse(strategy.isWriteLocked(nonWriteLockedState), "isWriteLocked false for 0");
     }
 
     @Test
@@ -197,16 +201,16 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         int expectedWaitCount = 1;
 
         int waitCount = strategy.waitCount(state);
-        assertEquals(expectedWaitCount, waitCount);
+        assertEquals(expectedWaitCount, waitCount, "waitCount returns expected value");
     }
 
     @Test
     void testIsLocked() {
         long lockedState = VanillaReadWriteUpdateWithWaitsLockingStrategy.lockWord(1, 0);
-        assertTrue(strategy.isLocked(lockedState));
+        assertTrue(strategy.isLocked(lockedState), "isLocked true for non-zero lock state");
 
         long nonLockedState = 0;
-        assertFalse(strategy.isLocked(nonLockedState));
+        assertFalse(strategy.isLocked(nonLockedState), "isLocked false for 0");
     }
 
     @Test
@@ -215,12 +219,12 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         String expectedString = "[read locks = 1, update locked = false, write locked = false, waits = 1]";
 
         String lockStateString = strategy.toString(state);
-        assertEquals(expectedString, lockStateString);
+        assertEquals(expectedString, lockStateString, "toString formats lock state");
     }
 
     @Test
     void testSizeInBytes() {
         int expectedSize = 8;
-        assertEquals(expectedSize, strategy.sizeInBytes());
+        assertEquals(expectedSize, strategy.sizeInBytes(), "sizeInBytes returns expected value");
     }
 }
