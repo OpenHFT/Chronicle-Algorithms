@@ -26,3 +26,4 @@ target
 # tests
 *.bin
 *.deleteme
+logs/
