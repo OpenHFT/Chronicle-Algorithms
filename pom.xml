@@ -16,7 +16,7 @@
     </parent>
 
     <artifactId>chronicle-algorithms</artifactId>
-    <version>2026.2-SNAPSHOT</version>
+    <version>2026.2</version>
     <name>OpenHFT/Chronicle-Algorithms</name>
     <description>Chronicle-Algorithms</description>
 
@@ -161,7 +161,7 @@
         <connection>scm:git:git@github.com:OpenHFT/Chronicle-Algorithms.git</connection>
         <developerConnection>scm:git:git@github.com:OpenHFT/Chronicle-Algorithms.git
         </developerConnection>
-        <tag>master</tag>
+        <tag>chronicle-algorithms-2026.2</tag>
     </scm>
 
 </project>
