@@ -5,8 +5,8 @@ package net.openhft.chronicle.algo.hashing;
 
 import net.openhft.chronicle.algo.bytes.NativeAccess;
 import net.openhft.chronicle.bytes.NativeBytes;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
 
@@ -15,7 +15,7 @@ import java.security.SecureRandom;
  */
 public class City64MoreTest {
     @Test
-    @Ignore("Long running, avg score = 6834")
+    @Disabled("Long running, avg score = 6834")
     public void testSmallRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
@@ -50,7 +50,7 @@ public class City64MoreTest {
         System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
     }
 
-    @Ignore("Long running, avg score = 6852")
+    @Disabled("Long running, avg score = 6852")
     @Test
     public void testRandomness() {
         long time = 0, timeCount = 0;

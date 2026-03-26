@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteOrder;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ZeroAccessTest {
 
@@ -86,6 +85,6 @@ class ZeroAccessTest {
 
     @Test
     void testByteOrder() {
-        assertEquals(ByteOrder.nativeOrder(), zeroAccess.byteOrder(null));
+        assertSame(ByteOrder.nativeOrder(), zeroAccess.byteOrder(null));
     }
 }

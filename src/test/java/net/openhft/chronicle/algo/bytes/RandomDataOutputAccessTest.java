@@ -3,16 +3,17 @@
  */
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
 import net.openhft.chronicle.bytes.RandomDataOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteOrder;
 
 import static org.mockito.Mockito.*;
 
-public class RandomDataOutputAccessTest extends TestCase {
+public class RandomDataOutputAccessTest {
     private RandomDataOutputImpl mockOutput;
     private RandomDataOutputAccess<RandomDataOutputImpl> access;
 
@@ -105,7 +106,7 @@ public class RandomDataOutputAccessTest extends TestCase {
     @Test
     public void testByteOrder() {
         when(mockOutput.byteOrder()).thenReturn(ByteOrder.BIG_ENDIAN);
-        assertEquals(ByteOrder.BIG_ENDIAN, access.byteOrder(mockOutput));
+        assertSame(ByteOrder.BIG_ENDIAN, access.byteOrder(mockOutput));
         verify(mockOutput).byteOrder();
     }
 

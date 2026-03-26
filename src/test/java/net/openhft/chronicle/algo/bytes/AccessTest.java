@@ -3,14 +3,15 @@
  */
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class AccessTest extends TestCase {
+public class AccessTest {
 
     private Access<Object> access;
     private Object handle;
