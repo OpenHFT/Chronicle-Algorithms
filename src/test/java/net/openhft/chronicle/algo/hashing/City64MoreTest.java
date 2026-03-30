@@ -50,8 +50,8 @@ public class City64MoreTest {
         System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
     }
 
-    @Disabled("Long running, avg score = 6852")
     @Test
+    @Disabled("Long running, avg score = 6852")
     public void testRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
