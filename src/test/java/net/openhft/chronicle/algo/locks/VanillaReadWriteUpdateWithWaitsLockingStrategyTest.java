@@ -225,5 +225,4 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         int expectedSize = 8;
         assertEquals(expectedSize, strategy.sizeInBytes());
     }
-
 }
