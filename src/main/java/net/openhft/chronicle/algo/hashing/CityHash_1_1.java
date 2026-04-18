@@ -12,7 +12,7 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
 
 /**
  * Adapted from the C++ CityHash implementation from Google at
- * http://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
+ * https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
  */
 class CityHash_1_1 {
 
