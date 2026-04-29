@@ -3,15 +3,16 @@
  */
 package net.openhft.chronicle.algo.bitset;
 
-import junit.framework.TestCase;
 import net.openhft.chronicle.algo.bytes.Access;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
-public class ConcurrentFlatBitSetFrameTest extends TestCase {
+public class ConcurrentFlatBitSetFrameTest {
     private ConcurrentFlatBitSetFrame bitSetFrame;
     private Access<Object> access;
     private Object handle;

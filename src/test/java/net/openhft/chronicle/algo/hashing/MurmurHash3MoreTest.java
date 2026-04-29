@@ -5,8 +5,8 @@ package net.openhft.chronicle.algo.hashing;
 
 import net.openhft.chronicle.algo.bytes.NativeAccess;
 import net.openhft.chronicle.bytes.NativeBytes;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
 
@@ -15,7 +15,7 @@ import java.security.SecureRandom;
  */
 public class MurmurHash3MoreTest {
     @Test
-    @Ignore("Long running, avg score = 6994")
+    @Disabled("Long running, avg score = 6994")
     public void testSmallRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;
@@ -50,8 +50,8 @@ public class MurmurHash3MoreTest {
         System.out.printf("Average time %.3f us%n", time / timeCount / 1e3);
     }
 
-    @Ignore("Long running, avg score = 6836")
     @Test
+    @Disabled("Long running, avg score = 6836")
     public void testRandomness() {
         long time = 0, timeCount = 0;
         long scoreSum = 0;

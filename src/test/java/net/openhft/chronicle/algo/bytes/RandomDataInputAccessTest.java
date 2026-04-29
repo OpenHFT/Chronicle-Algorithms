@@ -3,16 +3,17 @@
  */
 package net.openhft.chronicle.algo.bytes;
 
-import junit.framework.TestCase;
 import net.openhft.chronicle.bytes.RandomDataInput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteOrder;
 
 import static org.mockito.Mockito.*;
 
-public class RandomDataInputAccessTest extends TestCase {
+public class RandomDataInputAccessTest {
     private RandomDataInput mockInput;
     private RandomDataInputAccess<RandomDataInput> access;
 
@@ -83,14 +84,14 @@ public class RandomDataInputAccessTest extends TestCase {
     @Test
     public void testReadFloat() {
         when(mockInput.readFloat(0L)).thenReturn(5.0f);
-        assertEquals(5.0f, access.readFloat(mockInput, 0L));
+        assertEquals(5.0f, access.readFloat(mockInput, 0L), 0.0);
         verify(mockInput).readFloat(0L);
     }
 
     @Test
     public void testReadDouble() {
         when(mockInput.readDouble(0L)).thenReturn(6.0);
-        assertEquals(6.0, access.readDouble(mockInput, 0L));
+        assertEquals(6.0, access.readDouble(mockInput, 0L), 0.0);
         verify(mockInput).readDouble(0L);
     }
 
@@ -118,7 +119,7 @@ public class RandomDataInputAccessTest extends TestCase {
     @Test
     public void testByteOrder() {
         when(mockInput.byteOrder()).thenReturn(ByteOrder.BIG_ENDIAN);
-        assertEquals(ByteOrder.BIG_ENDIAN, access.byteOrder(mockInput));
+        assertSame(ByteOrder.BIG_ENDIAN, access.byteOrder(mockInput));
         verify(mockInput).byteOrder();
     }
 }

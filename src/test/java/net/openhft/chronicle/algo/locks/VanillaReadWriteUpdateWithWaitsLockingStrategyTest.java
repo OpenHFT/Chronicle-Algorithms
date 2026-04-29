@@ -29,7 +29,7 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
     void testSingletonInstance() {
         ReadWriteUpdateWithWaitsLockingStrategy instance1 = instance();
         ReadWriteUpdateWithWaitsLockingStrategy instance2 = instance();
-        assertEquals(instance1, instance2, "Expected the same instance to be returned each time.");
+        assertSame(instance1, instance2, "Expected the same instance to be returned each time.");
     }
 
     @Test
@@ -225,5 +225,4 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
         int expectedSize = 8;
         assertEquals(expectedSize, strategy.sizeInBytes());
     }
-
 }
