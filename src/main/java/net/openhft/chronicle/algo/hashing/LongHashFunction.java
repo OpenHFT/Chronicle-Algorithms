@@ -353,7 +353,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code char} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in chars (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in chars (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
@@ -377,7 +377,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the string which bytes to hash
      * @param off   index of the first {@code char} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in chars (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in chars (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return the hash code of the given {@code String}'s bytes
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length()}
@@ -401,7 +401,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the string builder which bytes to hash
      * @param off   index of the first {@code char} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in chars (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in chars (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return the hash code of the given {@code String}'s bytes
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length()}
@@ -433,7 +433,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code short} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in shorts (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in shorts (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
@@ -457,7 +457,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code int} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in ints (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in ints (i.e. the length of the bytes
      *              sequence to hash is {@code len * 4L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
@@ -481,7 +481,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code long} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in longs (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in longs (i.e. the length of the bytes
      *              sequence to hash is {@code len * 8L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}

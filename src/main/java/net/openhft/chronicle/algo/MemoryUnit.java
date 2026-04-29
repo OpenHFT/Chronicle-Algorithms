@@ -121,7 +121,7 @@ public enum MemoryUnit {
     },
 
     /**
-     * Memory unit representing one byte, i. e. 8 bits.
+     * Memory unit representing one byte, i.e. 8 bits.
      */
     BYTES {
         @Override
@@ -211,7 +211,7 @@ public enum MemoryUnit {
     },
 
     /**
-     * Memory unit representing 8 bytes, i. e. 64-bit word,
+     * Memory unit representing 8 bytes, i.e. 64-bit word,
      * the width of Java's primitive {@code long} type.
      */
     LONGS {
@@ -302,7 +302,7 @@ public enum MemoryUnit {
     },
 
     /**
-     * Memory unit representing 64 bytes, i. e. the most common CPU cache line size.
+     * Memory unit representing 64 bytes, i.e. the most common CPU cache line size.
      */
     CACHE_LINES {
         @Override
@@ -482,7 +482,7 @@ public enum MemoryUnit {
     },
 
     /**
-     * Memory unit representing 4096 bytes, i. e. the most common native memory page size.
+     * Memory unit representing 4096 bytes, i.e. the most common native memory page size.
      */
     PAGES {
         @Override
@@ -835,7 +835,7 @@ public enum MemoryUnit {
     /**
      * Aligns the given memory amount in the given unit to this unit. For example, aligning
      * {@code 1000} bytes to kilobytes results in {@code 1024}. Negative values are aligned towards
-     * negative infinity: e. g. aligning {@code -5} longs to cache lines results in {@code -8}.
+     * negative infinity: e.g. aligning {@code -5} longs to cache lines results in {@code -8}.
      *
      * @param amountToAlign the memory amount in the given {@code unit}
      * @param unit          the unit of the {@code amountToAlign} argument
