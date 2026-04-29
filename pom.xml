@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+    Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
 
 -->
 
@@ -21,6 +21,7 @@
     <description>Chronicle-Algorithms</description>
 
     <properties>
+        <license.year>2013-2026</license.year>
         <jacoco.line.coverage>0.56</jacoco.line.coverage>
         <jacoco.branch.coverage>0.35</jacoco.branch.coverage>
     </properties>
