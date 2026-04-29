@@ -12,7 +12,7 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
 
 /**
  * Adapted from the C++ CityHash implementation from Google at
- * http://code.google.com/p/cityhash/source/browse/trunk/src/city.cc.
+ * https://github.com/google/cityhash/blob/master/src/city.cc.
  */
 class CityHash_1_1 {
 
@@ -423,7 +423,7 @@ class CityHash_1_1 {
         public static final AsLongHashFunction INSTANCE = new AsLongHashFunction();
         private static final long serialVersionUID = 0L;
         private static final int FIRST_SHORT_BYTE_SHIFT = NATIVE_LITTLE_ENDIAN ? 0 : 8;
-        // JIT could probably optimize & -1 to no-op
+        // JIT could probably optimise & -1 to no-op
         private static final int FIRST_SHORT_BYTE_MASK = NATIVE_LITTLE_ENDIAN ? 0xFF : -1;
         private static final int SECOND_SHORT_BYTE_SHIFT = 8 - FIRST_SHORT_BYTE_SHIFT;
         private static final int SECOND_SHORT_BYTE_MASK = NATIVE_LITTLE_ENDIAN ? -1 : 0xFF;

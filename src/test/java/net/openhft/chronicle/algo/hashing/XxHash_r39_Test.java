@@ -13,7 +13,7 @@ public class XxHash_r39_Test {
 
     /**
      * Test data is output of the following program with xxHash implementation
-     * from https://code.google.com/p/xxhash/
+     * from https://github.com/Cyan4973/xxHash
      * <p>
      * #include "xxhash.c"
      * #include <stdlib.h>

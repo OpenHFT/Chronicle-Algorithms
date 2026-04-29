@@ -34,7 +34,7 @@ import static net.openhft.chronicle.algo.bytes.Accessor.*;
  *     is defined by the given {@link ReadAccess} strategy to the given object.</li>
  * </ul>
  *
- * <p>Hash function implementation could either produce equal results for equal input on platforms
+ * <p>Hash function implementation either produces equal results for equal input on platforms
  * with different {@link ByteOrder}, favoring one byte order in terms of performance, or different
  * results, but performing equally good. This choice should be explicitly documented for all
  * {@code LongHashFunction} implementations.
@@ -66,8 +66,8 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc?r=10">
-     * CityHash64 algorithm, version 1.1</a> without seed values. This implementation produce
+     * <a href="https://github.com/google/cityhash/blob/master/src/city.cc">
+     * CityHash64 algorithm, version 1.1</a> without seed values. This implementation produces
      * equal results for equal input on platforms with different {@link ByteOrder}, but is slower
      * on big-endian platforms than on little-endian.
      *
@@ -80,8 +80,8 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc?r=10">
-     * CityHash64 algorithm, version 1.1</a> using the given seed value. This implementation produce
+     * <a href="https://github.com/google/cityhash/blob/master/src/city.cc">
+     * CityHash64 algorithm, version 1.1</a> using the given seed value. This implementation produces
      * equal results for equal input on platforms with different {@link ByteOrder}, but is slower
      * on big-endian platforms than on little-endian.
      *
@@ -94,7 +94,7 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc?r=10">
+     * <a href="https://github.com/google/cityhash/blob/master/src/city.cc">
      * CityHash64 algorithm, version 1.1</a> using the two given seed values. This implementation
      * produce equal results for equal input on platforms with different {@link ByteOrder}, but
      * is slower on big-endian platforms than on little-endian.
@@ -110,7 +110,7 @@ public abstract class LongHashFunction implements Serializable {
      * Returns a hash function implementing
      * <a href="https://github.com/Cyan4973/xxHash/releases/tag/r39">xxHash
      * algorithm, release 39</a> without seed value (0 is used as default seed value).
-     * This implementation produce equal results for equal
+     * This implementation produces equal results for equal
      * input on platforms with different {@link ByteOrder}, but is slower on big-endian platforms
      * than on little-endian.
      *
@@ -126,7 +126,7 @@ public abstract class LongHashFunction implements Serializable {
      * Returns a hash function implementing
      * <a href="https://github.com/Cyan4973/xxHash/releases/tag/r39">xxHash
      * algorithm, release 39</a> with the given seed value.
-     * This implementation produce equal results for equal
+     * This implementation produces equal results for equal
      * input on platforms with different {@link ByteOrder}, but is slower on big-endian platforms
      * than on little-endian.
      *
@@ -140,8 +140,8 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp">MurmurHash3
-     * algorithm</a> without seed values. This implementation produce equal results for equal input
+     * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">MurmurHash3
+     * algorithm</a> without seed values. This implementation produces equal results for equal input
      * on platforms with different {@link ByteOrder}, but is slower on big-endian platforms than on
      * little-endian.
      *
@@ -153,8 +153,8 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp">MurmurHash3
-     * algorithm</a> with the given seed value. This implementation produce equal results for equal
+     * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">MurmurHash3
+     * algorithm</a> with the given seed value. This implementation produces equal results for equal
      * input on platforms with different {@link ByteOrder}, but is slower on big-endian platforms
      * than on little-endian.
      *
@@ -193,7 +193,7 @@ public abstract class LongHashFunction implements Serializable {
      * value is interpreted in {@linkplain ByteOrder#nativeOrder() native} byte order. For example,
      * the result of {@code hashShort(v)} call is identical to the result of
      * {@code hashShorts(new short[] {v})} call for any {@code short} value.
-     * As a consequence, {@code hashShort(v)} call produce always the same result as {@code
+     * As a consequence, {@code hashShort(v)} call produces always the same result as {@code
      * hashChar((char) v)}.
      */
     public abstract long hashShort(short input);
@@ -204,7 +204,7 @@ public abstract class LongHashFunction implements Serializable {
      * value is interpreted in {@linkplain ByteOrder#nativeOrder() native} byte order. For example,
      * the result of {@code hashChar(v)} call is identical to the result of
      * {@code hashChars(new char[] {v})} call for any {@code char} value.
-     * As a consequence, {@code hashChar(v)} call produce always the same result as {@code
+     * As a consequence, {@code hashChar(v)} call produces always the same result as {@code
      * hashShort((short) v)}.
      */
     public abstract long hashChar(char input);
@@ -353,7 +353,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code char} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in chars (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in chars (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
@@ -377,7 +377,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the string which bytes to hash
      * @param off   index of the first {@code char} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in chars (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in chars (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return the hash code of the given {@code String}'s bytes
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length()}
@@ -401,7 +401,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the string builder which bytes to hash
      * @param off   index of the first {@code char} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in chars (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in chars (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return the hash code of the given {@code String}'s bytes
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length()}
@@ -433,7 +433,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code short} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in shorts (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in shorts (i.e. the length of the bytes
      *              sequence to hash is {@code len * 2L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
@@ -457,7 +457,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code int} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in ints (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in ints (i.e. the length of the bytes
      *              sequence to hash is {@code len * 4L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
@@ -481,7 +481,7 @@ public abstract class LongHashFunction implements Serializable {
      *
      * @param input the array to read data from
      * @param off   index of the first {@code long} in the subsequence to hash
-     * @param len   length of the subsequence to hash, in longs (i. e. the length of the bytes
+     * @param len   length of the subsequence to hash, in longs (i.e. the length of the bytes
      *              sequence to hash is {@code len * 8L})
      * @return hash code for the specified subsequence
      * @throws IndexOutOfBoundsException if {@code off < 0} or {@code off + len > input.length}
