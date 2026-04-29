@@ -7,7 +7,7 @@ import net.openhft.chronicle.algo.bytes.Access;
 
 /**
  * Abstract base class for read-write locking strategies.
- * Implements common behavior for acquiring and releasing write locks.
+ * Implements common behaviour for acquiring and releasing write locks.
  */
 public abstract class AbstractReadWriteLockingStrategy implements ReadWriteLockingStrategy {
 
