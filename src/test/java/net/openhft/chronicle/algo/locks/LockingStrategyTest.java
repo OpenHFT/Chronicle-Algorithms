@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.locks;
 
@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assumptions.*;
 public class LockingStrategyTest {
 
     private LockingStrategy lockingStrategy;
-    private AccessMethod accessMethod;
     private final TestReadWriteLockState rwLockState = new TestReadWriteLockState();
     private final Callable<Boolean> tryReadLockTask = () -> rwls().tryReadLock();
     private final TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
@@ -52,10 +51,8 @@ public class LockingStrategyTest {
         });
     }
 
-    @SuppressWarnings("unchecked")
     private void setUp(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
         this.lockingStrategy = lockingStrategy;
-        this.accessMethod = accessMethod;
         e1 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>());
         e2 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
@@ -215,7 +212,7 @@ public class LockingStrategyTest {
             rwls().readUnlock();
             assertTrue(rwls().tryWriteLock());
         }
-// write lock is held
+        // write lock is held
         readUnlockForbidden();
         upgradeReadToWriteLockForbidden();
 
@@ -381,7 +378,6 @@ public class LockingStrategyTest {
 
     enum AccessMethod {ADDRESS, BYTES_WITH_OFFSET}
 
-    @SuppressWarnings("unchecked")
     private class TestReadWriteLockState extends AbstractReadWriteLockState {
 
         private ReadWriteLockingStrategy rwls() {
@@ -434,7 +430,6 @@ public class LockingStrategyTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private class TestReadWriteUpdateLockState extends TestReadWriteLockState
             implements ReadWriteUpdateLockState {
 
