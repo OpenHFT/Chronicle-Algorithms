@@ -11,7 +11,7 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
 /**
  * Adapted version of xxHash implementation from
  * https://github.com/Cyan4973/xxHash/releases/tag/r39, which is fully compatible with r40 though.
- * This implementation provides endian-independant hash values,
+ * This implementation provides endian-independent hash values,
  * but it's slower on big-endian platforms.
  */
 class XxHash_r39 {
