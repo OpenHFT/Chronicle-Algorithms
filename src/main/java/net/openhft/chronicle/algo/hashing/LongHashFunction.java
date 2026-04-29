@@ -66,7 +66,7 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc?r=10">
+     * <a href="https://github.com/google/cityhash/blob/master/src/city.cc">
      * CityHash64 algorithm, version 1.1</a> without seed values. This implementation produces
      * equal results for equal input on platforms with different {@link ByteOrder}, but is slower
      * on big-endian platforms than on little-endian.
@@ -80,7 +80,7 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc?r=10">
+     * <a href="https://github.com/google/cityhash/blob/master/src/city.cc">
      * CityHash64 algorithm, version 1.1</a> using the given seed value. This implementation produces
      * equal results for equal input on platforms with different {@link ByteOrder}, but is slower
      * on big-endian platforms than on little-endian.
@@ -94,7 +94,7 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/cityhash/source/browse/trunk/src/city.cc?r=10">
+     * <a href="https://github.com/google/cityhash/blob/master/src/city.cc">
      * CityHash64 algorithm, version 1.1</a> using the two given seed values. This implementation
      * produce equal results for equal input on platforms with different {@link ByteOrder}, but
      * is slower on big-endian platforms than on little-endian.
@@ -140,7 +140,7 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp">MurmurHash3
+     * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">MurmurHash3
      * algorithm</a> without seed values. This implementation produces equal results for equal input
      * on platforms with different {@link ByteOrder}, but is slower on big-endian platforms than on
      * little-endian.
@@ -153,7 +153,7 @@ public abstract class LongHashFunction implements Serializable {
 
     /**
      * Returns a hash function implementing
-     * <a href="https://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp">MurmurHash3
+     * <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">MurmurHash3
      * algorithm</a> with the given seed value. This implementation produces equal results for equal
      * input on platforms with different {@link ByteOrder}, but is slower on big-endian platforms
      * than on little-endian.
