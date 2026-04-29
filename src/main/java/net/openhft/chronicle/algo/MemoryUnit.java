@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  * A {@code MemoryUnit} represents memory amounts at a given unit of
  * granularity and provides utility methods to convert across units.  A
  * {@code MemoryUnit} does not maintain memory information, but only
- * helps organize and use memory amounts representations that may be maintained
+ * helps organise and use memory amounts representations that may be maintained
  * separately across various contexts.
  *
  * <p>Note than in this class kilo-, mega- and giga- prefixes means 2^10 = 1024 multiplexing,
