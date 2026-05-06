@@ -1,3 +1,6 @@
+/*
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ */
 /**
  * Locking strategies and state machines for low latency code.
  *
