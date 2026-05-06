@@ -115,7 +115,7 @@ public enum MemoryUnit {
 
         @Override
         public long align(long a, MemoryUnit u) {
-            return ise(u, this);
+            return a;
         }
     },
 
@@ -170,7 +170,7 @@ public enum MemoryUnit {
 
         @Override
         long alignToBytes(long a) {
-            return ise(this, BYTES);
+            return a;
         }
 
         @Override
@@ -261,12 +261,12 @@ public enum MemoryUnit {
 
         @Override
         long alignToBytes(long a) {
-            return ise(this, BYTES);
+            return a;
         }
 
         @Override
         long alignToLongs(long a) {
-            return ise(this, LONGS);
+            return a;
         }
 
         @Override
@@ -351,17 +351,17 @@ public enum MemoryUnit {
 
         @Override
         long alignToBytes(long a) {
-            return ise(this, BYTES);
+            return a;
         }
 
         @Override
         long alignToLongs(long a) {
-            return ise(this, LONGS);
+            return a;
         }
 
         @Override
         long alignToCacheLines(long a) {
-            return ise(this, CACHE_LINES);
+            return a;
         }
 
         @Override
@@ -441,22 +441,22 @@ public enum MemoryUnit {
 
         @Override
         long alignToBytes(long a) {
-            return ise(this, BYTES);
+            return a;
         }
 
         @Override
         long alignToLongs(long a) {
-            return ise(this, LONGS);
+            return a;
         }
 
         @Override
         long alignToCacheLines(long a) {
-            return ise(this, CACHE_LINES);
+            return a;
         }
 
         @Override
         long alignToKilobytes(long a) {
-            return ise(this, KILOBYTES);
+            return a;
         }
 
         @Override
@@ -531,27 +531,27 @@ public enum MemoryUnit {
 
         @Override
         long alignToBytes(long a) {
-            return ise(this, BYTES);
+            return a;
         }
 
         @Override
         long alignToLongs(long a) {
-            return ise(this, LONGS);
+            return a;
         }
 
         @Override
         long alignToCacheLines(long a) {
-            return ise(this, CACHE_LINES);
+            return a;
         }
 
         @Override
         long alignToKilobytes(long a) {
-            return ise(this, KILOBYTES);
+            return a;
         }
 
         @Override
         long alignToPages(long a) {
-            return ise(this, PAGES);
+            return a;
         }
 
         @Override
@@ -621,32 +621,32 @@ public enum MemoryUnit {
 
         @Override
         long alignToBytes(long a) {
-            return ise(this, BYTES);
+            return a;
         }
 
         @Override
         long alignToLongs(long a) {
-            return ise(this, LONGS);
+            return a;
         }
 
         @Override
         long alignToCacheLines(long a) {
-            return ise(this, CACHE_LINES);
+            return a;
         }
 
         @Override
         long alignToKilobytes(long a) {
-            return ise(this, KILOBYTES);
+            return a;
         }
 
         @Override
         long alignToPages(long a) {
-            return ise(this, PAGES);
+            return a;
         }
 
         @Override
         long alignToMegabytes(long a) {
-            return ise(this, MEGABYTES);
+            return a;
         }
 
         @Override
@@ -711,37 +711,37 @@ public enum MemoryUnit {
 
         @Override
         long alignToBytes(long a) {
-            return ise(this, BYTES);
+            return a;
         }
 
         @Override
         long alignToLongs(long a) {
-            return ise(this, LONGS);
+            return a;
         }
 
         @Override
         long alignToCacheLines(long a) {
-            return ise(this, CACHE_LINES);
+            return a;
         }
 
         @Override
         long alignToKilobytes(long a) {
-            return ise(this, KILOBYTES);
+            return a;
         }
 
         @Override
         long alignToPages(long a) {
-            return ise(this, PAGES);
+            return a;
         }
 
         @Override
         long alignToMegabytes(long a) {
-            return ise(this, MEGABYTES);
+            return a;
         }
 
         @Override
         long alignToGigabytes(long a) {
-            return ise(this, GIGABYTES);
+            return a;
         }
 
         @Override
@@ -778,31 +778,17 @@ public enum MemoryUnit {
         long mask = ~(align - 1L);
         if (amount > 0L) {
             long filled = amount + align - 1L;
-            if (filled > 0L) {
+            if (filled >= amount) // no overflow
                 return filled & mask;
-
-            } else {
-                long maxAlignedLong = Long.MAX_VALUE & mask;
-                if (amount <= maxAlignedLong)
-                    return maxAlignedLong;
-            }
-        } else {
-            // amount is negative
-            long filled = amount - align + 1L;
-            if (filled < 0L) {
-                return filled & mask;
-
-            } else {
-                long minAlignedLong = Long.MIN_VALUE & mask;
-                if (amount >= minAlignedLong)
-                    return minAlignedLong;
-            }
+            long maxAlignedLong = Long.MAX_VALUE & mask;
+            if (amount <= maxAlignedLong)
+                return maxAlignedLong;
+            throw new IllegalArgumentException("Couldn't align " + amount + " by " + align);
         }
-        throw new IllegalArgumentException("Couldn't align " + amount + " by " + align);
-    }
-
-    static long ise(MemoryUnit unitToAlign, MemoryUnit alignmentUnit) {
-        throw new IllegalStateException("Couldn't align " + unitToAlign + " by " + alignmentUnit);
+        // amount < 0: round toward negative infinity. amount & mask is the largest
+        // multiple of align that is <= amount; for already-aligned values this is
+        // identity. No overflow path: Long.MIN_VALUE is a multiple of every power of two.
+        return amount & mask;
     }
 // To maintain full signature compatibility with 1.5, and to improve the
     // clarity of the generated javadoc (see 6287639: Abstract methods in
@@ -836,11 +822,14 @@ public enum MemoryUnit {
      * {@code 1000} bytes to kilobytes results in {@code 1024}. Negative values are aligned towards
      * negative infinity: e.g. aligning {@code -5} longs to cache lines results in {@code -8}.
      *
+     * <p>If the given {@code unit} is the same as, or coarser than, this unit, the amount is
+     * already on a {@code this}-unit boundary and is returned unchanged.
+     *
      * @param amountToAlign the memory amount in the given {@code unit}
      * @param unit          the unit of the {@code amountToAlign} argument
      * @return the aligned amount, still in the given unit
-     * @throws IllegalArgumentException if the given {@code unit} is finer than this unit,
-     *                                  or if the aligned value overflows {@code long} bounds
+     * @throws IllegalArgumentException if rounding the value up to the next {@code this}-unit
+     *                                  boundary would overflow {@code long} bounds
      */
     public long align(long amountToAlign, MemoryUnit unit) {
         throw new AbstractMethodError();
