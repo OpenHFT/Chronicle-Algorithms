@@ -1,11 +1,13 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.bytes;
 
 import net.openhft.chronicle.bytes.RandomDataOutput;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteOrder;
 
@@ -105,7 +107,7 @@ public class RandomDataOutputAccessTest {
     @Test
     public void testByteOrder() {
         when(mockOutput.byteOrder()).thenReturn(ByteOrder.BIG_ENDIAN);
-        assertEquals(ByteOrder.BIG_ENDIAN, access.byteOrder(mockOutput));
+        assertSame(ByteOrder.BIG_ENDIAN, access.byteOrder(mockOutput));
         verify(mockOutput).byteOrder();
     }
 

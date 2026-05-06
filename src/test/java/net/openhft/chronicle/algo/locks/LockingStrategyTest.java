@@ -1,16 +1,14 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.locks;
 
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.algo.bytes.Accessor;
 import net.openhft.chronicle.bytes.BytesStore;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.ByteBuffer;
 import java.util.Collection;
@@ -20,15 +18,13 @@ import static java.util.Arrays.asList;
 import static net.openhft.chronicle.algo.bytes.Accessor.uncheckedByteBufferAccessor;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.ADDRESS;
 import static net.openhft.chronicle.algo.locks.LockingStrategyTest.AccessMethod.BYTES_WITH_OFFSET;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-@RunWith(value = Parameterized.class)
 public class LockingStrategyTest {
 
-    private final LockingStrategy lockingStrategy;
-    private final AccessMethod accessMethod;
+    private LockingStrategy lockingStrategy;
     private final TestReadWriteLockState rwLockState = new TestReadWriteLockState();
     private final Callable<Boolean> tryReadLockTask = () -> rwls().tryReadLock();
     private final TestReadWriteUpdateLockState rwuLockState = new TestReadWriteUpdateLockState();
@@ -46,12 +42,6 @@ public class LockingStrategyTest {
     private Access access;
     private Object handle;
 
-    public LockingStrategyTest(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
-        this.lockingStrategy = lockingStrategy;
-        this.accessMethod = accessMethod;
-    }
-
-    @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return asList(new Object[][]{
                 {VanillaReadWriteUpdateWithWaitsLockingStrategy.instance(), ADDRESS},
@@ -61,9 +51,8 @@ public class LockingStrategyTest {
         });
     }
 
-    @SuppressWarnings("unchecked")
-    @Before
-    public void setUp() {
+    private void setUp(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
+        this.lockingStrategy = lockingStrategy;
         e1 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>());
         e2 = new ThreadPoolExecutor(0, 1, Integer.MAX_VALUE, TimeUnit.SECONDS,
@@ -85,14 +74,16 @@ public class LockingStrategyTest {
         rwls().reset();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        e1.shutdown();
-        e2.shutdown();
+        if (e1 != null) e1.shutdown();
+        if (e2 != null) e2.shutdown();
     }
 
-    @Test
-    public void testUpdateLockIsExclusive() throws ExecutionException, InterruptedException {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testUpdateLockIsExclusive(LockingStrategy lockingStrategy, AccessMethod accessMethod) throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -111,8 +102,10 @@ public class LockingStrategyTest {
         e2.submit(updateUnlockTask).get();
     }
 
-    @Test
-    public void testUpdateLockAllowsOtherReaders() throws ExecutionException, InterruptedException {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testUpdateLockAllowsOtherReaders(LockingStrategy lockingStrategy, AccessMethod accessMethod) throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -128,8 +121,10 @@ public class LockingStrategyTest {
         e2.submit(readUnlockTask).get();
     }
 
-    @Test
-    public void testUpdateLockBlocksOtherWriters() throws ExecutionException, InterruptedException {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testUpdateLockBlocksOtherWriters(LockingStrategy lockingStrategy, AccessMethod accessMethod) throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -148,8 +143,10 @@ public class LockingStrategyTest {
         e2.submit(writeUnlockTask).get();
     }
 
-    @Test
-    public void testWriteLockBlocksOtherReaders() throws ExecutionException, InterruptedException {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testWriteLockBlocksOtherReaders(LockingStrategy lockingStrategy, AccessMethod accessMethod) throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
         assumeReadWriteLock();
 
         // Acquire the write lock in thread 1...
@@ -168,8 +165,10 @@ public class LockingStrategyTest {
         e2.submit(readUnlockTask).get();
     }
 
-    @Test
-    public void testUpdateLockUpgradeToWriteLock() throws ExecutionException, InterruptedException {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testUpdateLockUpgradeToWriteLock(LockingStrategy lockingStrategy, AccessMethod accessMethod) throws ExecutionException, InterruptedException {
+        setUp(lockingStrategy, accessMethod);
         assumeReadWriteUpdateLock();
 
         // Acquire the update lock in thread 1...
@@ -185,8 +184,10 @@ public class LockingStrategyTest {
         e1.submit(updateUnlockTask).get();
     }
 
-    @Test
-    public void testReadWriteLockTransitions() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testReadWriteLockTransitions(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
+        setUp(lockingStrategy, accessMethod);
         assumeReadWriteLock();
 
         // forbid upgrades/downgrades/unlocks when lock is not held
@@ -228,8 +229,10 @@ public class LockingStrategyTest {
         rwls().reset();
     }
 
-    @Test
-    public void testReadWriteUpgradeLockTransitions() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testReadWriteUpgradeLockTransitions(LockingStrategy lockingStrategy, AccessMethod accessMethod) {
+        setUp(lockingStrategy, accessMethod);
         assumeReadWriteUpdateLock();
 
         // forbid upgrades/downgrades/unlocks when lock is not held
@@ -375,7 +378,6 @@ public class LockingStrategyTest {
 
     enum AccessMethod {ADDRESS, BYTES_WITH_OFFSET}
 
-    @SuppressWarnings("unchecked")
     private class TestReadWriteLockState extends AbstractReadWriteLockState {
 
         private ReadWriteLockingStrategy rwls() {
@@ -428,7 +430,6 @@ public class LockingStrategyTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private class TestReadWriteUpdateLockState extends TestReadWriteLockState
             implements ReadWriteUpdateLockState {
 

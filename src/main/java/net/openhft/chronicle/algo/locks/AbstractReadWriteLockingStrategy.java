@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.locks;
 
@@ -7,7 +7,7 @@ import net.openhft.chronicle.algo.bytes.Access;
 
 /**
  * Abstract base class for read-write locking strategies.
- * Implements common behavior for acquiring and releasing write locks.
+ * Implements common behaviour for acquiring and releasing write locks.
  */
 public abstract class AbstractReadWriteLockingStrategy implements ReadWriteLockingStrategy {
 

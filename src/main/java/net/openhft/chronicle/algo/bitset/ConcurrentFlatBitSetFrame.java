@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.bitset;
 
@@ -717,7 +717,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     if (x != 0) {
                         int trailingOnes = numberOfTrailingZeros(x);
                         bitIndex += trailingOnes;
-                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        // i.e. bitIndex + numberOfBits crosses 64 boundary
                         if ((bitIndex & 63) > n64Complement)
                             break continueLongLoop;
                         // (2)
@@ -750,7 +750,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     if (x != 0) {
                         int trailingOnes = numberOfTrailingZeros(x);
                         bitIndex += trailingOnes;
-                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        // i.e. bitIndex + numberOfBits crosses 64 boundary
                         if ((bitIndex & 63) > n64Complement)
                             break continueLongLoop;
                         // already shifted with one-filling at least once
@@ -815,7 +815,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     if (l != 0) {
                         int trailingZeros = numberOfTrailingZeros(l);
                         bitIndex += trailingZeros;
-                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        // i.e. bitIndex + numberOfBits crosses 64 boundary
                         if ((bitIndex & 63) > n64Complement)
                             break continueLongLoop;
                         l >>>= trailingZeros;
@@ -844,7 +844,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
                     if (l != 0) {
                         int trailingZeros = numberOfTrailingZeros(l);
                         bitIndex += trailingZeros;
-                        // i. e. bitIndex + numberOfBits crosses 64 boundary
+                        // i.e. bitIndex + numberOfBits crosses 64 boundary
                         if ((bitIndex & 63) > n64Complement)
                             break continueLongLoop;
                         l >>>= trailingZeros;
@@ -962,7 +962,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
      * WARNING! This implementation doesn't strictly follow the contract
      * from {@code DirectBitSet} interface. For the sake of atomicity this
      * implementation couldn't find and flip the range crossing native word
-     * boundary, e. g. bits from 55 to 75 (boundary is 64).
+     * boundary, e.g. bits from 55 to 75 (boundary is 64).
      *
      * @throws IllegalArgumentException if {@code numberOfBits}
      *                                  is out of range {@code 0 < numberOfBits && numberOfBits <= 64}

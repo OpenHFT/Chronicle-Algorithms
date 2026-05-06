@@ -1,13 +1,13 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.bitset;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class FlatBitSetAlgorithmTest  {
+public class FlatBitSetAlgorithmTest {
     @Test
     public void testSizeInBytes() {
         long logicalSize = 64L;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.hashing;
 
@@ -9,10 +9,10 @@ import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_ENDIAN;
 
 /**
- * Endian-independent xxHash64 implementation based on r39 (compatible with r40).
- * <p>
- * Converts inputs via {@link ReadAccess} so hashing can be applied to any addressable source.
- * Uses little-endian mixing internally; big-endian platforms pay a small penalty.
+ * Adapted version of xxHash implementation from
+ * https://github.com/Cyan4973/xxHash/releases/tag/r39, which is fully compatible with r40 though.
+ * This implementation provides endian-independent hash values,
+ * but it's slower on big-endian platforms.
  */
 class XxHash_r39 {
     private static final XxHash_r39 INSTANCE = new XxHash_r39();

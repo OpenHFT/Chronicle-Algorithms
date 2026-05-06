@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.locks;
 
@@ -29,7 +29,7 @@ class VanillaReadWriteUpdateWithWaitsLockingStrategyTest {
     void testSingletonInstance() {
         ReadWriteUpdateWithWaitsLockingStrategy instance1 = instance();
         ReadWriteUpdateWithWaitsLockingStrategy instance2 = instance();
-        assertEquals(instance1, instance2, "Expected the same instance to be returned each time.");
+        assertSame(instance1, instance2, "Expected the same instance to be returned each time.");
     }
 
     @Test

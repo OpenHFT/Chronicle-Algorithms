@@ -1,38 +1,35 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.bitset;
 
 import net.openhft.chronicle.algo.MemoryUnit;
 import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.bytes.BytesStore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Collection;
 
 import static net.openhft.chronicle.algo.bytes.Access.checkedByteBufferAccess;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(value = Parameterized.class)
 public class DirectBitSetTest {
 
     private static final int[] INDICES = new int[]{0, 50, 100, 127, 128, 255};
-    private final ReusableBitSet bs;
-    private final boolean singleThreaded;
+    private ReusableBitSet bs;
+    private boolean singleThreaded;
 
-    public DirectBitSetTest(ReusableBitSet bs) {
+    private void init(ReusableBitSet bs) {
         this.bs = bs;
-        singleThreaded = bs.frame instanceof SingleThreadedFlatBitSetFrame;
+        this.singleThreaded = bs.frame instanceof SingleThreadedFlatBitSetFrame;
         assertTrue(bs.logicalSize() >= 256);
     }
 
     @SuppressWarnings("unchecked")
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
+    static Collection<Object[]> data() {
         int capacityInBytes = (int) MemoryUnit.BITS.toBytes(256);
         BytesStore<?, ByteBuffer> bytes1 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
         BytesStore<?, ByteBuffer> bytes2 = BytesStore.wrap(ByteBuffer.allocateDirect(capacityInBytes));
@@ -89,7 +86,7 @@ public class DirectBitSetTest {
 
     private void assertRangeIsClear(String message, long from, long to) {
         for (long i = from; i < to; i++) {
-            assertFalse(message + ", bit: " + i, bs.get(i));
+            assertFalse(bs.get(i), message + ", bit: " + i);
         }
     }
 
@@ -99,55 +96,61 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testGetSetClearAndCardinality() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testGetSetClearAndCardinality(ReusableBitSet bs) {
+        init(bs);
         bs.clearAll();
         assertEquals(0, bs.cardinality());
         int c = 0;
         for (int i : INDICES) {
             c++;
-            assertFalse("At index " + i, bs.get(i));
-            assertFalse("At index " + i, bs.isSet(i));
-            assertTrue("At index " + i, bs.isClear(i));
+            assertFalse(bs.get(i), "At index " + i);
+            assertFalse(bs.isSet(i), "At index " + i);
+            assertTrue(bs.isClear(i), "At index " + i);
             bs.set(i);
-            assertTrue("At index " + i, bs.get(i));
-            assertTrue("At index " + i, bs.isSet(i));
-            assertFalse("At index " + i, bs.isClear(i));
+            assertTrue(bs.get(i), "At index " + i);
+            assertTrue(bs.isSet(i), "At index " + i);
+            assertFalse(bs.isClear(i), "At index " + i);
             assertEquals(c, bs.cardinality());
         }
         for (int i : INDICES) {
-            assertTrue("At index " + i, bs.get(i));
-            assertTrue("At index " + i, bs.isSet(i));
-            assertFalse("At index " + i, bs.isClear(i));
+            assertTrue(bs.get(i), "At index " + i);
+            assertTrue(bs.isSet(i), "At index " + i);
+            assertFalse(bs.isClear(i), "At index " + i);
             bs.clear(i);
-            assertFalse("At index " + i, bs.get(i));
-            assertFalse("At index " + i, bs.isSet(i));
-            assertTrue("At index " + i, bs.isClear(i));
+            assertFalse(bs.get(i), "At index " + i);
+            assertFalse(bs.isSet(i), "At index " + i);
+            assertTrue(bs.isClear(i), "At index " + i);
         }
         for (int i : INDICES) {
-            assertTrue("At index " + i, bs.setIfClear(i));
-            assertFalse("At index " + i, bs.setIfClear(i));
+            assertTrue(bs.setIfClear(i), "At index " + i);
+            assertFalse(bs.setIfClear(i), "At index " + i);
         }
         for (int i : INDICES) {
-            assertTrue("At index " + i, bs.clearIfSet(i));
-            assertFalse("At index " + i, bs.clearIfSet(i));
+            assertTrue(bs.clearIfSet(i), "At index " + i);
+            assertFalse(bs.clearIfSet(i), "At index " + i);
         }
     }
 
-    @Test
-    public void testFlip() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testFlip(ReusableBitSet bs) {
+        init(bs);
         bs.clearAll();
         for (int i : INDICES) {
-            assertFalse("At index " + i, bs.get(i));
+            assertFalse(bs.get(i), "At index " + i);
             bs.flip(i);
-            assertTrue("At index " + i, bs.get(i));
+            assertTrue(bs.get(i), "At index " + i);
             bs.flip(i);
-            assertFalse("At index " + i, bs.get(i));
+            assertFalse(bs.get(i), "At index " + i);
         }
     }
 
-    @Test
-    public void testNextSetBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testNextSetBit(ReusableBitSet bs) {
+        init(bs);
         setIndices();
         int order = 0;
         for (long i = bs.nextSetBit(0L); i >= 0; i = bs.nextSetBit(i + 1)) {
@@ -160,8 +163,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextSetBit(0L));
     }
 
-    @Test
-    public void testSetBitsIteration() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetBitsIteration(ReusableBitSet bs) {
+        init(bs);
         setIndices();
 
         BitSet.Bits bits = bs.setBits().reset();
@@ -186,8 +191,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bits.reset().next());
     }
 
-    @Test
-    public void testClearNextSetBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearNextSetBit(ReusableBitSet bs) {
+        init(bs);
         setIndices();
         long cardinality = bs.cardinality();
         int order = 0;
@@ -204,8 +211,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearNextSetBit(0L));
     }
 
-    @Test
-    public void testClearNext1SetBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearNext1SetBit(ReusableBitSet bs) {
+        init(bs);
         setIndices();
         long cardinality = bs.cardinality();
         int order = 0;
@@ -222,8 +231,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearNextNContinuousSetBits(0L, 1));
     }
 
-    @Test
-    public void testNextClearBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testNextClearBit(ReusableBitSet bs) {
+        init(bs);
         setIndicesComplement();
         int order = 0;
         for (long i = bs.nextClearBit(0L); i >= 0; i = bs.nextClearBit(i + 1)) {
@@ -236,8 +247,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.nextClearBit(0L));
     }
 
-    @Test
-    public void testSetNextClearBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetNextClearBit(ReusableBitSet bs) {
+        init(bs);
         setIndicesComplement();
         long cardinality = bs.cardinality();
         int order = 0;
@@ -254,8 +267,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setNextClearBit(0L));
     }
 
-    @Test
-    public void testSetNext1ClearBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetNext1ClearBit(ReusableBitSet bs) {
+        init(bs);
         setIndicesComplement();
         long cardinality = bs.cardinality();
         int order = 0;
@@ -272,8 +287,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setNextNContinuousClearBits(0L, 1));
     }
 
-    @Test
-    public void testPreviousSetBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testPreviousSetBit(ReusableBitSet bs) {
+        init(bs);
         setIndices();
         int order = INDICES.length;
         for (long i = bs.logicalSize(); (i = bs.previousSetBit(i - 1)) >= 0; ) {
@@ -286,8 +303,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousSetBit(bs.logicalSize()));
     }
 
-    @Test
-    public void testClearPreviousSetBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearPreviousSetBit(ReusableBitSet bs) {
+        init(bs);
         setIndices();
         long cardinality = bs.cardinality();
         int order = INDICES.length;
@@ -303,8 +322,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearPreviousSetBit(bs.logicalSize()));
     }
 
-    @Test
-    public void testClearPrevious1SetBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearPrevious1SetBit(ReusableBitSet bs) {
+        init(bs);
         setIndices();
         long cardinality = bs.cardinality();
         int order = INDICES.length;
@@ -321,8 +342,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.clearPreviousNContinuousSetBits(bs.logicalSize(), 1));
     }
 
-    @Test
-    public void testPreviousClearBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testPreviousClearBit(ReusableBitSet bs) {
+        init(bs);
         setIndicesComplement();
         int order = INDICES.length;
         for (long i = bs.logicalSize(); (i = bs.previousClearBit(i - 1)) >= 0; ) {
@@ -335,8 +358,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.previousClearBit(bs.logicalSize()));
     }
 
-    @Test
-    public void testSetPreviousClearBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetPreviousClearBit(ReusableBitSet bs) {
+        init(bs);
         setIndicesComplement();
         long cardinality = bs.cardinality();
         int order = INDICES.length;
@@ -352,8 +377,10 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setPreviousClearBit(bs.logicalSize()));
     }
 
-    @Test
-    public void testSetPrevious1ClearBit() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetPrevious1ClearBit(ReusableBitSet bs) {
+        init(bs);
         setIndicesComplement();
         long cardinality = bs.cardinality();
         int order = INDICES.length;
@@ -370,15 +397,19 @@ public class DirectBitSetTest {
         assertEquals(-1, bs.setPreviousNContinuousClearBits(bs.logicalSize(), 1));
     }
 
-    @Test
-    public void testSetAll() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetAll(ReusableBitSet bs) {
+        init(bs);
         bs.clearAll();
         bs.setAll();
         assertEquals(bs.logicalSize(), bs.cardinality());
     }
 
-    @Test
-    public void testRangeOpsWithinLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testRangeOpsWithinLongCase(ReusableBitSet bs) {
+        init(bs);
         bs.clearAll();
         if (singleThreaded) {
             assertTrue(bs.isRangeClear(0, 0));
@@ -412,8 +443,10 @@ public class DirectBitSetTest {
         assertEquals(1, bs.cardinality());
     }
 
-    @Test
-    public void testRangeOpsCrossLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testRangeOpsCrossLongCase(ReusableBitSet bs) {
+        init(bs);
         bs.clearAll();
 
         bs.flipRange(63, 64);
@@ -463,8 +496,10 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testRangeOpsSpanLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testRangeOpsSpanLongCase(ReusableBitSet bs) {
+        init(bs);
         bs.clearAll();
         if (singleThreaded) {
             assertTrue(bs.isRangeClear(0, bs.logicalSize()));
@@ -487,14 +522,16 @@ public class DirectBitSetTest {
         return "N: " + n + ", " + bs.getClass().getSimpleName();
     }
 
-    @Test
-    public void testSetNextNContinuousClearBitsWithinLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetNextNContinuousClearBitsWithinLongCase(ReusableBitSet bs) {
+        init(bs);
         long size = (bs.logicalSize() + 63) / 64 * 64;
         for (int n = 1; n <= 64; n *= 2) {
             bs.clearAll();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsClear(i * n, i * n + n);
-                assertEquals(m(n), i * n, bs.setNextNContinuousClearBits(0L, n));
+                assertEquals(i * n, bs.setNextNContinuousClearBits(0L, n), m(n));
                 assertRangeIsSet(i * n, i * n + n);
                 assertEquals(i * n + n, bs.cardinality());
             }
@@ -522,8 +559,10 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testSetNextNContinuousClearBitsCrossLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetNextNContinuousClearBitsCrossLongCase(ReusableBitSet bs) {
+        init(bs);
         if (concurrentBS())
             return;
         long size = bs.logicalSize();
@@ -531,7 +570,7 @@ public class DirectBitSetTest {
             bs.clearAll();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsClear(i * n, i * n + n);
-                assertEquals(m(n), i * n, bs.setNextNContinuousClearBits(0L, n));
+                assertEquals(i * n, bs.setNextNContinuousClearBits(0L, n), m(n));
                 assertRangeIsSet(i * n, i * n + n);
                 assertEquals(i * n + n, bs.cardinality());
             }
@@ -542,7 +581,7 @@ public class DirectBitSetTest {
             long from = n <= 64 ? lastBound - (n / 2) : 30;
             long to = from + n;
             bs.clearRange(from, to);
-            assertEquals("" + n, from, bs.setNextNContinuousClearBits(0L, n));
+            assertEquals(from, bs.setNextNContinuousClearBits(0L, n), "" + n);
             assertRangeIsSet(from, to);
 
             bs.clearRange(from, to);
@@ -558,15 +597,17 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testClearNextNContinuousSetBitsWithinLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearNextNContinuousSetBitsWithinLongCase(ReusableBitSet bs) {
+        init(bs);
         long size = (bs.logicalSize() + 63) / 64 * 64;
         for (int n = 1; n <= 64; n *= 2) {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsSet(i * n, i * n + n);
-                assertEquals(m(n), i * n, bs.clearNextNContinuousSetBits(0L, n));
+                assertEquals(i * n, bs.clearNextNContinuousSetBits(0L, n), m(n));
                 assertRangeIsClear(i * n, i * n + n);
                 assertEquals(cardinality - (i * n + n), bs.cardinality());
             }
@@ -594,8 +635,10 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testClearNextNContinuousSetBitsCrossLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearNextNContinuousSetBitsCrossLongCase(ReusableBitSet bs) {
+        init(bs);
         if (concurrentBS())
             return;
         long size = bs.logicalSize();
@@ -604,7 +647,7 @@ public class DirectBitSetTest {
             long cardinality = bs.cardinality();
             for (int i = 0; i < size / n; i++) {
                 assertRangeIsSet(i * n, i * n + n);
-                assertEquals(m(n), i * n, bs.clearNextNContinuousSetBits(0L, n));
+                assertEquals(i * n, bs.clearNextNContinuousSetBits(0L, n), m(n));
                 assertRangeIsClear(i * n, i * n + n);
                 assertEquals(cardinality -= n, bs.cardinality());
             }
@@ -635,15 +678,17 @@ public class DirectBitSetTest {
         return bs.frame instanceof ConcurrentFlatBitSetFrame;
     }
 
-    @Test
-    public void testSetPreviousNContinuousClearBitsWithinLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetPreviousNContinuousClearBitsWithinLongCase(ReusableBitSet bs) {
+        init(bs);
         long size = (bs.logicalSize() + 63) / 64 * 64;
         for (int n = 1; n <= 64; n *= 2) {
             bs.clearAll();
             long cardinality = 0;
             for (long i = size / n - 1; i >= 0; i--) {
                 assertRangeIsClear(i * n, i * n + n);
-                assertEquals(m(n), i * n, bs.setPreviousNContinuousClearBits(size, n));
+                assertEquals(i * n, bs.setPreviousNContinuousClearBits(size, n), m(n));
                 assertRangeIsSet(i * n, i * n + n);
                 assertEquals(cardinality += n, bs.cardinality());
             }
@@ -670,8 +715,10 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testSetPreviousNContinuousClearBitsCrossLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testSetPreviousNContinuousClearBitsCrossLongCase(ReusableBitSet bs) {
+        init(bs);
         if (concurrentBS())
             return;
         long size = bs.logicalSize();
@@ -680,7 +727,7 @@ public class DirectBitSetTest {
             long cardinality = 0;
             for (long from = size - n; from >= 0; from -= n) {
                 assertRangeIsClear(from, from + n);
-                assertEquals(m(n), from, bs.setPreviousNContinuousClearBits(size, n));
+                assertEquals(from, bs.setPreviousNContinuousClearBits(size, n), m(n));
                 assertRangeIsSet(from, from + n);
                 assertEquals(cardinality += n, bs.cardinality());
             }
@@ -706,15 +753,17 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testClearPreviousNContinuousSetBitsWithinLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearPreviousNContinuousSetBitsWithinLongCase(ReusableBitSet bs) {
+        init(bs);
         long size = (bs.logicalSize() + 63) / 64 * 64;
         for (int n = 1; n <= 64; n *= 2) {
             bs.setAll();
             long cardinality = bs.cardinality();
             for (long i = size / n - 1; i >= 0; i--) {
                 assertRangeIsSet(i * n, i * n + n);
-                assertEquals(m(n), i * n, bs.clearPreviousNContinuousSetBits(size, n));
+                assertEquals(i * n, bs.clearPreviousNContinuousSetBits(size, n), m(n));
                 assertRangeIsClear(m(n), i * n, i * n + n);
                 assertEquals(cardinality -= n, bs.cardinality());
             }
@@ -741,8 +790,10 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test
-    public void testClearPreviousNContinuousSetBitsCrossLongCase() {
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testClearPreviousNContinuousSetBitsCrossLongCase(ReusableBitSet bs) {
+        init(bs);
         if (concurrentBS())
             return;
         long size = bs.logicalSize();
@@ -751,7 +802,7 @@ public class DirectBitSetTest {
             long cardinality = bs.cardinality();
             for (long from = size - n; from >= 0; from -= n) {
                 assertRangeIsSet(from, from + n);
-                assertEquals(m(n), from, bs.clearPreviousNContinuousSetBits(size, n));
+                assertEquals(from, bs.clearPreviousNContinuousSetBits(size, n), m(n));
                 assertRangeIsClear(from, from + n);
                 assertEquals(cardinality -= n, bs.cardinality());
             }
@@ -777,178 +828,248 @@ public class DirectBitSetTest {
         }
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeGetNegative() {
-        bs.get(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeGetNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.get(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeGetOverCapacity() {
-        bs.get(bs.logicalSize());
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeGetOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.get(bs.logicalSize()));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetNegative() {
-        bs.set(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.set(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetOverCapacity() {
-        bs.set(bs.logicalSize());
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.set(bs.logicalSize()));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetIfClearNegative() {
-        bs.setIfClear(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetIfClearNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setIfClear(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetIfClearOverCapacity() {
-        bs.setIfClear(bs.logicalSize());
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetIfClearOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setIfClear(bs.logicalSize()));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearIfSetNegative() {
-        bs.clearIfSet(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearIfSetNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearIfSet(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearIfSetOverCapacity() {
-        bs.clearIfSet(bs.logicalSize());
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearIfSetOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearIfSet(bs.logicalSize()));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeFlipNegative() {
-        bs.flip(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeFlipNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.flip(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeFlipOverCapacity() {
-        bs.flip(bs.logicalSize());
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeFlipOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.flip(bs.logicalSize()));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeNextSetBit() {
-        bs.nextSetBit(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeNextSetBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.nextSetBit(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeNextClearBit() {
-        bs.nextClearBit(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeNextClearBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.nextClearBit(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobePreviousSetBit() {
-        bs.previousSetBit(-2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobePreviousSetBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.previousSetBit(-2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobePreviousClearBit() {
-        bs.previousClearBit(-2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobePreviousClearBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.previousClearBit(-2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearNextSetBit() {
-        bs.clearNextSetBit(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearNextSetBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearNextSetBit(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearNextNContinuousSetBits() {
-        bs.clearNextNContinuousSetBits(-1, 2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearNextNContinuousSetBits(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearNextNContinuousSetBits(-1, 2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetNextClearBit() {
-        bs.setNextClearBit(-1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetNextClearBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setNextClearBit(-1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetNextNContinuousClearBits() {
-        bs.setNextNContinuousClearBits(-1, 2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetNextNContinuousClearBits(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setNextNContinuousClearBits(-1, 2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearPreviousSetBit() {
-        bs.clearPreviousSetBit(-2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearPreviousSetBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearPreviousSetBit(-2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearPreviousNContinuousSetBit() {
-        bs.clearPreviousNContinuousSetBits(-2, 2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearPreviousNContinuousSetBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearPreviousNContinuousSetBits(-2, 2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetPreviousClearBit() {
-        bs.setPreviousClearBit(-2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetPreviousClearBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setPreviousClearBit(-2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetPreviousNContinuousClearBit() {
-        bs.setPreviousNContinuousClearBits(-2, 2);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetPreviousNContinuousClearBit(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setPreviousNContinuousClearBits(-2, 2));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetRangeFromNegative() {
-        bs.setRange(-1, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetRangeFromNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setRange(-1, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetRangeFromOverTo() {
-        bs.setRange(1, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetRangeFromOverTo(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setRange(1, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeSetRangeToOverCapacity() {
-        bs.setRange(0, bs.logicalSize() + 1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeSetRangeToOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.setRange(0, bs.logicalSize() + 1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearRangeFromNegative() {
-        bs.clearRange(-1, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearRangeFromNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearRange(-1, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearRangeFromOverTo() {
-        bs.clearRange(1, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearRangeFromOverTo(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearRange(1, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeClearRangeToOverCapacity() {
-        bs.clearRange(0, bs.logicalSize() + 1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeClearRangeToOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.clearRange(0, bs.logicalSize() + 1));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeFlipRangeFromNegative() {
-        bs.flipRange(-1, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeFlipRangeFromNegative(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.flipRange(-1, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeFlipRangeFromOverTo() {
-        bs.flipRange(1, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeFlipRangeFromOverTo(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.flipRange(1, 0));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void testIoobeFlipRangeToOverCapacity() {
-        bs.flipRange(0, bs.logicalSize() + 1);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIoobeFlipRangeToOverCapacity(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IndexOutOfBoundsException.class, () -> bs.flipRange(0, bs.logicalSize() + 1));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testIaeClearNextNContinuousSetBits() {
-        bs.clearNextNContinuousSetBits(0, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIaeClearNextNContinuousSetBits(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IllegalArgumentException.class, () -> bs.clearNextNContinuousSetBits(0, 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testIaeSetNextNContinuousClearBits() {
-        bs.setNextNContinuousClearBits(0, 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIaeSetNextNContinuousClearBits(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IllegalArgumentException.class, () -> bs.setNextNContinuousClearBits(0, 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testIaeClearPreviousNContinuousSetBits() {
-        bs.clearPreviousNContinuousSetBits(bs.logicalSize(), 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIaeClearPreviousNContinuousSetBits(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IllegalArgumentException.class, () -> bs.clearPreviousNContinuousSetBits(bs.logicalSize(), 0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testIaeSetPreviousNContinuousClearBits() {
-        bs.setPreviousNContinuousClearBits(bs.logicalSize(), 0);
+    @ParameterizedTest
+    @MethodSource("data")
+    public void testIaeSetPreviousNContinuousClearBits(ReusableBitSet bs) {
+        init(bs);
+        assertThrows(IllegalArgumentException.class, () -> bs.setPreviousNContinuousClearBits(bs.logicalSize(), 0));
     }
 }

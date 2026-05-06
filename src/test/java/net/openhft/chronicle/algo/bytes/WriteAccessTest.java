@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.bytes;
 
@@ -9,9 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 @SuppressWarnings("unchecked")
 class WriteAccessTest {
@@ -25,7 +25,7 @@ class WriteAccessTest {
         writeAccess = Mockito.spy(WriteAccess.class);
         handle = new byte[16];
 
-        // Mock behavior for writeByte
+        // Mock behaviour for writeByte
         doAnswer(invocation -> {
             byte[] h = invocation.getArgument(0);
             long offset = invocation.getArgument(1);
@@ -34,7 +34,7 @@ class WriteAccessTest {
             return null;
         }).when(writeAccess).writeByte(any(byte[].class), anyLong(), anyByte());
 
-        // Mock behavior for writeShort
+        // Mock behaviour for writeShort
         doAnswer(invocation -> {
             byte[] h = invocation.getArgument(0);
             long offset = invocation.getArgument(1);
@@ -44,7 +44,7 @@ class WriteAccessTest {
             return null;
         }).when(writeAccess).writeShort(any(byte[].class), anyLong(), anyShort());
 
-        // Mock behavior for writeInt
+        // Mock behaviour for writeInt
         doAnswer(invocation -> {
             byte[] h = invocation.getArgument(0);
             long offset = invocation.getArgument(1);
@@ -56,7 +56,7 @@ class WriteAccessTest {
             return null;
         }).when(writeAccess).writeInt(any(byte[].class), anyLong(), anyInt());
 
-        // Mock behavior for writeLong
+        // Mock behaviour for writeLong
         doAnswer(invocation -> {
             byte[] h = invocation.getArgument(0);
             long offset = invocation.getArgument(1);
@@ -72,7 +72,7 @@ class WriteAccessTest {
             return null;
         }).when(writeAccess).writeLong(any(byte[].class), anyLong(), anyLong());
 
-        // Mock behavior for writeFloat
+        // Mock behaviour for writeFloat
         doAnswer(invocation -> {
             byte[] h = invocation.getArgument(0);
             long offset = invocation.getArgument(1);
@@ -85,7 +85,7 @@ class WriteAccessTest {
             return null;
         }).when(writeAccess).writeFloat(any(byte[].class), anyLong(), anyFloat());
 
-        // Mock behavior for writeDouble
+        // Mock behaviour for writeDouble
         doAnswer(invocation -> {
             byte[] h = invocation.getArgument(0);
             long offset = invocation.getArgument(1);

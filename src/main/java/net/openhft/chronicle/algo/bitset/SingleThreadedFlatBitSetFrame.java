@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.bitset;
 
@@ -26,7 +26,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
      * Creates a new {@code SingleThreadedFlatBitSetFrame} of the given logical size.
      *
      * @param logicalSize the logical bit set size, should be {@code long}-aligned
-     *                    (i. e. a multiple of 8)
+     *                    (i.e. a multiple of 8)
      * @throws IllegalArgumentException is the given logicalSize is not a multiple of 8
      *                                  or non-positive
      */
@@ -38,7 +38,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         longLength = BITS.toLongs(logicalSize);
         if (LONGS.toBits(longLength) != logicalSize) {
             throw new IllegalArgumentException(
-                    "logical size should be long-aligned (i. e. a multiple of 8), " +
+                    "logical size should be long-aligned (i.e. a multiple of 8), " +
                             logicalSize + " given");
         }
     }

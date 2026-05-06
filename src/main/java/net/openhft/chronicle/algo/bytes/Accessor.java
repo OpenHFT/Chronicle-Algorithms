@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 chronicle.software; SPDX-License-Identifier: Apache-2.0
+ * Copyright 2013-2026 chronicle.software; SPDX-License-Identifier: Apache-2.0
  */
 package net.openhft.chronicle.algo.bytes;
 
@@ -152,7 +152,7 @@ public interface Accessor<S, T, A extends AccessCommon<T>> {
     /**
      * Convert size (length) in the source domain to size in bytes.
      * <p>
-     * The default implementation returns the given {@code size} back, i. e. assuming
+     * The default implementation returns the given {@code size} back, i.e. assuming
      * byte-indexed source.
      *
      * @param size size (length) in the source type domain
