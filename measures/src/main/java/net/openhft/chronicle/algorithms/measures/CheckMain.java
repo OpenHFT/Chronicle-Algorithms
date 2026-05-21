@@ -38,6 +38,18 @@ Avalanche: The 99%tile of the drift from 50% was 0.61%
 Mask of Hash: 99%tile collisions: 1816
  */
 public class CheckMain {
+
+    /**
+     * Command line harness that runs the hash quality measures for all configured address wrapper
+     * variants and prints summary statistics.
+     *
+     * <p>For each {@link AddressWrappers} entry this tool evaluates orthogonal bit scores,
+     * avalanche behaviour, and masked hash collisions using {@link OrtogonalBitsScore},
+     * {@link AvalancheScore}, and {@link MaskHashScore}. The output is intended for manual
+     * inspection when comparing hash implementations, not for use on application hot paths.
+     *
+     * @param args ignored
+     */
     public static void main(String[] args) {
         for (AddressWrappers aw : AddressWrappers.values()) {
             System.out.println(aw);

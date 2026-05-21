@@ -13,13 +13,10 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
  * Derived from https://github.com/google/guava/blob/fa95e381e665d8ee9639543b99ed38020c8de5ef
  * /guava/src/com/google/common/hash/Murmur3_128HashFunction.java
  */
+@SuppressWarnings("fallthrough")
 class MurmurHash_3 {
     // Singleton instance of MurmurHash_3
     private static final MurmurHash_3 INSTANCE = new MurmurHash_3();
-
-    // Singleton instance of MurmurHash_3 for native byte order
-    private static final MurmurHash_3 NATIVE_MURMUR = NATIVE_LITTLE_ENDIAN ?
-            MurmurHash_3.INSTANCE : BigEndian.INSTANCE;
 
     // Constants used in the hash function
     private static final long C1 = 0x87c37b91114253d5L;
@@ -27,6 +24,10 @@ class MurmurHash_3 {
 
     // Private constructor to prevent instantiation
     private MurmurHash_3() {
+    }
+
+    private static MurmurHash_3 nativeMurmur() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
     }
 
     /**
@@ -184,9 +185,9 @@ class MurmurHash_3 {
         long h2 = seed;
         long remaining = length;
         while (remaining >= 16L) {
-            long k1 = fetch64(access, input, offset);
-            long k2 = fetch64(access, input, offset + 8L);
-            offset += 16L;
+            long blockOffset = offset;
+            long k1 = fetch64(access, input, blockOffset);
+            offset = blockOffset + 16L;
             remaining -= 16L;
             h1 ^= mixK1(k1);
 
@@ -194,6 +195,7 @@ class MurmurHash_3 {
             h1 += h2;
             h1 = h1 * 5L + 0x52dce729L;
 
+            long k2 = fetch64(access, input, blockOffset + 8L);
             h2 ^= mixK2(k2);
 
             h2 = Long.rotateLeft(h2, 31);
@@ -201,122 +203,70 @@ class MurmurHash_3 {
             h2 = h2 * 5L + 0x38495ab5L;
         }
         if (remaining > 0L) {
-            long k1 = 0L;
-            long k2 = 0L;
-            switch ((int) remaining) {
-                case 15:
-                    k2 ^= ((long) access.readUnsignedByte(input, offset + 14L)) << 48; // fall through
-                case 14:
-                    k2 ^= ((long) access.readUnsignedByte(input, offset + 13L)) << 40; // fall through
-                case 13:
-                    k2 ^= ((long) access.readUnsignedByte(input, offset + 12L)) << 32; // fall through
-                case 12:
-                    k2 ^= ((long) access.readUnsignedByte(input, offset + 11L)) << 24; // fall through
-                case 11:
-                    k2 ^= ((long) access.readUnsignedByte(input, offset + 10L)) << 16; // fall through
-                case 10:
-                    k2 ^= ((long) access.readUnsignedByte(input, offset + 9L)) << 8; // fall through
-                case 9:
-                    k2 ^= access.readUnsignedByte(input, offset + 8L); // fall through
-                case 8:
-                    k1 ^= fetch64(access, input, offset);
-                    break;
-                case 7:
-                    k1 ^= ((long) access.readUnsignedByte(input, offset + 6L)) << 48; // fall through
-                case 6:
-                    k1 ^= ((long) access.readUnsignedByte(input, offset + 5L)) << 40; // fall through
-                case 5:
-                    k1 ^= ((long) access.readUnsignedByte(input, offset + 4L)) << 32; // fall through
-                case 4:
-                    k1 ^= Primitives.unsignedInt(fetch32(access, input, offset));
-                    break;
-                case 3:
-                    k1 ^= ((long) access.readUnsignedByte(input, offset + 2L)) << 16; // fall through
-                case 2:
-                    k1 ^= ((long) access.readUnsignedByte(input, offset + 1L)) << 8; // fall through
-                case 1:
-                    k1 ^= access.readUnsignedByte(input, offset);
-                case 0:
-                    break;
-                default:
-                    throw new AssertionError("Should never get here.");
-            }
+            int tailLength = (int) remaining;
+            long k1 = tailK1(access, input, offset, tailLength);
+            long k2 = tailK2(access, input, offset, tailLength);
             h1 ^= mixK1(k1);
             h2 ^= mixK2(k2);
         }
-// This version appears to be working slower
-
-//        if (remaining > 0L) {
-//            long k1 = 0L;
-//            long k2 = 0L;
-//            megaSwitch:
-//            {
-//              fetch0_7:
-//              {
-//                fetch8_11:
-//                {
-//                    fetch0_3:
-//                    {
-//                        switch ((int) remaining) {
-//                            case 15:
-//                                k2 ^= ((long) access.readUnsignedByte(input, offset + 14L)) << 48;
-//                            case 14:
-//                                k2 ^= ((long) toLittleEndianShort(
-//                                        access.getUnsignedShort(input, offset + 12L))) << 32;
-//                                break fetch8_11;
-//                            case 13:
-//                                k2 ^= ((long) access.readUnsignedByte(input, offset + 12L)) << 32;
-//                            case 12:
-//                                break fetch8_11;
-//                            case 11:
-//                                k2 ^= ((long) access.readUnsignedByte(input, offset + 10L)) << 16;
-//                            case 10:
-//                                k2 ^= (long) toLittleEndianShort(
-//                                        access.getUnsignedShort(input, offset + 8L));
-//                                break fetch0_7;
-//                            case 9:
-//                                k2 ^= ((long) access.readUnsignedByte(input, offset + 8L));
-//                            case 8:
-//                                break fetch0_7;
-//                            case 7:
-//                                k1 ^= ((long) access.readUnsignedByte(input, offset + 6L)) << 48;
-//                            case 6:
-//                                k1 ^= ((long) toLittleEndianShort(
-//                                        access.getUnsignedShort(input, offset + 4L))) << 32;
-//                                break fetch0_3;
-//                            case 5:
-//                                k1 ^= ((long) access.readUnsignedByte(input, offset + 4L)) << 32;
-//                            case 4:
-//                                break fetch0_3;
-//                            case 3:
-//                                k1 ^= ((long) access.readUnsignedByte(input, offset + 2L)) << 16;
-//                            case 2:
-//                                k1 ^= (long) toLittleEndianShort(
-//                                        access.getUnsignedShort(input, offset));
-//                                break megaSwitch;
-//                            case 1:
-//                                k1 ^= ((long) access.readUnsignedByte(input, offset));
-//                                break megaSwitch;
-//                            default:
-//                                throw new AssertionError();
-//                        }
-//                    } // fetch0_3
-//                    k1 ^= unsignedInt(fetch32(access, input, offset));
-//                    break megaSwitch;
-//                } // fetch8_11
-//                k2 ^= unsignedInt(fetch32(access, input, offset + 8L));
-//              } // fetch0_7
-//              k1 ^= fetch64(access, input, offset);
-//            } // megaSwitch
-//
-//            h1 ^= mixK1(k1);
-//            h2 ^= mixK2(k2);
-//        }
         return finalize(length, h1, h2);
     }
 
+    private <T> long tailK1(ReadAccess<T> access, T input, long offset, int remaining) {
+        if (remaining >= 8) {
+            return fetch64(access, input, offset);
+        }
+        long k1 = 0L;
+        switch (remaining) {
+            case 7:
+                k1 ^= ((long) access.readUnsignedByte(input, offset + 6L)) << 48; // fall through
+            case 6:
+                k1 ^= ((long) access.readUnsignedByte(input, offset + 5L)) << 40; // fall through
+            case 5:
+                k1 ^= ((long) access.readUnsignedByte(input, offset + 4L)) << 32; // fall through
+            case 4:
+                k1 ^= Primitives.unsignedInt(fetch32(access, input, offset));
+                break;
+            case 3:
+                k1 ^= ((long) access.readUnsignedByte(input, offset + 2L)) << 16; // fall through
+            case 2:
+                k1 ^= ((long) access.readUnsignedByte(input, offset + 1L)) << 8; // fall through
+            case 1:
+                k1 ^= access.readUnsignedByte(input, offset);
+            default:
+                break;
+        }
+        return k1;
+    }
+
+    private <T> long tailK2(ReadAccess<T> access, T input, long offset, int remaining) {
+        if (remaining <= 8) {
+            return 0L;
+        }
+        long k2 = 0L;
+        switch (remaining) {
+            case 15:
+                k2 ^= ((long) access.readUnsignedByte(input, offset + 14L)) << 48; // fall through
+            case 14:
+                k2 ^= ((long) access.readUnsignedByte(input, offset + 13L)) << 40; // fall through
+            case 13:
+                k2 ^= ((long) access.readUnsignedByte(input, offset + 12L)) << 32; // fall through
+            case 12:
+                k2 ^= ((long) access.readUnsignedByte(input, offset + 11L)) << 24; // fall through
+            case 11:
+                k2 ^= ((long) access.readUnsignedByte(input, offset + 10L)) << 16; // fall through
+            case 10:
+                k2 ^= ((long) access.readUnsignedByte(input, offset + 9L)) << 8; // fall through
+            case 9:
+                k2 ^= access.readUnsignedByte(input, offset + 8L);
+            default:
+                break;
+        }
+        return k2;
+    }
+
     /**
-     * Big-endian implementation of MurmurHash_3.
+     * Big-endian implementation of MurmurHash3.
      */
     private static class BigEndian extends MurmurHash_3 {
         // Singleton instance of BigEndian
@@ -353,7 +303,7 @@ class MurmurHash_3 {
     }
 
     /**
-     * Implementation of LongHashFunction using MurmurHash_3.
+     * Implementation of LongHashFunction using MurmurHash3.
      */
     private static class AsLongHashFunction extends LongHashFunction {
         // Singleton instance of AsLongHashFunction
@@ -389,23 +339,23 @@ class MurmurHash_3 {
 
         @Override
         public long hashLong(long input) {
-            return hashNativeLong(NATIVE_MURMUR.toLittleEndian(input), 8L);
+            return hashNativeLong(nativeMurmur().toLittleEndian(input), 8L);
         }
 
         @Override
         public long hashInt(int input) {
-            return hashNativeLong(Primitives.unsignedInt(NATIVE_MURMUR.toLittleEndian(input)), 4L);
+            return hashNativeLong(Primitives.unsignedInt(nativeMurmur().toLittleEndian(input)), 4L);
         }
 
         @Override
         public long hashShort(short input) {
             return hashNativeLong(
-                    NATIVE_MURMUR.toLittleEndianShort(Primitives.unsignedShort(input)), 2L);
+                    nativeMurmur().toLittleEndianShort(Primitives.unsignedShort(input)), 2L);
         }
 
         @Override
         public long hashChar(char input) {
-            return hashNativeLong(NATIVE_MURMUR.toLittleEndianShort(input), 2L);
+            return hashNativeLong(nativeMurmur().toLittleEndianShort(input), 2L);
         }
 
         @Override
@@ -430,7 +380,7 @@ class MurmurHash_3 {
     }
 
     /**
-     * Implementation of LongHashFunction using MurmurHash_3 with a seed value.
+     * Implementation of LongHashFunction using MurmurHash3 with a seed value.
      */
     private static class AsLongHashFunctionSeeded extends AsLongHashFunction {
         private static final long serialVersionUID = 0L;
@@ -438,7 +388,7 @@ class MurmurHash_3 {
         // The seed value
         private final long seed;
         // The precomputed hash value for an empty input
-        private final transient long voidHash;
+        private final long voidHash;
 
         /**
          * Constructs an instance with the given seed.
@@ -459,8 +409,7 @@ class MurmurHash_3 {
         long hashNativeLong(long nativeLong, long len) {
             long seed = this.seed;
             long h1 = seed ^ mixK1(nativeLong);
-            long h2 = seed;
-            return MurmurHash_3.finalize(len, h1, h2);
+            return MurmurHash_3.finalize(len, h1, seed);
         }
 
         @Override

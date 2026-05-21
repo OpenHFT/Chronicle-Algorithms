@@ -16,8 +16,6 @@ import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_
  */
 class XxHash_r39 {
     private static final XxHash_r39 INSTANCE = new XxHash_r39();
-    private static final XxHash_r39 NATIVE_XX = NATIVE_LITTLE_ENDIAN ?
-            XxHash_r39.INSTANCE : BigEndian.INSTANCE;
 
     // Primes if treated as unsigned
     private static final long P1 = -7046029288634856825L;
@@ -30,11 +28,12 @@ class XxHash_r39 {
     private XxHash_r39() {
     }
 
+    private static XxHash_r39 nativeXx() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
+    }
+
     /**
-     * Finalizes the hash value with additional mixing of bits.
-     *
-     * @param hash The initial hash value to finalize
-     * @return The finalized hash value
+     * Final mixing step used by xxHash64.
      */
     private static long finalize(long hash) {
         hash ^= hash >>> 33;
@@ -46,19 +45,14 @@ class XxHash_r39 {
     }
 
     /**
-     * Returns a LongHashFunction instance implementing xxHash without a seed.
-     *
-     * @return A LongHashFunction instance
+     * Returns a seedless xxHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithoutSeed() {
         return AsLongHashFunction.SEEDLESS_INSTANCE;
     }
 
     /**
-     * Returns a LongHashFunction instance implementing xxHash with the given seed.
-     *
-     * @param seed The seed value for the hash function
-     * @return A LongHashFunction instance
+     * Returns a seeded xxHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
         return new AsLongHashFunctionSeeded(seed);
@@ -262,7 +256,8 @@ class XxHash_r39 {
             // Reverse bytes for big-endian compatibility
             return Integer.reverseBytes(access.readInt(in, off)) & 0xFFFFFFFFL;
         }
-// fetch8 is not overloaded, because endianness doesn't matter for single byte
+
+        // fetch8 is not overloaded, because endianness doesn't matter for single byte
 
         @Override
         long toLittleEndian(long v) {
@@ -307,11 +302,11 @@ class XxHash_r39 {
         @Override
         public long hashLong(long input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
-            long hash = seed() + P5 + 8;
+            input = nativeXx().toLittleEndian(input);
             input *= P2;
             input = Long.rotateLeft(input, 31);
             input *= P1;
+            long hash = seed() + P5 + 8;
             hash ^= input;
             hash = Long.rotateLeft(hash, 27) * P1 + P4;
             return XxHash_r39.finalize(hash);
@@ -320,7 +315,7 @@ class XxHash_r39 {
         @Override
         public long hashInt(int input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             long hash = seed() + P5 + 4;
             hash ^= Primitives.unsignedInt(input) * P1;
             hash = Long.rotateLeft(hash, 23) * P2 + P3;
@@ -330,7 +325,7 @@ class XxHash_r39 {
         @Override
         public long hashShort(short input) {
             // Convert input to little-endian and compute hash
-            input = NATIVE_XX.toLittleEndian(input);
+            input = nativeXx().toLittleEndian(input);
             long hash = seed() + P5 + 2;
             hash ^= Primitives.unsignedByte(input) * P5;
             hash = Long.rotateLeft(hash, 11) * P1;

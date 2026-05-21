@@ -6,7 +6,7 @@ package net.openhft.chronicle.algo.locks;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
- * Represents an operation that attempts to acquire a lock using a given locking strategy.
+ * Callback invoked by {@link AcquisitionStrategy} implementations to attempt lock acquisition.
  *
  * @param <S> the type of the locking strategy
  */

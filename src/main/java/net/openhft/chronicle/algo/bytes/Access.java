@@ -9,9 +9,11 @@ import net.openhft.chronicle.bytes.RandomDataInput;
 import java.nio.ByteBuffer;
 
 /**
- * The Access interface combines read and write access capabilities for a given type {@code T}.
- * It provides various utility methods for native access, byte buffer access, and bytes store access,
- * as well as methods for copying and checking equivalence between different access types.
+ * Combines {@link ReadAccess} and {@link WriteAccess} for a given handle type.
+ * <p>
+ * Provides factory methods for common access strategies (native memory, {@link ByteBuffer},
+ * {@link net.openhft.chronicle.bytes.BytesStore}) and utility helpers for copying or comparing
+ * regions using arbitrary access implementations.
  *
  * @param <T> the type of the object to be accessed
  */
@@ -58,17 +60,8 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     }
 
     /**
-     * Copies data from the source to the target using the provided access interfaces.
-     *
-     * @param sourceAccess the source access interface
-     * @param source       the source handle
-     * @param sourceOffset the source offset
-     * @param targetAccess the target access interface
-     * @param target       the target handle
-     * @param targetOffset the target offset
-     * @param len          the length of data to copy
-     * @param <S>          the source type
-     * @param <T>          the target type
+     * Copy bytes between two addressable regions using their respective access strategies.
+     * Performs minimal work by moving data in 8/4/2/1 byte chunks.
      */
     static <S, T> void copy(final ReadAccess<S> sourceAccess,
                             final S source,
@@ -99,18 +92,9 @@ public interface Access<T> extends ReadAccess<T>, WriteAccess<T> {
     }
 
     /**
-     * Checks if the data in two different access types are equivalent.
+     * Compare bytes between two regions, using the provided {@link ReadAccess} strategies.
      *
-     * @param access1 the first access interface
-     * @param handle1 the first handle
-     * @param offset1 the first offset
-     * @param access2 the second access interface
-     * @param handle2 the second handle
-     * @param offset2 the second offset
-     * @param len     the length of data to compare
-     * @param <T>     the type of the first handle
-     * @param <U>     the type of the second handle
-     * @return true if the data is equivalent, false otherwise
+     * @return true if all bytes in the range match
      */
     static <T, U> boolean equivalent(final ReadAccess<T> access1,
                                      final T handle1,

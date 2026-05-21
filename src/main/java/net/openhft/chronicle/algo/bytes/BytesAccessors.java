@@ -6,7 +6,7 @@ package net.openhft.chronicle.algo.bytes;
 import net.openhft.chronicle.bytes.BytesStore;
 
 /**
- * Utility class for providing accessor implementations for {@link BytesStore}.
+ * Accessor helpers for bridging {@link BytesStore} into the Chronicle algorithms access model.
  */
 final class BytesAccessors {
 
@@ -15,7 +15,7 @@ final class BytesAccessors {
     }
 
     /**
-     * Generic accessor implementation for {@link BytesStore}.
+     * Generic accessor implementation for {@link BytesStore} instances.
      *
      * @param <S> the type of BytesStore
      */
@@ -25,8 +25,6 @@ final class BytesAccessors {
 
         /**
          * Returns the access implementation for the BytesStore.
-         *
-         * @return the access implementation for the BytesStore
          */
         @SuppressWarnings("unchecked")
         @Override
@@ -47,10 +45,6 @@ final class BytesAccessors {
 
         /**
          * Converts the index in the source domain to an access offset.
-         *
-         * @param source the source BytesStore
-         * @param index  the index in the source type domain
-         * @return the offset for access corresponding to the given index
          */
         @Override
         public long offset(S source, long index) {

@@ -13,8 +13,11 @@ import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
 import static net.openhft.chronicle.algo.bitset.SingleThreadedFlatBitSetFrame.*;
 
 /**
- * DirectBitSet with input validations and thread-safe memory access.
- * This class provides a concurrent implementation of a BitSet frame.
+ * Direct bit set frame that mirrors {@link SingleThreadedFlatBitSetFrame} operations but performs
+ * all mutations with CAS, making it safe to share across threads.
+ * <p>
+ * Bounds checks mirror the single threaded implementation, while read/modify/write loops use
+ * volatile reads and compare-and-swap to protect against concurrent updates.
  */
 public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
     private final long longLength;

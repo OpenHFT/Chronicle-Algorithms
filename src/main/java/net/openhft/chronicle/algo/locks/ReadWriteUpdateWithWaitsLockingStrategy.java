@@ -6,10 +6,9 @@ package net.openhft.chronicle.algo.locks;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
- * Interface representing a read-write-update lock with wait registration capabilities.
+ * Read/write/update locking strategy that also tracks wait registrations.
  * <p>
- * This interface extends both {@link ReadWriteUpdateLockingStrategy} and {@link ReadWriteWithWaitsLockingStrategy},
- * adding the capability to upgrade an update lock to a write lock while deregistering the wait state.
+ * Adds a helper to upgrade an update lock to a write lock while deregistering an outstanding wait.
  */
 public interface ReadWriteUpdateWithWaitsLockingStrategy
         extends ReadWriteUpdateLockingStrategy, ReadWriteWithWaitsLockingStrategy {

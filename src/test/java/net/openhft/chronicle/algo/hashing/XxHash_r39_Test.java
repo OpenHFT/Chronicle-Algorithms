@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class XxHash_r39_Test {
 
@@ -16,8 +17,8 @@ public class XxHash_r39_Test {
      * from https://github.com/Cyan4973/xxHash
      * <p>
      * #include "xxhash.c"
-     * #include <stdlib.h>
-     * #include <stdio.h>
+     * #include &lt;stdlib.h&gt;
+     * #include &lt;stdio.h&gt;
      * int main()
      * {
      * char* src = (char*) malloc(1024);
@@ -2092,7 +2093,7 @@ public class XxHash_r39_Test {
             5528644708740739488L
     };
     public static Collection<Object[]> data() {
-        ArrayList<Object[]> data = new ArrayList<Object[]>();
+        List<Object[]> data = new ArrayList<>();
         for (int len = 0; len < 1025; len++) {
             data.add(new Object[]{len});
         }

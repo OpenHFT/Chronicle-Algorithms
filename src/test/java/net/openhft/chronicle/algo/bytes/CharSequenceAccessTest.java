@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteOrder;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class CharSequenceAccessTest {
     private static final CharSequence TEST_SEQUENCE = "0123456789ABCDEF";
 

@@ -30,7 +30,7 @@ public class ReusableBitSet implements BitSet {
     }
 
     /**
-     * Reuses the current ReusableBitSet with the specified frame, access, handle, and offset.
+     * Point this instance at a new backing store without allocating a fresh wrapper.
      *
      * @param frame  the bit set frame to use
      * @param access the access interface for reading/writing bits
@@ -206,7 +206,7 @@ public class ReusableBitSet implements BitSet {
      * for iterating over set bits in the bit set.
      */
     protected class Bits implements BitSet.Bits {
-        protected BitSetFrame.Bits frameBits;
+        protected final BitSetFrame.Bits frameBits;
 
         /**
          * Constructs a new Bits instance with the specified frame bits.

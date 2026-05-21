@@ -1,0 +1,222 @@
+= Chronicle-Algorithms Decision Log
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+Chronicle-Algorithms records architectural and design decisions using two ID streams:
+
+* `ALGO-DEC-*` for module-level decisions aligned to requirements.
+* `ADR-*` for architectural decision records that may cut across multiple features.
+
+Both sets are captured in this unified decision log.
+
+[[ALGO-DEC-001]]
+== Decision ALGO-DEC-001: Non-Cryptographic Hash Focus
+*Status:* Accepted
+*Linked requirements:* <<ALGO-FN-001>>, <<ALGO-NF-P-001>>, <<ALGO-NF-S-001>>
+
+=== Context
+The module supplies hashes for data structures and indexing, where throughput and distribution matter more than cryptographic strength.
+
+=== Decision
+Provide fast 64-bit non-cryptographic hashes (Murmur3, CityHash, xxHash) as the default set.
+
+=== Alternatives Considered
+
+* Cryptographic hashes: rejected due to higher latency and unnecessary security properties for this module's scope.
+
+=== Consequences
+
+* High throughput and good distribution for Chronicle data structures.
+* Callers must not rely on these hashes for integrity or confidentiality; security-sensitive uses must choose other algorithms.
+
+[[ALGO-DEC-002]]
+== Decision ALGO-DEC-002: Flat Bit Set Representation
+*Status:* Accepted
+*Linked requirements:* <<ALGO-FN-002>>, <<ALGO-NF-P-001>>
+
+=== Context
+Bit sets back Chronicle structures that need predictable latency and cache-friendly scans.
+
+=== Decision
+Represent bit sets as flat arrays of machine words with single-writer-friendly algorithms.
+
+=== Alternatives Considered
+
+* Hierarchical or segmented bit sets: rejected for higher traversal overhead and cache cost in target workloads.
+
+=== Consequences
+
+* Excellent sequential performance and memory locality.
+* Extremely sparse large spaces may need additional upstream structures to avoid wasted memory.
+
+[[ALGO-DEC-003]]
+== Decision ALGO-DEC-003: Zero-Copy Byte Access Abstractions
+*Status:* Accepted
+*Linked requirements:* <<ALGO-FN-003>>, <<ALGO-NF-P-001>>, <<ALGO-NF-S-001>>
+
+=== Context
+Hashing and related algorithms must read bytes from varied backings (on-heap, direct buffers, Chronicle Bytes) with minimal overhead and safe bounds.
+
+=== Decision
+Provide accessor interfaces that wrap caller-owned storage without copying, while enforcing bounds checks at API edges.
+
+=== Alternatives Considered
+
+* Copy inputs into owned buffers: rejected to avoid allocation and duplicate storage.
+
+=== Consequences
+
+* Minimal allocation and no implicit copies.
+* Callers remain responsible for storage lifecycle and for ensuring buffers stay valid during use.
+
+[[ADR-001]]
+== Decision ADR-001: Abstraction of Memory Access via `Access` Interface
+*Status:* Accepted
+
+=== Context
+The library must perform operations (hashing, locking, bit set manipulation) on data that may reside:
+
+* On the Java heap (byte arrays),
+* In direct memory (`ByteBuffer`),
+* At raw memory addresses (off-heap).
+
+Implementing algorithms separately for each data source leads to code duplication and maintenance issues.
+
+=== Decision
+Introduce a generic `Access<T>` interface (extending `ReadAccess` and `WriteAccess`) to abstract memory access.
+
+=== Details
+
+* The `Access` interface defines primitive read and write methods (for example, `readLong`, `writeInt`) and atomic operations (for example, `compareAndSwap`).
+* Implementations are created for specific sources, such as:
+
+* `NativeAccess` (Unsafe-backed),
+* `ByteBufferAccess`,
+* Array-backed accessors.
+* Algorithms accept an `Access` instance and a handle `T`, allowing the same logic to run regardless of where the data lives.
+
+=== Consequences
+
+* Algorithms are written once and reused for all memory types.
+* JIT-compilation can inline accessor calls, giving near zero-overhead abstraction in hot paths.
+* Slightly higher complexity in method signatures (passing accessors and handles).
+
+[[ADR-002]]
+== Decision ADR-002: Stateless Hash Function Design
+*Status:* Accepted
+
+=== Context
+Standard Java `MessageDigest` and many object `hashCode` implementations:
+
+* Often require object allocation,
+* Maintain internal mutable state,
+
+which increases GC pressure in high-frequency trading and other latency-sensitive environments.
+
+=== Decision
+Implement `LongHashFunction` as immutable, stateless singletons (or simple data holders for seeds).
+
+=== Details
+
+* Methods such as `hashBytes` or `hashMemory` take the input data directly and return a `long`.
+* No heap objects are allocated during the hashing process.
+* Concrete implementations (City, Murmur, xxHash) are exposed via static factory methods on `LongHashFunction`.
+
+=== Consequences
+
+* Zero-allocation hashing suitable for latency-critical paths.
+* Thread-safe by design since the functions are stateless and immutable.
+
+[[ADR-003]]
+== Decision ADR-003: Three-Tier Locking Strategy (Read-Write-Update)
+*Status:* Accepted
+
+=== Context
+Standard `ReentrantReadWriteLock` does not support an "Update" lock state where:
+
+* A thread intends to write but can still read,
+* Other writers are blocked,
+* Other readers may still proceed until the actual write.
+
+Standard JDK locks also cannot easily be stored in off-heap shared memory for inter-process coordination.
+
+=== Decision
+Implement `ReadWriteUpdateLockingStrategy` interfaces that operate over the `Access` abstraction to support a three-tier lock model: Read, Update, and Write.
+
+=== Details
+
+* Locks are represented by state words (integers or longs) in memory.
+* The Update lock state is:
+
+* Mutually exclusive with other Update and Write locks,
+* Compatible with concurrent Readers.
+* Supports atomic upgrades and downgrades:
+
+* Read -> Update -> Write,
+* Write -> Read (and similar patterns as required).
+* Lock state can be stored in shared memory mapped files or off-heap regions via `Access`.
+
+=== Consequences
+
+* Enables concurrency patterns not possible with standard JDK locks (for example, optimistic read with reserved write intent).
+* Locks can be placed in shared memory for inter-process synchronisation.
+* Complexity of reasoning about lock states is higher and must be carefully documented and tested.
+
+[[ADR-004]]
+== Decision ADR-004: Fixed-Size Flat Bit Sets
+*Status:* Accepted
+
+=== Context
+`java.util.BitSet` is dynamic and heap-based. Chronicle-Algorithms requires bit sets that:
+
+* Map onto fixed memory regions (for example, hardware registers, shared memory buffers),
+* Offer deterministic memory layout and size.
+
+This aligns with and elaborates on <<ALGO-DEC-002>>.
+
+=== Decision
+Implement `BitSetFrame` and `ReusableBitSet` as fixed-size, "flat" bit set abstractions.
+
+=== Details
+
+* "Flat" means the bit set is a contiguous block of memory without dynamic expansion.
+* Implementations are provided for:
+
+* Single-threaded usage (non-atomic operations),
+* Concurrent usage (atomic CAS operations).
+* Bit sets can be overlaid onto arbitrary memory regions (for example, network packets, shared memory segments).
+
+=== Consequences
+
+* Deterministic memory usage and layout.
+* Bit sets can be used directly over hardware-facing or shared memory structures.
+* Cannot resize dynamically; capacity is strictly bounded by the initial configuration, so upstream code must size correctly.
+
+[[ADR-005]]
+== Decision ADR-005: Native Byte Order Optimisation
+*Status:* Accepted
+
+=== Context
+Hashing algorithms frequently process data in 4- or 8-byte chunks. Converting byte sequences to integers or longs must respect endianness:
+
+* Java's abstract view is big-endian,
+* Common hardware (for example, x86) is little-endian.
+
+Naive implementations that always normalise to a single byte order can pay unnecessary byte-swapping costs.
+
+=== Decision
+Detect `ByteOrder.nativeOrder()` at runtime and provide specialised implementations per native endianness.
+
+=== Details
+
+* Classes such as `CityHash_1_1` and `MurmurHash_3` have internal static subclasses or strategy variants for big-endian and little-endian.
+* A small indirection on first use chooses the implementation matching the architecture.
+* Subsequent calls are dispatched directly to the chosen variant.
+
+=== Consequences
+
+* Maximises performance on the host architecture by avoiding unnecessary byte-swapping.
+* Hash results may differ between little-endian and big-endian platforms for the same byte input unless normalisation is explicitly added.
+* Cross-platform consistency must be considered explicitly by callers that depend on identical hash values across architectures.

@@ -11,17 +11,16 @@ import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static net.openhft.chronicle.algo.hashing.LongHashFunction.NATIVE_LITTLE_ENDIAN;
 
 /**
- * Adapted from the C++ CityHash implementation from Google at
- * https://github.com/google/cityhash/blob/master/src/city.cc.
+ * Endian-independent CityHash64 v1.1 implementation adapted from Google's reference.
+ * <p>
+ * Exposes hash functions via {@link LongHashFunction} and consumes data through {@link ReadAccess}
+ * so any addressable source can be hashed without copying. On big-endian platforms values are
+ * byte-swapped to maintain consistent output.
  */
 class CityHash_1_1 {
 
     // Singleton instance of CityHash_1_1
     private static final CityHash_1_1 INSTANCE = new CityHash_1_1();
-
-    // Singleton instance with native byte order
-    private static final CityHash_1_1 NATIVE_CITY = NATIVE_LITTLE_ENDIAN ?
-            CityHash_1_1.INSTANCE : BigEndian.INSTANCE;
 
     // Constants used in the hashing algorithm
     private static final long K0 = 0xc3a5c85c97cb3127L;
@@ -33,22 +32,19 @@ class CityHash_1_1 {
     private CityHash_1_1() {
     }
 
+    private static CityHash_1_1 nativeCity() {
+        return NATIVE_LITTLE_ENDIAN ? INSTANCE : BigEndian.INSTANCE;
+    }
+
     /**
-     * Applies a bitwise shift and mix operation to the given value.
-     *
-     * @param val the value to be shifted and mixed
-     * @return the result of the shift and mix operation
+     * Applies the CityHash shift/mix primitive.
      */
     private static long shiftMix(long val) {
         return val ^ (val >>> 47);
     }
 
     /**
-     * Hashes two long values using a default multiplier.
-     *
-     * @param u the first value
-     * @param v the second value
-     * @return the hashed result
+     * Hashes two long values using the default multiplier.
      */
     private static long hashLen16(long u, long v) {
         return hashLen16(u, v, K_MUL);
@@ -56,11 +52,6 @@ class CityHash_1_1 {
 
     /**
      * Hashes two long values using the specified multiplier.
-     *
-     * @param u   the first value
-     * @param v   the second value
-     * @param mul the multiplier
-     * @return the hashed result
      */
     private static long hashLen16(long u, long v, long mul) {
         long a = shiftMix((u ^ v) * mul);
@@ -68,23 +59,14 @@ class CityHash_1_1 {
     }
 
     /**
-     * Computes the multiplier based on the length.
-     *
-     * @param len the length
-     * @return the multiplier
+     * Compute the mixing multiplier based on input length.
      */
     private static long mul(long len) {
         return K2 + (len << 1);
     }
 
     /**
-     * Hashes a length of 1 to 3 bytes.
-     *
-     * @param len           the length
-     * @param firstByte     the first byte
-     * @param midOrLastByte the middle or last byte
-     * @param lastByte      the last byte
-     * @return the hashed result
+     * Hash for inputs of 1-3 bytes.
      */
     private static long hash1To3Bytes(int len, int firstByte, int midOrLastByte, int lastByte) {
         int y = firstByte + (midOrLastByte << 8);
@@ -93,12 +75,7 @@ class CityHash_1_1 {
     }
 
     /**
-     * Hashes a length of 4 to 7 bytes.
-     *
-     * @param len         the length
-     * @param first4Bytes the first 4 bytes
-     * @param last4Bytes  the last 4 bytes
-     * @return the hashed result
+     * Hash for inputs of 4-7 bytes.
      */
     private static long hash4To7Bytes(long len, long first4Bytes, long last4Bytes) {
         long mul = mul(len);
@@ -106,12 +83,7 @@ class CityHash_1_1 {
     }
 
     /**
-     * Hashes a length of 8 to 16 bytes.
-     *
-     * @param len         the length
-     * @param first8Bytes the first 8 bytes
-     * @param last8Bytes  the last 8 bytes
-     * @return the hashed result
+     * Hash for inputs of 8-16 bytes.
      */
     private static long hash8To16Bytes(long len, long first8Bytes, long last8Bytes) {
         long mul = mul(len);
@@ -122,30 +94,21 @@ class CityHash_1_1 {
     }
 
     /**
-     * Provides an instance of LongHashFunction without a seed.
-     *
-     * @return an instance of LongHashFunction without a seed
+     * Seedless CityHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithoutSeed() {
         return AsLongHashFunction.INSTANCE;
     }
 
     /**
-     * Provides an instance of LongHashFunction with a seed.
-     *
-     * @param seed the seed
-     * @return an instance of LongHashFunction with the seed
+     * Seeded CityHash64 {@link LongHashFunction}.
      */
     public static LongHashFunction asLongHashFunctionWithSeed(long seed) {
         return new AsLongHashFunctionSeeded(K2, seed);
     }
 
     /**
-     * Provides an instance of LongHashFunction with two seeds.
-     *
-     * @param seed0 the first seed
-     * @param seed1 the second seed
-     * @return an instance of LongHashFunction with the seeds
+     * CityHash64 {@link LongHashFunction} seeded with two values.
      */
     public static LongHashFunction asLongHashFunctionWithTwoSeeds(long seed0, long seed1) {
         return new AsLongHashFunctionSeeded(seed0, seed1);
@@ -296,12 +259,8 @@ class CityHash_1_1 {
         } else if (len <= 64L) {
             return hashLen33To64(access, in, off, len);
         }
-        long x = fetch64(access, in, off + len - 40L);
-        long y = fetch64(access, in, off + len - 16L) + fetch64(access, in, off + len - 56L);
         long z = hashLen16(fetch64(access, in, off + len - 48L) + len,
                 fetch64(access, in, off + len - 24L));
-
-        long vFirst, vSecond, wFirst, wSecond;
 
         // This and following 3 blocks are produced by a single-click inline-function refactoring.
         // IntelliJ IDEA ftw
@@ -314,12 +273,12 @@ class CityHash_1_1 {
         long z4 = fetch64(access, in, off + len - 64L + 24L);
         a3 += w4;
         b3 = rotateRight(b3 + a3 + z4, 21);
-        long c3 = a3;
+        final long c3 = a3;
         a3 += x4 + y4;
         b3 += rotateRight(a3, 44);
-        vFirst = a3 + z4;
-        vSecond = b3 + c3;
 
+        long x = fetch64(access, in, off + len - 40L);
+        long y = fetch64(access, in, off + len - 16L) + fetch64(access, in, off + len - 56L);
         // WeakHashLen32WithSeeds
         long a2 = y + K1;
         long b2 = x;
@@ -332,8 +291,10 @@ class CityHash_1_1 {
         long c2 = a2;
         a2 += x3 + y3;
         b2 += rotateRight(a2, 44);
-        wFirst = a2 + z3;
-        wSecond = b2 + c2;
+        long wSecond = b2 + c2;
+        long wFirst = a2 + z3;
+        long vSecond = b3 + c3;
+        long vFirst = a3 + z4;
 
         x = x * K1 + fetch64(access, in, off);
 
@@ -357,8 +318,8 @@ class CityHash_1_1 {
             long c1 = a1;
             a1 += x2 + y2;
             b1 += rotateRight(a1, 44);
-            vFirst = a1 + z2;
             vSecond = b1 + c1;
+            vFirst = a1 + z2;
 
             // WeakHashLen32WithSeeds
             long a = z + wSecond;
@@ -372,8 +333,8 @@ class CityHash_1_1 {
             long c = a;
             a += x1 + y1;
             b += rotateRight(a, 44);
-            wFirst = a + z1;
             wSecond = b + c;
+            wFirst = a + z1;
 
             long tmp = x;
             x = z;
@@ -434,14 +395,14 @@ class CityHash_1_1 {
 
         @Override
         public long hashLong(long input) {
-            input = NATIVE_CITY.toLittleEndian(input);
+            input = nativeCity().toLittleEndian(input);
             long hash = hash8To16Bytes(8L, input, input);
             return finalizeHash(hash);
         }
 
         @Override
         public long hashInt(int input) {
-            input = NATIVE_CITY.toLittleEndian(input);
+            input = nativeCity().toLittleEndian(input);
             long unsignedInt = Primitives.unsignedInt(input);
             long hash = hash4To7Bytes(4L, unsignedInt, unsignedInt);
             return finalizeHash(hash);
@@ -454,9 +415,8 @@ class CityHash_1_1 {
 
         @Override
         public long hashChar(char input) {
-            int unsignedInput = input;
-            int firstByte = (unsignedInput >> FIRST_SHORT_BYTE_SHIFT) & FIRST_SHORT_BYTE_MASK;
-            int secondByte = (unsignedInput >> SECOND_SHORT_BYTE_SHIFT) & SECOND_SHORT_BYTE_MASK;
+            int firstByte = ((int) input >> FIRST_SHORT_BYTE_SHIFT) & FIRST_SHORT_BYTE_MASK;
+            int secondByte = ((int) input >> SECOND_SHORT_BYTE_SHIFT) & SECOND_SHORT_BYTE_MASK;
             long hash = hash1To3Bytes(2, firstByte, secondByte, secondByte);
             return finalizeHash(hash);
         }
@@ -496,7 +456,7 @@ class CityHash_1_1 {
         private static final long serialVersionUID = 0L;
 
         private final long seed0, seed1;
-        private final transient long voidHash;
+        private final long voidHash;
 
         private AsLongHashFunctionSeeded(long seed0, long seed1) {
             this.seed0 = seed0;

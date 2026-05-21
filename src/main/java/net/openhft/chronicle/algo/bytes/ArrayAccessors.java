@@ -6,9 +6,10 @@ package net.openhft.chronicle.algo.bytes;
 import static net.openhft.chronicle.core.UnsafeMemory.MEMORY;
 
 /**
- * Utility class for providing array accessors for various primitive array types.
- * This class includes enums that implement {@link Accessor.Full} for different primitive types,
- * facilitating access to elements of arrays.
+ * Unsafe-backed {@link Accessor} implementations for primitive arrays.
+ * <p>
+ * Each nested enum captures the base offset for its array type and reuses {@link NativeAccess}
+ * to provide fast indexed access without intermediate bounds checks.
  */
 final class ArrayAccessors {
 
@@ -40,7 +41,7 @@ final class ArrayAccessors {
     }
 
     /**
-     * Enum providing full Accessor implementation for boolean arrays.
+     * Accessor for {@code boolean[]} using native memory offsets.
      */
     enum Boolean implements Accessor.Full<boolean[], boolean[]> {
         INSTANCE;
@@ -80,7 +81,7 @@ final class ArrayAccessors {
     }
 
     /**
-     * Enum providing full Accessor implementation for byte arrays.
+     * Accessor for {@code byte[]} using native memory offsets.
      */
     enum Byte implements Accessor.Full<byte[], byte[]> {
         INSTANCE;
@@ -120,7 +121,7 @@ final class ArrayAccessors {
     }
 
     /**
-     * Enum providing full Accessor implementation for char arrays.
+     * Accessor for {@code char[]} using native memory offsets.
      */
     enum Char implements Accessor.Full<char[], char[]> {
         INSTANCE;
@@ -171,7 +172,7 @@ final class ArrayAccessors {
     }
 
     /**
-     * Enum providing full Accessor implementation for short arrays.
+     * Accessor for {@code short[]} using native memory offsets.
      */
     enum Short implements Accessor.Full<short[], short[]> {
         INSTANCE;

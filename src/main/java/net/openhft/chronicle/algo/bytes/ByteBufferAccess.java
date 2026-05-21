@@ -7,8 +7,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Provides an implementation of the {@link Access} interface for {@link ByteBuffer} instances.
- * This class provides methods to read and write various data types to and from a {@link ByteBuffer}.
+ * {@link Access} implementation that reads and writes directly against a {@link ByteBuffer}.
+ * <p>
+ * Offsets are treated as absolute positions; callers should configure buffer order as required.
  */
 final class ByteBufferAccess implements Access<ByteBuffer> {
 

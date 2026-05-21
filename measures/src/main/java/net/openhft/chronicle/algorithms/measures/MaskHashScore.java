@@ -11,13 +11,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by peter on 22/08/15.
+ * Evaluates how evenly the low bits of a hash function are distributed.
+ * <p>
+ * The routine hashes many one-bit variations of an input buffer and counts collisions after
+ * applying a bitmask, highlighting bias in the lower bits of the hash output.
  */
 public class MaskHashScore {
     /**
-     * This test looks at how many collision you get in the lower bits.
-     * It generates 8K hashes, for 8Kbit input and look at at the lower 14 bits (for 16K values)
-     * The ideal is 8K unique hashes after mask.
+     * Run the masked hash collision test and return the 99th percentile number of collisions.
      */
     public static double score(AddressWrapper wrapper) {
         int runs = 2000;

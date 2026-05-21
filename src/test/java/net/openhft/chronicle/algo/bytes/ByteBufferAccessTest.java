@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class ByteBufferAccessTest {
     private ByteBufferAccess access;
     private ByteBuffer buffer;

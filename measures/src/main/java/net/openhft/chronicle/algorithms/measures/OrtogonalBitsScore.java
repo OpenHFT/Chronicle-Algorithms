@@ -9,9 +9,18 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * Created by peter on 21/08/15.
+ * Scores how orthogonal the outputs of a hash function are when single input bits flip.
+ * <p>
+ * The metric penalises pairs of outputs whose Hamming distance is too small, providing a measure of
+ * output independence across nearby inputs.
  */
 public class OrtogonalBitsScore {
+    /**
+     * Execute the orthogonality test and return the 99th percentile penalty score.
+     *
+     * @param wrapper implementation used to hash a native memory block
+     * @return high percentile cumulative penalty; lower values indicate better independence
+     */
     public static long score(AddressWrapper wrapper) {
         int runs = 1000;
         long[] scores = new long[runs];

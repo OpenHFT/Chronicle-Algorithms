@@ -14,9 +14,16 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 /**
- * Created by peter on 21/08/15.
+ * Collection of {@link AddressWrapper} implementations used to exercise hashing strategies over
+ * native memory.
+ * <p>
+ * Each constant implements {@link #setAddress(long, long)} and {@link #hash()} using a different
+ * hashing approach so quality and performance can be compared by the score harnesses.
  */
 public enum AddressWrappers implements AddressWrapper {
+    /**
+     * Returns a random {@code long} irrespective of the provided address.
+     */
     RANDOM {
         Random rand = new Random();
 
@@ -29,6 +36,9 @@ public enum AddressWrappers implements AddressWrapper {
             return rand.nextLong();
         }
     },
+    /**
+     * Uses {@link SecureRandom} to return unpredictable values.
+     */
     SECURE_RANDOM {
         SecureRandom rand = new SecureRandom();
 
@@ -42,6 +52,9 @@ public enum AddressWrappers implements AddressWrapper {
         }
     },
 
+    /**
+     * Wraps the address as a {@link Bytes} and hashes using {@link OptimisedBytesStoreHash}.
+     */
     VANILLA {
         int length;
         Bytes bytes;
@@ -59,6 +72,9 @@ public enum AddressWrappers implements AddressWrapper {
             return OptimisedBytesStoreHash.applyAsLong32bytesMultiple(bytes, length);
         }
     },
+    /**
+     * Hashes the memory region using {@link LongHashFunction#city_1_1()}.
+     */
     CITY_1_1 {
         long address,length;
 
@@ -73,6 +89,9 @@ public enum AddressWrappers implements AddressWrapper {
             return LongHashFunction.city_1_1().hash((Object) null, NativeAccess.instance(), address, length);
         }
     },
+    /**
+     * Hashes the memory region using {@link LongHashFunction#murmur_3()}.
+     */
     MURMUR_3 {
         long address,length;
 
@@ -87,6 +106,10 @@ public enum AddressWrappers implements AddressWrapper {
             return LongHashFunction.murmur_3().hash((Object) null, NativeAccess.instance(), address, length);
         }
     },
+    /**
+     * Builds a 32-bit hash by iterating over bytes as characters and applying the JDK
+     * {@link java.util.HashMap} agitation function to reduce collisions.
+     */
     STRING32 {
         Bytes bytes;
 
@@ -115,6 +138,9 @@ public enum AddressWrappers implements AddressWrapper {
             return h ^ (h >>> 7) ^ (h >>> 4);
         }
     },
+    /**
+     * Builds a 64-bit hash using a similar approach to {@link #STRING32} but keeping more entropy.
+     */
     STRING64 {
         Bytes bytes;
 
@@ -139,6 +165,9 @@ public enum AddressWrappers implements AddressWrapper {
             return h ^ (h >>> 14) ^ (h >>> 7);
         }
     },
+    /**
+     * Generates the raw 32-bit polynomial hash without the extra agitation step.
+     */
     STRING32_WITHOUT_AGITATE {
         Bytes bytes;
 

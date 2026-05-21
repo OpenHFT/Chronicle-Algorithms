@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.nio.ByteOrder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class RandomDataOutputAccessTest {
@@ -111,6 +112,6 @@ public class RandomDataOutputAccessTest {
     }
 
     // Mock class extending RandomDataOutput with self-referential generic type
-    abstract class RandomDataOutputImpl implements RandomDataOutput<RandomDataOutputImpl> {
+    abstract static class RandomDataOutputImpl implements RandomDataOutput<RandomDataOutputImpl> {
     }
 }

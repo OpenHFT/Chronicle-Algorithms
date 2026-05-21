@@ -9,7 +9,8 @@ import net.openhft.chronicle.core.Jvm;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Provides various acquisition strategies for locking mechanisms.
+ * Factory for common lock acquisition strategies including spin loops and wait-registration
+ * helpers. Designed to be combined with {@link LockingStrategy} implementations.
  */
 public final class AcquisitionStrategies {
 

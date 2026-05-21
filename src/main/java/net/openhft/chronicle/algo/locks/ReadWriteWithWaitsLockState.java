@@ -4,10 +4,9 @@
 package net.openhft.chronicle.algo.locks;
 
 /**
- * Interface representing a read-write lock state with wait registration capabilities.
+ * Read/write lock state that also tracks waiting threads for coordination purposes.
  * <p>
- * This interface extends {@link ReadWriteLockState}, adding methods to register and
- * deregister waits, and to manage write locks with wait deregistration.
+ * Adds wait registration, wait-aware acquisition helpers, and a specialised strategy link.
  */
 public interface ReadWriteWithWaitsLockState extends ReadWriteLockState {
 

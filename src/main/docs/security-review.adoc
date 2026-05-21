@@ -1,0 +1,23 @@
+= Chronicle-Algorithms Security Review (Initial)
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Scope
+Hashing, bit set, byte access, and lock primitives; includes off-heap friendly code paths.
+
+== Threat Considerations
+- Bounds safety: validate indices and lengths for on/off-heap accesses to avoid memory corruption.
+- Input handling: hashing APIs accept untrusted data; ensure size checks and avoid integer overflows.
+- Concurrency: lock and bit set operations must not expose torn state or races when used as documented.
+- Cryptography: only non-cryptographic hashes are included; do not use for confidentiality or integrity.
+
+== Current Posture
+- No network or IO entry points in this module.
+- No embedded secrets or key material.
+- Static analysis (Checkstyle/SpotBugs) reports clean; rerun in CI on changes.
+
+== Follow-Ups
+- Document any additional fuzz/security testing for hashing and bounds checks.
+- Record any deviations or suppressions alongside rationale in future reviews.

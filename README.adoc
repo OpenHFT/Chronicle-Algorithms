@@ -1,0 +1,250 @@
+= Chronicle-Algorithms
+:license: Apache 2.0
+:toc: macro
+:toclevels: 3
+:lang: en-GB
+:source-highlighter: rouge
+
+image:[https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-algorithms/badge.svg[link="https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-algorithms](https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-algorithms/badge.svg[link=%22https://maven-badges.herokuapp.com/maven-central/net.openhft/chronicle-algorithms)"]
+image:[https://javadoc.io/badge2/net.openhft/chronicle-algorithms/javadoc.svg[link="https://javadoc.io/doc/net.openhft/chronicle-algorithms](https://javadoc.io/badge2/net.openhft/chronicle-algorithms/javadoc.svg[link=%22https://javadoc.io/doc/net.openhft/chronicle-algorithms)"]
+image:[https://img.shields.io/badge/License-Apache%202.0-blue.svg[link="https://opensource.org/licenses/Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg[link=%22https://opensource.org/licenses/Apache-2.0)"]
+
+Chronicle-Algorithms is a Java library providing zero-allocation, high-performance algorithms for hashing, bit set operations, off-heap locking, and low-level memory access. It is designed for latency-sensitive systems where garbage collection pauses are critical concerns.
+
+Zero-allocation, efficient algorithms for hashing, bit set operations, raw byte access, and lightweight off-heap-friendly locking.
+
+toc::[]
+
+== Features
+
+* **Hashing**
+** Non-cryptographic 64-bit hash functions including CityHash 1.1, MurmurHash3, and xxHash r39.
+** Optimised for performance and zero allocation, with consistent results across big-endian and little-endian platforms.
+
+* **Bit Sets**
+** High-performance, rigid-capacity bit sets with both single-threaded and concurrent implementations.
+** Cache-friendly, flat representations suitable for dense and sparse scenarios.
+** Operate over raw memory or byte stores with strict bounds checking.
+
+* **Bytes Access**
+** Unified abstractions for accessing raw bytes from diverse sources (arrays, `ByteBuffer`s, `String`s, off-heap memory, Chronicle Bytes) with zero allocation.
+** Unified accessors for on-heap arrays, direct buffers, and Chronicle Bytes without hidden copying.
+
+* **Locking**
+** Off-heap read-write-update locking strategies for concurrent access control.
+** Lightweight locks tuned for Chronicle primitives rather than `java.util.concurrent` abstractions.
+
+* **Hash-Quality Evaluation Helpers**
+** Hash-quality evaluation tools in `net.openhft.chronicle.algorithms.measures` for benchmarking and analysis (support tooling, not public API).
+
+== Package Layout
+
+* **Public APIs**
+`net.openhft.chronicle.algo` and subpackages:
+
+* `.bitset`
+* `.bytes`
+* `.hashing`
+* `.locks`
+
+* **Internal-only code**
+`net.openhft.chronicle.algo.internal` and hash-quality tooling in `net.openhft.chronicle.algorithms.measures` are not supported for external use and may change without notice.
+
+== Documentation
+
+Documentation is maintained under `src/main/docs/`:
+
+* Architecture overview: link:src/main/docs/architecture-overview.adoc[]
+* Requirements: link:src/main/docs/project-requirements.adoc[]
+* Decision log: link:src/main/docs/decision-log.adoc[]
+* Testing strategy: link:src/main/docs/testing-strategy.adoc[]
+* Security review: link:src/main/docs/security-review.adoc[]
+
+Additional online resources:
+
+* Javadoc: [https://javadoc.io/doc/net.openhft/chronicle-algorithms](https://javadoc.io/doc/net.openhft/chronicle-algorithms)
+* Maven Central metadata: [https://search.maven.org/artifact/net.openhft/chronicle-algorithms](https://search.maven.org/artifact/net.openhft/chronicle-algorithms)
+
+== Hashing
+
+The library provides a unified API for several non-cryptographic 64-bit hash functions through the `LongHashFunction` class. These implementations are optimised for performance, produce consistent results across platforms (big-endian and little-endian), and generate zero garbage.
+
+=== Supported Algorithms
+
+* **CityHash 1.1** – Based on Google's CityHash algorithm.
+* **MurmurHash3** – Based on the SMHasher suite implementation.
+* **xxHash r39** – Based on Cyan4973's xxHash (r39 revision).
+
+=== Usage Examples
+
+## [source,java,opts=novalidate]
+
+import net.openhft.chronicle.algo.hashing.LongHashFunction;
+
+public class HashingExample {
+public static void main(String[] args) {
+String input = "Hello World";
+
+```
+    // Get an instance of the hash function
+    LongHashFunction xxHash = LongHashFunction.xx_r39();
+
+    // Hash a String
+    long hash = xxHash.hashChars(input);
+
+    // Hash a primitive
+    long longHash = xxHash.hashLong(123456789L);
+
+    // Hash a byte array
+    byte[] data = new byte[] {1, 2, 3, 4, 5};
+    long bytesHash = LongHashFunction.city_1_1().hashBytes(data);
+
+    // Hash off-heap memory (unsafe access)
+    // long address = ...; // unsafe memory address
+    // long length = 64;
+    // long memoryHash = LongHashFunction.murmur_3().hashMemory(address, length);
+}
+```
+
+## }
+
+== Bit Sets
+
+The `net.openhft.chronicle.algo.bitset` package provides `BitSet` implementations that operate over raw memory or byte stores. Unlike `java.util.BitSet`, which has dynamic capacity, Chronicle bit sets have a rigid logical size and throw `IndexOutOfBoundsException` for out-of-bounds access.
+
+=== Implementations
+
+* **SingleThreadedFlatBitSetFrame** – Not thread-safe, optimised for single-threaded access.
+* **ConcurrentFlatBitSetFrame** – Thread-safe implementation using CAS (compare-and-swap) operations for concurrent access.
+* **ReusableBitSet** – Adapter for reusing `BitSet` instances with different underlying storage.
+
+=== Usage Examples
+
+## [source,java,opts=novalidate]
+
+import net.openhft.chronicle.algo.bitset.BitSetFrame;
+import net.openhft.chronicle.algo.bitset.SingleThreadedFlatBitSetFrame;
+import net.openhft.chronicle.algo.bitset.ReusableBitSet;
+import net.openhft.chronicle.algo.bytes.Access;
+import java.nio.ByteBuffer;
+
+// Create a frame definition for 64 bits
+BitSetFrame frame = new SingleThreadedFlatBitSetFrame(64);
+
+// Create a ByteBuffer to back the bit set
+ByteBuffer buffer = ByteBuffer.allocate(8); // 64 bits = 8 bytes
+
+// Create the ReusableBitSet wrapper
+ReusableBitSet bitSet = new ReusableBitSet(frame, Access.checkedByteBufferAccess(), buffer, 0);
+
+// Operations
+bitSet.set(1);
+bitSet.set(3);
+boolean isSet = bitSet.get(1); // true
+long nextSet = bitSet.nextSetBit(0); // 1
+-----------------------------------------
+
+== Bytes Access
+
+The `net.openhft.chronicle.algo.bytes` package provides a unified `Access` and `Accessor` abstraction to read and write primitives from various underlying sources without creating objects. This enables zero-allocation operations across heterogeneous data types.
+
+=== Supported Sources
+
+* **Native memory** – Direct access via `Unsafe`.
+* **ByteBuffer** – Both heap and direct `ByteBuffer`s.
+* **Arrays** – All primitive array types (`byte[]`, `long[]`, `int[]`, etc.).
+* **CharSequence/String** – Efficient access to `String` internals (including compact strings in Java 9+).
+* **BytesStore** – Chronicle Bytes abstractions.
+
+## [source,java,opts=novalidate]
+
+import net.openhft.chronicle.algo.bytes.Access;
+import net.openhft.chronicle.algo.bytes.NativeAccess;
+
+// Native access singleton
+Access<Object> unsafeAccess = NativeAccess.instance();
+long value = unsafeAccess.readLong(object, offset);
+---------------------------------------------------
+
+== Locking
+
+The `net.openhft.chronicle.algo.locks` package provides logic for read-write-update locks that can be stored off-heap or in shared memory.
+
+* **Read lock** – Multiple readers allowed.
+* **Update lock** – Only one update lock allowed, but allows concurrent readers. Can upgrade to write lock.
+* **Write lock** – Exclusive access.
+
+=== Locking Strategy
+
+The primary implementation is `VanillaReadWriteUpdateWithWaitsLockingStrategy`, which supports:
+
+* Lock upgrading (Read -> Update -> Write).
+* Lock downgrading.
+* Waiting strategies.
+
+All locking is implemented through the `Access` abstraction, enabling the lock state to reside in off-heap or shared memory regions.
+
+== Build and Test
+
+Quick commands:
+
+* Full build and tests: `mvn -q clean verify`
+* Standard build and install: `mvn clean install`
+* Module-only build (skip tests): `mvn -pl Chronicle-Algorithms -am -DskipTests install`
+* Run all tests: `mvn test`
+* Run specific test: `mvn test -Dtest=BitSetTest`
+
+=== Building from Source
+
+## [source,bash]
+
+# Clone the repository
+
+git clone [https://github.com/OpenHFT/Chronicle-Algorithms.git](https://github.com/OpenHFT/Chronicle-Algorithms.git)
+cd Chronicle-Algorithms
+
+# Build and run tests
+
+mvn clean install
+
+# Run specific test
+
+## mvn test -Dtest=BitSetTest
+
+== Maven Dependency
+
+To include Chronicle-Algorithms in your project, add the following dependency to your `pom.xml`:
+
+## [source,xml]
+
+<dependency>
+    <groupId>net.openhft</groupId>
+    <artifactId>chronicle-algorithms</artifactId>
+    <version>2.27ea1</version> <!-- Check Maven Central for latest version -->
+</dependency>
+----
+
+NOTE: Check link:[https://search.maven.org/artifact/net.openhft/chronicle-algorithms[Maven](https://search.maven.org/artifact/net.openhft/chronicle-algorithms[Maven) Central] for the latest available version.
+
+== Support
+
+For questions, issues, or feature requests:
+
+* GitHub Issues: [https://github.com/OpenHFT/Chronicle-Algorithms/issues](https://github.com/OpenHFT/Chronicle-Algorithms/issues)
+* Documentation: [https://javadoc.io/doc/net.openhft/chronicle-algorithms](https://javadoc.io/doc/net.openhft/chronicle-algorithms)
+* Chronicle Software: [https://chronicle.software](https://chronicle.software)
+
+== Related Projects
+
+Part of the OpenHFT Chronicle suite:
+
+* link:[https://github.com/OpenHFT/Chronicle-Core[Chronicle-Core](https://github.com/OpenHFT/Chronicle-Core[Chronicle-Core)] – Low-level utilities and memory management.
+* link:[https://github.com/OpenHFT/Chronicle-Bytes[Chronicle-Bytes](https://github.com/OpenHFT/Chronicle-Bytes[Chronicle-Bytes)] – Zero-copy bytes abstractions.
+* link:[https://github.com/OpenHFT/Chronicle-Queue[Chronicle-Queue](https://github.com/OpenHFT/Chronicle-Queue[Chronicle-Queue)] – Persisted low-latency messaging.
+* link:[https://github.com/OpenHFT/Chronicle-Map[Chronicle-Map](https://github.com/OpenHFT/Chronicle-Map[Chronicle-Map)] – Off-heap key-value store.
+
+== License
+
+Copyright 2013-2025 chronicle.software
+
+Licensed under the Apache License, Version 2.0. See the link:LICENSE file for details.

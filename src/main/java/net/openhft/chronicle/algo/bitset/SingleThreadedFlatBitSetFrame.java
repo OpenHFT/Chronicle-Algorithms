@@ -11,9 +11,10 @@ import static net.openhft.chronicle.algo.MemoryUnit.BITS;
 import static net.openhft.chronicle.algo.MemoryUnit.LONGS;
 
 /**
- * This is the SingleThreadedFlatBitSetFrame class implementing BitSetFrame.
- * It provides methods for bit manipulation with input validations.
- * This class is not thread-safe.
+ * Flat bit set frame that performs unchecked memory access via {@link Access} for a single thread.
+ * <p>
+ * All bounds validation is performed up front, but operations themselves assume exclusive access to
+ * the underlying storage and therefore avoid CAS or volatile reads for speed.
  */
 public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
 
@@ -54,8 +55,8 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
     static long lowerBitsIncludingThis(long bitIndex) {
         return ALL_ONES >>> ~bitIndex;
     }
-// conversions
 
+    // conversions
     static long higherBitsExcludingThis(long bitIndex) {
         return ~(ALL_ONES >>> ~bitIndex);
     }
@@ -84,8 +85,8 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
         if (numberOfBits <= 0 || numberOfBits > 64)
             throw new IllegalArgumentException("Illegal number of bits: " + numberOfBits);
     }
-// checks
 
+    // checks
     static boolean checkNotFoundIndex(long fromIndex) {
         if (fromIndex < 0) {
             if (fromIndex == NOT_FOUND)
@@ -1451,7 +1452,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 currentWord = (l >>> trailingZeros) >>> 1;
                 return bitIndex += trailingZeros + 1;
             }
-            for (long i = byteIndex, lim = byteLength; (i += 8) < lim; ) {
+            for (long i = byteIndex; (i += 8) < byteLength; ) {
                 if ((l = access.readLong(handle, i)) != 0) {
                     byteIndex = i;
                     int trailingZeros = numberOfTrailingZeros(l);

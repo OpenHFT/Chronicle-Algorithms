@@ -7,7 +7,10 @@ import net.openhft.chronicle.algo.bytes.Access;
 import net.openhft.chronicle.algo.bytes.ReadAccess;
 
 /**
- * Interface representing a locking strategy for managing locks on resources.
+ * Strategy for managing lock state stored in arbitrary addressable resources.
+ * <p>
+ * Provides low-level operations that are composed by higher-level acquisition strategies to
+ * implement spin locks, read/write locks and other primitives.
  */
 public interface LockingStrategy {
 

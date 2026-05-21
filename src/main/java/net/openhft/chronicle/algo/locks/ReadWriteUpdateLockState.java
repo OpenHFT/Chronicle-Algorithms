@@ -4,11 +4,11 @@
 package net.openhft.chronicle.algo.locks;
 
 /**
- * Interface representing the state and operations of a read-write-update lock.
+ * Mutable view of a read/write/update lock's state.
  * <p>
- * A read lock allows multiple concurrent reads.
- * An update lock allows concurrent reads but not multiple update locks.
- * A write lock is exclusive.
+ * Supports acquiring and releasing the intermediate update state, upgrading from read to update,
+ * then to write, and downgrading in the opposite direction. The associated strategy handles the
+ * low-level storage representation.
  */
 public interface ReadWriteUpdateLockState extends ReadWriteLockState {
 

@@ -1,0 +1,223 @@
+= Project Requirements: Chronicle-Algorithms
+:toc: left
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+:icons: font
+
+== 1. Overview
+
+The **Chronicle-Algorithms** project provides a library of high-performance, zero-allocation algorithms designed for low-latency Java applications. The primary focus is on:
+
+* efficiency and predictable latency,
+* off-heap memory capabilities,
+* minimising Garbage Collection (GC) pressure.
+
+The library encompasses four main functional areas:
+
+. Hashing
+. Bit set operations
+. Memory access (Bytes and related abstractions)
+. Off-heap locking strategies
+
+The remainder of this document captures both a concise requirements matrix (with IDs for traceability) and detailed narrative requirements for each area.
+
+== 2. Functional Requirements
+
+=== 2.1 Summary Matrix
+
+[%autowidth,cols="1,3,2"]
+|===
+| ID | Requirement | Verification
+
+| [[ALGO-FN-001]]ALGO-FN-001
+| Provide high-throughput non-cryptographic hash functions (Murmur3, CityHash, xxHash) for Chronicle data structures.
+| Unit tests, property tests for avalanche and distribution, JMH baselines.
+
+| [[ALGO-FN-002]]ALGO-FN-002
+| Offer flat, cache-friendly bit set implementations suitable for dense and sparse cases.
+| Boundary and unit tests for indices and density extremes; property tests for set and scan operations.
+
+| [[ALGO-FN-003]]ALGO-FN-003
+| Expose byte access abstractions that unify on-heap arrays, direct buffers, and Chronicle Bytes inputs without copies.
+| Compatibility tests across backings; fuzz tests for bounds and offset handling.
+
+| [[ALGO-FN-004]]ALGO-FN-004
+| Supply lightweight lock models tailored to Chronicle data structures without full `java.util.concurrent` overhead.
+| Concurrency unit tests for state transitions and contention; microbenchmarks for hot paths.
+|===
+
+The following sub-sections elaborate these requirements.
+
+=== 2.2 Hashing (details for <<ALGO-FN-001>>)
+
+The system must provide efficient, non-cryptographic hash functions capable of processing various inputs and producing 64-bit hash values.
+
+*Algorithms*
+
+* Must implement **CityHash 1.1**.
+* Must implement **MurmurHash3**.
+* Must implement **xxHash r39**.
+
+*Input support*
+
+* Must support hashing of Java primitives: `long`, `int`, `short`, `char`, `byte`, `boolean`.
+* Must support hashing of:
+** byte arrays (`byte[]`),
+** `ByteBuffer`,
+** `String`,
+** `StringBuilder`.
+* Must support hashing of raw memory addresses (off-heap memory).
+
+*Configuration and semantics*
+
+* Must allow hashing with and without seed values.
+* Must handle endianness (little-endian versus big-endian) correctly, optimising for native byte order where possible (see performance requirement <<ALGO-NF-P-001>>).
+* Hash functions are non-cryptographic and must not be positioned or documented as suitable for integrity or confidentiality guarantees.
+
+=== 2.3 Bit Set Operations (details for <<ALGO-FN-002>>)
+
+The system must provide bit set implementations that operate efficiently on contiguous memory regions, including off-heap memory, and are suitable for dense and sparse cases.
+
+*Core operations*
+
+* Support standard bit manipulations: `set`, `clear`, `flip`, `get`.
+* Support range operations: `setRange`, `clearRange`, `flipRange`.
+* Support search operations: `nextSetBit`, `nextClearBit`, `previousSetBit`, `previousClearBit`.
+* Support continuous block operations: finding and setting or clearing `N` continuous bits.
+
+*Concurrency*
+
+* Must provide a single-threaded implementation (for example, `SingleThreadedFlatBitSetFrame`) for maximum raw performance.
+* Must provide a thread-safe, concurrent implementation (for example, `ConcurrentFlatBitSetFrame`) using atomic operations (CAS).
+
+*Storage model*
+
+* Must abstract storage so that bit sets can reside:
+** on-heap (arrays, `ByteBuffer`), and
+** off-heap (direct `ByteBuffer`, raw pointers).
+* Implementations must be flat and cache-friendly (contiguous machine words) to support predictable scans and low tail latency.
+
+=== 2.4 Memory Access (Bytes) (details for <<ALGO-FN-003>>)
+
+The system must provide a unified abstraction layer for accessing memory to decouple algorithms from the underlying storage mechanism.
+
+*Access API*
+
+* Define generic `ReadAccess` and `WriteAccess` interfaces.
+* Provide concrete implementations for:
+** `NativeAccess` (using `Unsafe` for raw memory and arrays).
+** `ByteBufferAccess` (for `java.nio.ByteBuffer`).
+** `BytesStore`-backed access (integration with Chronicle-Bytes).
+** `RandomDataInput` and `RandomDataOutput`.
+* Support reading and writing of all Java primitive types and unsigned variants at arbitrary offsets.
+
+*Concurrency primitives*
+
+* Support atomic compare-and-swap (CAS) operations for fields used by locks and other concurrency primitives.
+* Respect the off-heap safety constraints in <<ALGO-NF-S-001>> by providing bounds enforcement where appropriate.
+
+=== 2.5 Locking Strategies (details for <<ALGO-FN-004>>)
+
+The system must provide locking mechanisms designed for shared memory and inter-process communication (IPC) scenarios and tuned for Chronicle data structures.
+
+*Lock types*
+
+* *Read-write locks*: allow multiple readers or one writer.
+* *Read-write-update locks*: introduce an "Update" state allowing atomic upgrade from Read to Write while still permitting concurrent readers until commit.
+
+*Features*
+
+* Locks must be implementable over the generic `Access` interface, enabling off-heap or shared-memory lock placement.
+* Must support "wait" strategies (for example, spin, yield, back-off) to handle contention without forcing specific policy into the algorithm layer.
+* Must provide `tryLock` capabilities for non-blocking attempts.
+* Must support lock state upgrades and downgrades:
+** Read -> Update -> Write,
+** Write -> Read (and other safe transitions as defined in the locking strategy).
+
+== 3. Non-Functional Requirements
+
+=== 3.1 Summary Matrix
+
+[%autowidth,cols="1,3,2"]
+|===
+| ID | Requirement | Verification
+
+| [[ALGO-NF-P-001]]ALGO-NF-P-001
+| Performance: minimise allocation; hot-path methods avoid copying and favour predictable branches.
+| JMH regression suite; allocation profiling on representative payloads.
+
+| [[ALGO-NF-S-001]]ALGO-NF-S-001
+| Off-heap safety: enforce bounds checks for any direct or Bytes-backed accessors and reject overflow sizes.
+| Negative and bounds tests; fuzz inputs near overflow; SpotBugs and Checkstyle for unsafe patterns.
+
+| [[ALGO-NF-O-001]]ALGO-NF-O-001
+| Compatibility: maintain API stability within a major version; document any breaking changes.
+| API compatibility review per release; deprecation notices; release notes.
+
+| [[ALGO-NF-O-002]]ALGO-NF-O-002
+| Observability: primitives remain deterministic with no hidden threads or background work; signal misuse explicitly.
+| Unit tests asserting deterministic results and explicit exceptions; static analysis for thread creation or logging in hot paths.
+|===
+
+=== 3.2 Performance (details for <<ALGO-NF-P-001>>)
+
+* Algorithms must generate zero garbage (zero allocation) during steady-state operation.
+* Hash functions must be optimised for native byte order execution and must avoid unnecessary byte swapping.
+* Bit set and locking operations must minimise branches and favour predictable branching where possible.
+* Performance characteristics must be validated with:
+** JMH regression suites over representative payload sizes and distributions.
+** Allocation profiling to confirm zero or near-zero allocation in hot paths.
+
+=== 3.3 Safety and Off-Heap Access (details for <<ALGO-NF-S-001>>)
+
+* Any direct or off-heap accessors must enforce bounds checks at API edges and reject overflow sizes.
+* Unsafe or `Unsafe`-based implementations may assume valid inputs in some internal methods for speed, but public APIs must provide mechanisms for validation.
+* Safety guarantees must be backed by:
+** Negative tests and bounds tests that probe underflow and overflow scenarios.
+** Fuzz tests that exercise offsets and lengths near boundaries.
+** Static analysis (SpotBugs, Checkstyle) to detect unsafe usage patterns.
+
+=== 3.4 Compatibility (details for <<ALGO-NF-O-001>>)
+
+* The library must be modular, with a clear separation between algorithm logic and memory access logic.
+* Must support Java 8 and newer (for example, usage of `java.util.function` and diamond operators).
+* Within a major version:
+** Public APIs should remain stable.
+** Any breaking change must be explicitly documented with:
+*** Deprecation periods where feasible.
+*** Clear notes in release documentation.
+*** Migration hints for downstream users.
+
+=== 3.5 Observability and Determinism (details for <<ALGO-NF-O-002>>)
+
+* Algorithms and primitives must be deterministic:
+** No hidden background threads.
+** No implicit scheduling or asynchronous tasks started from hot paths.
+* Hot paths must avoid logging; any logging present must be clearly outside latency-critical sections.
+* Misuse must be surfaced through explicit exceptions (for example, bounds violations) rather than silent coercion or truncation.
+* Metrics or telemetry concerns are delegated to upstream Chronicle components; APIs should, however, be straightforward to wrap with metrics or tracing.
+
+== 4. Testing and Validation Expectations
+
+These expectations apply across all functional and non-functional requirements.
+
+* Keep Checkstyle and SpotBugs clean; justify any suppressions inline and tie them to specific requirements where relevant.
+* Prefer deterministic unit and property tests for:
+** Boundary indices (start, end, and out-of-range).
+** Empty inputs and minimal sizes.
+** Dense and sparse bit set cases.
+** Hashing avalanche and distribution characteristics.
+* Maintain performance baselines for representative workloads when changing algorithms; capture any material regression and document trade-offs.
+* Log seeds on property test failures to aid exact reproduction of issues.
+
+== 5. Observability Expectations (expanded guidance for <<ALGO-NF-O-002>>)
+
+* No background services or implicit threads may be created by this library without explicit opt-in API calls.
+* Behaviour must remain deterministic across runs for the same inputs, excluding documented sources of non-determinism (for example, native CPU features).
+* Signal misuse via:
+** Clear, specific exception types and messages.
+** Avoiding silent data truncation, wrap-around, or out-of-range coercion unless explicitly documented.
+* Leave metrics and telemetry emission to upstream components, but:
+** Keep APIs simple to decorate with metrics, tracing, or logging.
+** Avoid patterns that make wrapping difficult (for example, extensive use of statics with hidden state).

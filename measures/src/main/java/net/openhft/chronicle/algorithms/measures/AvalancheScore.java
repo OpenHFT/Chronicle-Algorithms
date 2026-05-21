@@ -9,16 +9,18 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * Created by peter on 22/08/15.
+ * Measures the avalanche behaviour of a hash function using a SMHasher inspired workload.
+ * <p>
+ * The test repeatedly flips individual input bits and observes how close the output comes to the
+ * ideal 50/50 bit flip distribution. A lower returned value indicates better avalanche properties.
  */
 public class AvalancheScore {
     /**
-     * Based on the SMHasher Avalanche test
-     * <p>
-     * search for biases bits.
-     * when flipping a single bit of the input, the output should have a 49% - 51% chance of flipping. Some randomness is expected.
+     * Runs the avalanche test and reports the 99th percentile drift from the ideal 50 percent flip
+     * rate.
      *
-     * @return the worst flip bias.
+     * @param wrapper implementation used to hash raw memory
+     * @return 99th percentile deviation from the ideal bit flip percentage
      */
     public static double score(AddressWrapper wrapper) {
         int runs = 1000;

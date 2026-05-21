@@ -6,7 +6,7 @@ package net.openhft.chronicle.algo.locks;
 import net.openhft.chronicle.algo.bytes.Access;
 
 /**
- * Interface representing an acquisition strategy for locking mechanisms.
+ * Pluggable strategy for acquiring locks using a {@link LockingStrategy} and {@link Access}.
  *
  * @param <S> the type of the locking strategy
  * @param <E> the type of exception that might be thrown during the acquisition process

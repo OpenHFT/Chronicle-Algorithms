@@ -1,0 +1,30 @@
+= Chronicle-Algorithms Testing Strategy
+:toc:
+:sectnums:
+:lang: en-GB
+:source-highlighter: rouge
+
+== Scope
+Testing guidance for hashing, bit set, byte access, and lock primitives in Chronicle-Algorithms.
+
+== Unit and Property Testing
+- Hashing: verify avalanche/distribution properties with randomised inputs and seeded property tests.
+- Bit sets: cover empty, dense, and sparse cases; test boundary indices and concurrency assumptions where applicable.
+- Bytes accessors: validate bounds checks, slice/offset handling, and behaviour with on-heap vs direct vs Chronicle Bytes backings.
+- Locks: assert state transitions and contention paths without relying on `java.util.concurrent` locks.
+
+== Fuzz and Negative Testing
+- Feed random and malformed inputs through hashing and bounds-sensitive paths to catch overflows and index errors.
+- Include adversarial cases (large lengths, near-overflow sizes) for off-heap friendly accessors.
+
+== Performance Regression
+- Maintain microbenchmarks (e.g., JMH) for hot paths: hash computation on typical payload sizes, bit set set/get/scan operations.
+- Track baseline metrics; flag regressions when latency/throughput deviates beyond agreed thresholds.
+
+== Static Analysis and Checks
+- Keep Checkstyle and SpotBugs clean; document any suppression rationale inline.
+- Prefer deterministic tests with fixed seeds; log seeds on failure when randomness is involved.
+
+== Observability Expectations
+- No hidden threads or background tasks in tests; keep measurements isolated.
+- Fail fast on misuse (bounds violations) rather than silently truncating or wrapping inputs.
