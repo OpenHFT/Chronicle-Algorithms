@@ -24,6 +24,9 @@
         <license.year>2013-2026</license.year>
         <jacoco.line.coverage>0.56</jacoco.line.coverage>
         <jacoco.branch.coverage>0.35</jacoco.branch.coverage>
+        <!-- Released java-parent-pom:2026.0 -> root-parent-pom:2026.0 defines neither
+             property. Keep these defaults until a published parent is adopted;
+             see src/main/docs/testing-strategy.adoc for the removal checks. -->
         <chronicle.test.forkCount>8</chronicle.test.forkCount>
         <chronicle.test.reuseForks>true</chronicle.test.reuseForks>
     </properties>

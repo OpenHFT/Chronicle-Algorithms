@@ -13,6 +13,43 @@ Testing guidance for hashing, bit set, byte access, and lock primitives in Chron
 - Bytes accessors: validate bounds checks, slice/offset handling, and behaviour with on-heap vs direct vs Chronicle Bytes backings.
 - Locks: assert state transitions and contention paths without relying on `java.util.concurrent` locks.
 
+== Worker Defaults and Parent Adoption
+
+The local `chronicle.test.forkCount` and `chronicle.test.reuseForks` defaults
+are required by this proposal's named Surefire execution. Algorithms inherits
+the published `net.openhft:java-parent-pom:2026.0`, which inherits
+`net.openhft:root-parent-pom:2026.0`. Neither released POM defines these
+properties. The empty parent `relativePath` selects the repository artifact;
+changes in a neighbouring parent checkout do not change this inheritance.
+
+https://github.com/OpenHFT/OpenHFT/pull/331[The parent-defaults proposal]
+does not reach consumers until publication and adoption.
+https://github.com/ChronicleSoftware/RootPom/pull/413[The merged source-goal change]
+addresses source attachment, not these worker properties.
+Removing the two local values while retaining parent `2026.0` leaves
+`${chronicle.test.forkCount}` and `${chronicle.test.reuseForks}` unresolved in
+the effective `default-test` execution.
+
+Capture the model used by Maven with:
+
+[source,shell]
+----
+mvn help:effective-pom -Doutput=target/effective-pom.xml
+----
+
+Remove the local defaults only after the following sequence:
+
+. Publish a root parent containing the intended worker properties.
+. Publish a Java parent that inherits that root parent, then explicitly update
+  Algorithms' parent version.
+. Compare effective Surefire configuration before and after removal under the
+  lifecycle, named execution, `-Ptest-serial` and targeted `-Dtest` routes.
+  Both values must resolve to the intended policy without child defaults.
+. Verify complete testcase inventories and the existing source/artifact checks.
+
+Parent adoption is a separate change. This explanation retains the released
+parent coordinates, worker allocation and current test selections.
+
 == Fuzz and Negative Testing
 - Feed random and malformed inputs through hashing and bounds-sensitive paths to catch overflows and index errors.
 - Include adversarial cases (large lengths, near-overflow sizes) for off-heap friendly accessors.
