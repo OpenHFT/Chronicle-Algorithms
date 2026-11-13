@@ -24,11 +24,6 @@
         <license.year>2013-2026</license.year>
         <jacoco.line.coverage>0.56</jacoco.line.coverage>
         <jacoco.branch.coverage>0.35</jacoco.branch.coverage>
-        <!-- Released java-parent-pom:2026.0 -> root-parent-pom:2026.0 defines neither
-             property. Keep these defaults until a published parent is adopted;
-             see src/main/docs/testing-strategy.adoc for the removal checks. -->
-        <chronicle.test.forkCount>8</chronicle.test.forkCount>
-        <chronicle.test.reuseForks>true</chronicle.test.reuseForks>
     </properties>
 
     <dependencyManagement>
@@ -160,24 +155,6 @@
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>none</phase>
-                    </execution>
-                    <!-- The package lifecycle has already generated sources; avoid repeating its earlier phases. -->
-                    <execution>
-                        <id>attach-sources-no-fork</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
