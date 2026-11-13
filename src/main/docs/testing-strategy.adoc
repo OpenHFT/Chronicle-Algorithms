@@ -13,6 +13,31 @@ Testing guidance for hashing, bit set, byte access, and lock primitives in Chron
 - Bytes accessors: validate bounds checks, slice/offset handling, and behaviour with on-heap vs direct vs Chronicle Bytes backings.
 - Locks: assert state transitions and contention paths without relying on `java.util.concurrent` locks.
 
+== Worker Defaults and Parent Inheritance
+
+Algorithms inherits `net.openhft:java-parent-pom:2026.1`, which inherits
+`net.openhft:root-parent-pom:2026.1`. The root parent supplies
+`chronicle.test.forkCount=8` and `chronicle.test.reuseForks=true`; the Java
+parent attaches sources with `jar-no-fork`. These settings are not duplicated
+in the child POM.
+
+The local `chronicle-eight-default` profile applies the worker properties to
+Surefire's `default-test` execution when `-Dtest` is absent. Use `-T1`, since
+the worker count is per execution rather than a reactor-wide limit.
+Targeted `-Dtest=...` runs and `-Ptest-serial` retain one fresh worker.
+Bare `surefire:test` uses the plugin-level one/fresh configuration; use the
+lifecycle or `surefire:test@default-test` to select the named execution.
+
+Capture the model used by Maven with:
+
+[source,shell]
+----
+mvn help:effective-pom -Doutput=target/effective-pom.xml
+----
+
+When updating a parent, compare the effective lifecycle, named, serial and
+targeted executions, and verify the test inventory and source attachment.
+
 == Fuzz and Negative Testing
 - Feed random and malformed inputs through hashing and bounds-sensitive paths to catch overflows and index errors.
 - Include adversarial cases (large lengths, near-overflow sizes) for off-heap friendly accessors.
