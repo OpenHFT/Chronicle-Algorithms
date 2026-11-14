@@ -39,7 +39,7 @@ public class MaskHashScore {
                 for (int i = 0; i < init.length; i++)
                     init[i] &= init2[i];
             }
-            wrapper.setAddress(b.address(0), b.realCapacity());
+            wrapper.setAddress(b.addressForWrite(0), b.realCapacity());
 
             b.clear();
             b.write(init);
