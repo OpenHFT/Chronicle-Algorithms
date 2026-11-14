@@ -84,16 +84,16 @@ public class MainBytes {
 
     @Benchmark
     public long city11Hash() {
-        return city_1_1.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
+        return city_1_1.hashMemory(bytes.addressForRead(bytes.readPosition()), bytes.readRemaining());
     }
 
     @Benchmark
     public long murmur3Hash() {
-        return murmur_3.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
+        return murmur_3.hashMemory(bytes.addressForRead(bytes.readPosition()), bytes.readRemaining());
     }
 
     @Benchmark
     public long xx39Hash() {
-        return xx_r39.hashMemory(bytes.address(bytes.readPosition()), bytes.readRemaining());
+        return xx_r39.hashMemory(bytes.addressForRead(bytes.readPosition()), bytes.readRemaining());
     }
 }
