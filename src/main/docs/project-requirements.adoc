@@ -200,6 +200,17 @@ The system must provide locking mechanisms designed for shared memory and inter-
 
 == 4. Testing and Validation Expectations
 
+=== Orthogonality benchmark buffer ownership (FIX-292)
+
+Each orthogonality sample owns its native input buffer and releases it after hashing,
+including when the wrapper rejects the address or throws during hashing.
+The pairwise penalty remains unchanged: a pair with Hamming distance below 18 adds
+`1L << (17 - distance)` to the sample score.
+Run the benchmark module's regression tests and packaging with `mvn -f measures/pom.xml clean verify`.
+`OrthogonalBufferReleaseTest` checks exception cleanup, successful bit flips and the penalty calculation.
+
+=== General expectations
+
 These expectations apply across all functional and non-functional requirements.
 
 * Keep Checkstyle and SpotBugs clean; justify any suppressions inline and tie them to specific requirements where relevant.
