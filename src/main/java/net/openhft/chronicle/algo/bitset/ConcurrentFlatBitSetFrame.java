@@ -664,7 +664,7 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
 
     @Override
     public <T> long cardinality(Access<T> access, T handle, long offset) {
-        long count = Long.bitCount(access.readVolatileLong(handle, 0)); // Count bits in the first long
+        long count = Long.bitCount(access.readVolatileLong(handle, offset)); // Count bits in the first long
         for (long i = 1; i < longLength; i++) {
             count += Long.bitCount(readLong(access, handle, offset, i)); // Sum the count of bits in each long
         }
@@ -1066,34 +1066,30 @@ public final class ConcurrentFlatBitSetFrame implements BitSetFrame {
         @Override
         public <T> long next(Access<T> access, T handle, long offset) {
             long bitIndex = this.bitIndex;
-            if (bitIndex >= 0) {
-                long i = byteIndex;
-                long l = access.readVolatileLong(handle, i) >>> bitIndex;
-                if (l != 0) {
-                    int trailingZeros = numberOfTrailingZeros(l);
-                    long index = bitIndex + trailingZeros;
-                    if (((this.bitIndex = index + 1) & 63) == 0) {
-                        if ((byteIndex = i + 8) == byteLength)
-                            this.bitIndex = -1;
-                    }
-                    return index;
-                }
-                for (long lim = byteLength; (i += 8) < lim; ) {
-                    if ((l = access.readLong(handle, i)) != 0) {
-                        int trailingZeros = numberOfTrailingZeros(l);
-                        long index = (i << 3) + trailingZeros;
-                        if (((this.bitIndex = index + 1) & 63) != 0) {
-                            byteIndex = i;
-                        } else {
-                            if ((byteIndex = i + 8) == lim)
-                                this.bitIndex = -1;
-                        }
-                        return index;
-                    }
-                }
+            if (bitIndex < 0)
+                return -1;
+            long i = byteIndex;
+            long l = access.readVolatileLong(handle, offset + i) >>> bitIndex;
+            if (l != 0)
+                return found(i, bitIndex + numberOfTrailingZeros(l));
+            for (; (i += 8) < byteLength; ) {
+                l = access.readLong(handle, offset + i);
+                if (l != 0)
+                    return found(i, (i << 3) + numberOfTrailingZeros(l));
             }
             this.bitIndex = -1;
             return -1;
+        }
+
+        private long found(long wordByteIndex, long index) {
+            byteIndex = wordByteIndex;
+            bitIndex = index + 1;
+            if ((bitIndex & 63) == 0) {
+                byteIndex += 8;
+                if (byteIndex == byteLength)
+                    bitIndex = -1;
+            }
+            return index;
         }
     }
 }
