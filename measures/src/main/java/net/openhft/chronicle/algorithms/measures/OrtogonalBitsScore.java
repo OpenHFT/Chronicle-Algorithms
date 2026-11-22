@@ -27,12 +27,27 @@ public class OrtogonalBitsScore {
         long[] times = new long[runs];
         for (int t = 0; t < runs; t++) {
             long[] hashs = new long[8192];
-            byte[] init = new byte[hashs.length / 8];
-            NativeBytes b = NativeBytes.nativeBytes(init.length);
+            times[t] = sample(wrapper, t % 2 == 0, hashs);
+            scores[t] = penalty(hashs);
+        }
+        Arrays.sort(scores);
+        Arrays.sort(times);
+        long score = scores[runs * 99 / 100];
+        long time = times[runs * 99 / 100];
+        System.out.println("Orthogonal bits: 99%tile score: " + score);
+        System.out.printf("Speed: The 99%%tile for latency was %.3f us%n", time / 1e3);
+        return score;
+    }
+
+    // One sample owns its native buffer, including when a wrapper rejects it or fails to hash.
+    static long sample(AddressWrapper wrapper, boolean lowBitCount, long[] hashs) {
+        byte[] init = new byte[hashs.length / 8];
+        NativeBytes<?> b = NativeBytes.nativeBytes(init.length);
+        try {
             SecureRandom rand = new SecureRandom();
             rand.nextBytes(init);
             // low bit count test
-            if (t % 2 == 0) {
+            if (lowBitCount) {
                 byte[] init2 = new byte[hashs.length / 8];
                 rand.nextBytes(init2);
                 for (int i = 0; i < init.length; i++)
@@ -42,6 +57,7 @@ public class OrtogonalBitsScore {
 
             b.clear();
             b.write(init);
+            long time = 0;
             for (int i = 0; i < hashs.length; i++) {
                 int index = i >> 6 << 3;
                 long prev = b.readLong(index);
@@ -49,27 +65,24 @@ public class OrtogonalBitsScore {
                 b.readLimit(hashs.length / 8);
                 long start = System.nanoTime();
                 hashs[i] = wrapper.hash();
-                times[t] = System.nanoTime() - start;
+                time = System.nanoTime() - start;
                 b.writeLong(index, prev);
             }
-            long score = 0;
-            for (int i = 0; i < hashs.length - 1; i++)
-                for (int j = i + 1; j < hashs.length; j++) {
-                    long diff = hashs[j] ^ hashs[i];
-                    int diffBC = Long.bitCount(diff);
-                    if (diffBC < 18) {
-                        long d = 1L << (17 - diffBC);
-                        score += d;
-                    }
-                }
-            scores[t] = score;
+            return time;
+        } finally {
+            b.releaseLast();
         }
-        Arrays.sort(scores);
-        Arrays.sort(times);
-        long score = scores[runs * 99 / 100];
-        long time = times[runs * 99 / 100];
-        System.out.println("Orthogonal bits: 99%tile score: " + score);
-        System.out.printf("Speed: The 99%%tile for latency was %.3f us%n", time / 1e3);
+    }
+
+    static long penalty(long[] hashs) {
+        long score = 0;
+        for (int i = 0; i < hashs.length - 1; i++) {
+            for (int j = i + 1; j < hashs.length; j++) {
+                int diffBC = Long.bitCount(hashs[j] ^ hashs[i]);
+                if (diffBC < 18)
+                    score += 1L << (17 - diffBC);
+            }
+        }
         return score;
     }
 }
