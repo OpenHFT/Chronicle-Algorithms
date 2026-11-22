@@ -200,6 +200,17 @@ The system must provide locking mechanisms designed for shared memory and inter-
 
 == 4. Testing and Validation Expectations
 
+=== Orthogonality benchmark buffer ownership (FIX-292)
+
+Each orthogonality sample owns its native input buffer and releases it after hashing,
+including when the wrapper rejects the address or throws during hashing.
+The pairwise penalty remains unchanged: a pair with Hamming distance below 18 adds
+`1L << (17 - distance)` to the sample score.
+Run the benchmark module's regression tests and packaging with `mvn -f measures/pom.xml clean verify`.
+`OrthogonalBufferReleaseTest` checks exception cleanup, successful bit flips and the penalty calculation.
+
+=== General expectations
+
 These expectations apply across all functional and non-functional requirements.
 
 * Keep Checkstyle and SpotBugs clean; justify any suppressions inline and tie them to specific requirements where relevant.
@@ -220,4 +231,10 @@ These expectations apply across all functional and non-functional requirements.
 ** Avoiding silent data truncation, wrap-around, or out-of-range coercion unless explicitly documented.
 * Leave metrics and telemetry emission to upstream components, but:
 ** Keep APIs simple to decorate with metrics, tracing, or logging.
+
+=== Bit set frame offsets (FIX-292)
+
+Cardinality and set-bit iteration honour the byte offset supplied to the frame.
+Returned bit indices are relative to the frame, including after crossing a word
+boundary or resetting the iterator. Neither operation reads the surrounding bytes.
 ** Avoid patterns that make wrapping difficult (for example, extensive use of statics with hidden state).
