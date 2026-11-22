@@ -220,4 +220,10 @@ These expectations apply across all functional and non-functional requirements.
 ** Avoiding silent data truncation, wrap-around, or out-of-range coercion unless explicitly documented.
 * Leave metrics and telemetry emission to upstream components, but:
 ** Keep APIs simple to decorate with metrics, tracing, or logging.
+
+=== Bit set frame offsets (FIX-292)
+
+Cardinality and set-bit iteration honour the byte offset supplied to the frame.
+Returned bit indices are relative to the frame, including after crossing a word
+boundary or resetting the iterator. Neither operation reads the surrounding bytes.
 ** Avoid patterns that make wrapping difficult (for example, extensive use of statics with hidden state).

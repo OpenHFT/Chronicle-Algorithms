@@ -1453,7 +1453,7 @@ public final class SingleThreadedFlatBitSetFrame implements BitSetFrame {
                 return bitIndex += trailingZeros + 1;
             }
             for (long i = byteIndex; (i += 8) < byteLength; ) {
-                if ((l = access.readLong(handle, i)) != 0) {
+                if ((l = access.readLong(handle, offset + i)) != 0) {
                     byteIndex = i;
                     int trailingZeros = numberOfTrailingZeros(l);
                     currentWord = (l >>> trailingZeros) >>> 1;
